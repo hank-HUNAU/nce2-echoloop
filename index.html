@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NCE2 Loop · 精听跟读复述复习</title>
+<style>
+:root{--acc:#4C6EF5;--ok:#12B886;--bad:#E03131;--warn:#F59F00;--ink:#212529;--sub:#868E96;
+ --line:#E9ECEF;--card:#fff;--bg:#F5F6F8;--stage1:#4C6EF5;--stage2:#9C36B5;--stage3:#1971C2;--stage4:#12B886}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+ background:var(--bg);color:var(--ink);font-size:16px;line-height:1.6;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+.wrap{max-width:880px;margin:0 auto;padding:14px 14px 20px}
+h1{font-size:20px;margin:0}
+h2{font-size:16px;margin:0 0 10px}
+.sec{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-top:14px}
+.tip{color:var(--sub);font-size:13px;margin:0 0 10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:12px;
+ padding:12px 20px;font-size:15px;font-family:inherit;cursor:pointer;background:var(--acc);color:#fff;min-height:46px}
+.btn.g{background:#F1F3F5;color:var(--ink);border:1px solid var(--line)}
+.btn.ok{background:var(--ok)} .btn.rd{background:var(--bad)}
+.btn.sm{padding:7px 12px;min-height:38px;font-size:13px;border-radius:9px}
+.btn:disabled{opacity:.45;cursor:default}
+.pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;background:#EDF2FF;color:#364FC7}
+.tag{display:inline-block;border-radius:6px;padding:0 6px;font-size:11px;background:#EDF2FF;color:#364FC7;margin-right:4px}
+.tag.w{background:#E6FCF5;color:#087F5B}.tag.v{background:#F3F0FF;color:#6741D9}.tag.d{background:#FFF9DB;color:#E67700}
+.item{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px dashed var(--line)}
+.item:last-child{border-bottom:0}
+.item .tt{flex:1;min-width:0}
+.item .meta{font-size:12px;color:var(--sub)}
+.play{flex:0 0 42px;width:42px;height:42px;border-radius:50%;border:0;background:var(--acc);color:#fff;font-size:15px;cursor:pointer}
+.play.on{background:var(--bad)}
+.ck{width:22px;height:22px;accent-color:var(--ok)}
+.late{color:var(--bad);font-weight:600}
+.empty{color:var(--sub);text-align:center;padding:16px 0;font-size:14px}
+/* 课程网格 */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px}
+.cell{border:1px solid var(--line);border-radius:12px;background:#fff;text-align:center;padding:8px 2px;cursor:pointer;position:relative}
+.cell b{font-size:15px;display:block}
+.cell span{font-size:10px;color:var(--sub);display:block}
+.cell.done{border-color:var(--ok);background:#F0FFF9}
+.cell.doing{border-color:var(--acc);background:#F0F4FF}
+.cell.due::after{content:"";position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--bad)}
+/* 底部导航 */
+nav.tabs{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
+ display:flex;z-index:30;padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs a{flex:1;text-align:center;padding:9px 0 7px;font-size:11px;color:var(--sub);text-decoration:none}
+nav.tabs a svg{width:22px;height:22px;display:block;margin:0 auto 2px}
+nav.tabs a.on{color:var(--acc)}
+/* 句子列表 */
+.sent{display:flex;align-items:flex-start;gap:9px;padding:9px 2px;border-bottom:1px dashed var(--line)}
+.sent.cur{background:#F0F4FF;border-radius:10px}
+.sent .en{font-family:Georgia,"Times New Roman",serif}
+.sent .zh{color:var(--sub);font-size:14px}
+.sent .idx{flex:0 0 26px;color:var(--sub);font-size:12px;padding-top:3px}
+.star{background:none;border:0;font-size:19px;color:#CED4DA;cursor:pointer;padding:2px;min-width:34px;min-height:38px}
+.star.on{color:var(--warn)}
+.detail{background:#F8F9FC;border-radius:12px;padding:10px 12px;margin:6px 0;font-size:14px}
+.detail .ch{display:inline-block;background:#fff;border:1px solid var(--line);border-radius:8px;padding:3px 9px;margin:2px 3px;font-size:13px}
+.detail .ch i{font-style:normal;color:var(--sub);font-size:11px;margin-left:4px}
+.blur{filter:blur(7px);transition:filter .3s;user-select:none}
+/* 阶段条 */
+.stepper{display:flex;gap:6px;margin:12px 0}
+.stepper .st{flex:1;text-align:center;font-size:12px;padding:8px 2px;border-radius:10px;background:#F1F3F5;color:var(--sub)}
+.stepper .st.on{color:#fff;font-weight:600}
+.stepper .st.ok{background:#E6FCF5;color:#087F5B}
+.stepper .st.s0.on{background:var(--stage1)}.stepper .st.s1.on{background:var(--stage2)}
+.stepper .st.s2.on{background:var(--stage3)}.stepper .st.s3.on{background:var(--stage4)}
+/* 跟读台 */
+.shadow{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:12px}
+.shadow .big{font-size:19px;font-family:Georgia,serif;margin:8px 0}
+.shadow .cnt{display:flex;gap:6px;align-items:center;margin:10px 0;flex-wrap:wrap}
+.rec{width:64px;height:64px;border-radius:50%;border:0;background:var(--rd,#E03131);color:#fff;font-size:24px;cursor:pointer}
+.rec.recording{animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.55}}
+.ab{display:flex;gap:8px;margin:10px 0}
+.stars{font-size:24px;cursor:pointer;user-select:none;letter-spacing:4px}
+.stars i{font-style:normal;color:#CED4DA}.stars i.on{color:var(--warn)}
+.grade{font-size:13px;margin-top:6px}
+.bar{height:8px;border-radius:999px;background:#EDF2F7;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok)}
+.card{perspective:900px;height:190px;margin:10px 0}
+.card .in{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .45s;cursor:pointer}
+.card.flip .in{transform:rotateY(180deg)}
+.card .f,.card .b{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;border:1px solid var(--line);
+ display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;text-align:center}
+.card .f{background:#fff}.card .b{background:#F0F4FF;transform:rotateY(180deg)}
+.ring{width:110px}
+.ring text{font-weight:700}
+.foot{color:var(--sub);font-size:12px;text-align:center;margin-top:14px}
+audio{width:100%}
+@media print{nav.tabs{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<nav class="tabs" id="tabs"></nav>
+<audio id="au" preload="none"></audio>
+
+<script>
+/* ================= 状态与存储层 ================= */
+const LS='el2_';
+const OFFSETS=[0.25,1,2,4,7,14,28];          // 7 轮复习（天）
+const STAGES=['精听','跟读','盲听','复述'];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pad=n=>(n<10?'0':'')+n;
+const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());};
+const fmtDate=s=>{if(!s)return'';const p=String(s).slice(0,10).split('-');return (+p[1])+'月'+(+p[2])+'日';};
+
+const store={
+  get(){ try{return JSON.parse(localStorage.getItem(LS+'progress')||'{}');}catch(e){return{};} },
+  set(p){ localStorage.setItem(LS+'progress',JSON.stringify(p)); },
+  getHard(){ try{return JSON.parse(localStorage.getItem(LS+'hard')||'[]');}catch(e){return[];} },
+  setHard(a){ localStorage.setItem(LS+'hard',JSON.stringify(a)); },
+  getStats(){ try{return JSON.parse(localStorage.getItem(LS+'stats')||'{}');}catch(e){return{};} },
+  setStats(s){ localStorage.setItem(LS+'stats',JSON.stringify(s)); },
+};
+let PROG=store.get();
+let STATS=Object.assign({playSec:0,shadowN:0,recN:0,days:{}},store.getStats());
+function saveProgress(){ store.set(PROG); }
+function saveStats(){ store.setStats(STATS); }
+function prog(no){ if(!PROG[no]) PROG[no]={stage:0,si:0,listened:{},shadow:{},hard:[],firstLearnAt:0,reviews:0,lastReviewAt:0,blindDone:false,retellDone:false}; return PROG[no]; }
+
+/* 复习调度：nextDue(no) → 毫秒时间戳；dueRound(no) → 第几轮(1-7) 或 0 */
+function nextDue(p){
+  if(!p.firstLearnAt||p.reviews>=OFFSETS.length) return 0;
+  return p.firstLearnAt+OFFSETS[p.reviews]*864e5;
+}
+function dueList(){
+  const now=Date.now(),out=[];
+  for(const k in PROG){ const p=PROG[k];
+    if(!p.firstLearnAt) continue;
+    const nd=nextDue(p);
+    if(nd&&now>=nd) out.push({no:+k,round:p.reviews+1,due:nd,overdueDays:Math.floor((now-nd)/864e5)});
+  }
+  out.sort((a,b)=>a.due-b.due); return out;
+}
+
+/* 统计 */
+function statDay(sec){ const d=todayStr(); STATS.playSec=(STATS.playSec||0)+sec;
+  STATS.days[d]=(STATS.days[d]||0)+sec; saveStats(); }
+
+/* ================= 录音（IndexedDB：每句保留最新一条） ================= */
+let IDB=null;
+function idb(){ if(IDB) return Promise.resolve(IDB);
+  return new Promise((res,rej)=>{
+    const rq=indexedDB.open('el2rec',1);
+    rq.onupgradeneeded=()=>rq.result.createObjectStore('r');
+    rq.onsuccess=()=>{IDB=rq.result;res(IDB);}; rq.onerror=()=>rej(rq.error);
+  });
+}
+async function recSave(key,blob){ try{ const db=await idb();
+  await new Promise((res,rej)=>{const tx=db.transaction('r','readwrite');tx.objectStore('r').put(blob,key);tx.oncomplete=res;tx.onerror=rej;});
+}catch(e){} }
+async function recLoad(key){ try{ const db=await idb();
+  return await new Promise((res)=>{const tx=db.transaction('r','readonly');const q=tx.objectStore('r').get(key);
+    q.onsuccess=()=>res(q.result||null); q.onerror=()=>res(null);});
+}catch(e){ return null; } }
+
+/* ================= 音频引擎 ================= */
+const AU=$('#au'); let segStop=null,playT0=0;
+function playSeg(t,t2,onend){
+  AU.src=CUR.audio; AU.currentTime=t; AU.play();
+  playT0=Date.now();
+  if(segStop) AU.removeEventListener('timeupdate',segStop);
+  segStop=()=>{ if(AU.currentTime>=t2){ AU.pause(); AU.removeEventListener('timeupdate',segStop);
+    statDay((Date.now()-playT0)/1000); if(onend)onend(); } };
+  AU.addEventListener('timeupdate',segStop);
+}
+function playAll(onend){ AU.src=CUR.audio; AU.currentTime=0; AU.play(); playT0=Date.now();
+  if(segStop) AU.removeEventListener('timeupdate',segStop);
+  segStop=()=>{ if(AU.ended){ AU.removeEventListener('timeupdate',segStop); statDay((Date.now()-playT0)/1000); if(onend)onend(); } };
+  AU.addEventListener('timeupdate',segStop);
+}
+
+/* ================= 数据加载 ================= */
+const DATACACHE={};
+async function loadLesson(no){
+  if(DATACACHE[no]) return DATACACHE[no];
+  const r=await fetch('data/L'+String(no).padStart(2,'0')+'.json');
+  DATACACHE[no]=await r.json(); return DATACACHE[no];
+}
+
+/* ================= 路由 ================= */
+let CUR={no:0,data:null,stage:0,mode:'learn'};
+const TABS=[
+  ['#/home','首页','<path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"/>'],
+  ['#/hard','难句','<path d="M12 21s-7-4.6-9.5-8.5C.6 9.5 2.4 6 5.7 6c2 0 3.4 1.1 4.3 2.6h4c.9-1.5 2.3-2.6 4.3-2.6 3.3 0 5.1 3.5 3.2 6.5C19 16.4 12 21 12 21z"/>'],
+  ['#/cards','卡片','<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/>'],
+  ['#/stats','统计','<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'],
+];
+function nav(){ const h=location.hash||'#/home';
+  $('#tabs').innerHTML=TABS.map(t=>{const on=h.startsWith(t[0])?' class="on"':'';
+    return `<a href="${t[0]}"${on}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${t[2]}</svg>${t[1]}</a>`;}).join('');
+}
+async function router(){
+  nav();
+  const h=location.hash||'#/home';
+  if(h.startsWith('#/lesson/')){
+    const m=h.match(/#\/lesson\/(\d+)(\?m=rev)?/);
+    CUR.mode=m[2]?'rev':'learn';
+    const no=+m[1];
+    if(CUR.no!==no||!CUR.data){ CUR.no=no; CUR.data=await loadLesson(no); }
+    renderLesson();
+  }else if(h.startsWith('#/hard')) renderHard();
+  else if(h.startsWith('#/cards')) renderCards();
+  else if(h.startsWith('#/stats')) renderStats();
+  else renderHome();
+}
+window.addEventListener('hashchange',router);
+
+/* ================= 首页 ================= */
+function renderHome(){
+  const due=dueList();
+  const total=96, learned=Object.keys(PROG).filter(k=>PROG[k].firstLearnAt).length;
+  const done=Object.keys(PROG).filter(k=>PROG[k].reviews>=OFFSETS.length).length;
+  let cont=0,best=-1;
+  for(const k in PROG){ const p=PROG[k]; const sc=p.stage*100+(p.si||0); if(sc>best){best=sc;cont=+k;} }
+  const lastTouched=Object.keys(PROG).map(Number).sort((a,b)=>b-a)[0]||1;
+  let h=`<h1>NCE2 Loop</h1>
+  <div class="sec"><h2>今天要处理</h2><div class="tip">间隔复习 7 轮自动排程：6小时 → 1天 → 2天 → 4天 → 7天 → 14天 → 28天</div>`;
+  if(due.length){
+    h+=due.map(d=>`<div class="item"><div class="tt"><div class="en">L${d.no} · 第 ${d.round} 轮复习</div>
+      <div class="meta">${d.overdueDays>0?`<span class="late">已逾期 ${d.overdueDays} 天</span>`:'今日到期'} · 盲听+难句补练+复述</div></div>
+      <button class="btn sm" data-go="#/lesson/${d.no}?m=rev">开始复习</button></div>`).join('');
+  }else{
+    h+=`<div class="empty">今天没有到期的复习，${learned?'学一课新的吧':'从 L01 开始吧'}</div>`;
+  }
+  h+=`</div>
+  <div class="sec"><h2>继续学习</h2>
+    <div class="item"><div class="tt"><div class="en">L${cont||1}${cont?'':'（未开始）'}</div>
+      <div class="meta">已学 ${learned}/96 · 通关 ${done}/96</div></div>
+      <button class="btn sm" data-go="#/lesson/${cont||1}">继续</button>
+      <button class="btn sm g" data-go="#/lesson/${cont?cont+1<=96?cont+1:1:1}">下一课</button></div>
+    <div class="bar" style="margin-top:10px"><i style="width:${Math.round(learned*100/total)}%"></i></div>
+    <div class="tip" style="margin-top:4px">总进度 ${Math.round(learned*100/total)}%</div>
+  </div>
+  <div class="sec"><h2>全部课程</h2><div class="grid">${cells()}</div></div>
+  <div class="foot">精听 → 跟读 → 盲听 → 复述 → 间隔复习 · 数据存本机浏览器</div>`;
+  $('#app').innerHTML=h;
+}
+function cells(){
+  const dueSet=new Set(dueList().map(d=>d.no));
+  let h='';
+  for(let n=1;n<=96;n++){
+    const p=PROG[n], cls=p?(p.reviews>=OFFSETS.length?'done':p.firstLearnAt?'doing':''):'';
+    const due=dueSet.has(n);
+    const label=p?(p.reviews>=OFFSETS.length?'通关':'第'+(p.reviews+1)+'轮'):'未学';
+    h+=`<div class="cell ${cls} ${due?'due':''}" data-go="#/lesson/${n}"><b>L${n}</b><span>${label}</span></div>`;
+  }
+  return h;
+}
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-go]');
+  if(el){ location.hash=el.getAttribute('data-go'); }
+});
+
+/* ================= 课程页（精听/跟读/盲听/复述 + 复习模式） ================= */
+function renderLesson(){
+  const p=prog(CUR.no), d=CUR.data;
+  const rev=CUR.mode==='rev';
+  const steps=rev?['盲听','难句补练','复述']:STAGES;
+  if(rev&&CUR.rstep==null) CUR.rstep=0;
+  const cur=rev?CUR.rstep:(p.stage??0);
+  let h=`<div style="display:flex;align-items:center;gap:8px">
+    <a href="#/home" style="color:var(--sub);text-decoration:none;font-size:14px">← 首页</a>
+    <h1 style="flex:1">L${d.no} · ${esc(d.title)}</h1></div>
+  <div class="tip">${esc(d.titleZh)} · ${d.sentences.length} 句 ${rev?`· 第 ${p.reviews+1} 轮复习`:''}</div>
+  <div class="stepper">${steps.map((s,i)=>`<div class="st s${rev?[2,0,3][i]:i} ${i===cur?'on':''}" data-act="jump" data-v="${i}">${s}</div>`).join('')}</div>
+  <div id="stage"></div>`;
+  $('#app').innerHTML=h;
+  renderStage();
+}
+function renderStage(){
+  const p=prog(CUR.no), d=CUR.data, rev=CUR.mode==='rev';
+  const el=$('#stage');
+  const step=rev?CUR.rstep:p.stage;
+  if(rev){
+    el.innerHTML=[stageBlind,stageHardDrill,stageRetell][step]();
+  }else{
+    el.innerHTML=[stageIntensive,stageShadow,stageBlind,stageRetell][step]();
+  }
+  if(CUR.afterRender){ const f=CUR.afterRender; CUR.afterRender=null; f(); }
+}
+/* —— 精听 —— */
+function stageIntensive(){
+  const p=prog(CUR.no), d=CUR.data;
+  const n=Object.keys(p.listened).length, total=d.sentences.length;
+  let h=`<div class="sec"><h2>逐句精听</h2><div class="tip">点 ▶ 逐句听懂；点句子展开意群/句型/译文。全部听过再进跟读。</div>
+    <div class="bar"><i style="width:${Math.round(n*100/total)}%"></i></div>
+    <div class="tip" style="margin-top:4px">${n}/${total}</div>`;
+  d.sentences.forEach((s,i)=>{
+    const star=p.hard.includes(i)?' on':'';
+    h+=`<div class="sent ${p.si===i?'cur':''}" id="sn${i}">
+      <span class="idx">${i+1}</span>
+      <button class="play ${p.listened[i]?'':'g'}" data-act="plays" data-i="${i}" style="${p.listened[i]?'':'background:#CED4DA'}">▶</button>
+      <div class="tt" data-act="det" data-i="${i}" style="cursor:pointer">
+        <div class="en">${esc(s.en)}</div><div class="zh" id="zh${i}" style="display:none">${esc(s.zh)}</div>
+        <div id="det${i}" style="display:none">${sentDetail(s)}</div>
+      </div>
+      <button class="star${star}" data-act="star" data-i="${i}">★</button>
+    </div>`;
+  });
+  h+=`<div style="margin-top:12px"><button class="btn" data-act="tostage" data-v="1">进入跟读 →</button></div></div>`;
+  return h;
+}
+function sentDetail(s){
+  let h='';
+  if(s.chunks) h+='<div style="margin:4px 0">'+s.chunks.map(c=>`<span class="ch">${esc(c.x)}<i>${esc(c.g||c.c)}</i></span>`).join('')+'</div>';
+  if(s.pat) h+=`<div style="margin:4px 0"><span class="tag">${esc(s.pat)}</span>${(s.gp||[]).map(g=>`<span class="tag w">${esc(g)}</span>`).join('')}</div>`;
+  if(s.zh) h+=`<div class="zh">${esc(s.zh)}</div>`;
+  return h;
+}
+/* —— 跟读 —— */
+function stageShadow(){
+  const p=prog(CUR.no), d=CUR.data;
+  if(CUR.si==null) CUR.si=p.si||0;
+  if(!CUR.loops) CUR.loops=1;
+  const s=d.sentences[CUR.si];
+  const n=Object.values(p.shadow).filter(v=>v>0).length;
+  return `<div class="shadow">
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="btn sm g" data-act="ps">← 上一句</button>
+      <b style="flex:1;text-align:center">${CUR.si+1} / ${d.sentences.length}</b>
+      <button class="btn sm g" data-act="ns">下一句 →</button></div>
+    <div class="bar" style="margin:10px 0"><i style="width:${Math.round(n*100/d.sentences.length)}%"></i></div>
+    <div class="big" data-act="det" data-i="${CUR.si}">${esc(s.en)}</div>
+    <div class="tip" id="zhx">参考中文：${esc(s.zh)}</div>
+    ${s.chunks?`<div>${s.chunks.map(c=>`<span class="tag v">${esc(c.x)}<i style="font-style:normal;opacity:.7"> ${esc(c.g||c.c)}</i></span>`).join(' ')}</div>`:''}
+    <div class="cnt">循环
+      ${[1,3,5].map(n=>`<button class="btn sm ${CUR.loops===n?'':'g'}" data-act="loop" data-v="${n}">×${n}</button>`).join('')}
+      <span class="pill" id="loopLeft">剩 ${CUR.loopsLeft??CUR.loops} 遍</span>
+      <button class="play" id="btnPlay" data-act="plays" data-i="${CUR.si}">▶</button></div>
+    <div class="ab">
+      <button class="btn sm g" data-act="rec" id="btnRec">● 录跟读</button>
+      <button class="btn sm g" data-act="abmine" id="btnMine" ${CUR.blob?'':'disabled'}>▶ 我的录音</button>
+      <button class="btn sm g" data-act="aborig">▶ 原声</button>
+      ${STT_AVAIL?'<button class="btn sm" data-act="stt" id="btnStt">识别评分</button>':''}
+    </div>
+    <div class="tip">我的跟读：<span id="recState">${CUR.blob?'已录 ✓（重新录会覆盖）':'未录制'}</span></div>
+    <div>自评：<span class="stars" data-act="ratewrap">${[1,2,3,4,5].map(v=>`<i class="${(p.shadow[CUR.si]||0)>=v?'on':''}" data-act="rate" data-v="${v}">★</i>`).join('')}</span></div>
+    <div class="grade" id="grade">${CUR.grade||''}</div>
+    <div style="margin-top:12px"><button class="btn" data-act="tostage" data-v="2">进入盲听 →</button></div>
+  </div>`;
+}
+/* —— 盲听 —— */
+function stageBlind(){
+  const p=prog(CUR.no), d=CUR.data;
+  return `<div class="sec"><h2>盲听整段</h2><div class="tip">不看字幕完整听一遍，检验整体理解。听不出的地方先忍住，听完再揭晓。</div>
+    <div style="margin:8px 0"><button class="btn" data-act="playall">▶ 完整播放</button></div>
+    <div id="blindBox" class="${p.blindDone?'':'blur'}" style="padding:4px 0">
+      ${d.sentences.map((s,i)=>`<div class="sent"><span class="idx">${i+1}</span>
+        <button class="play" style="background:#CED4DA" data-act="plays" data-i="${i}">▶</button>
+        <div class="tt"><div class="en">${esc(s.en)}</div><div class="zh">${esc(s.zh)}</div></div></div>`).join('')}
+    </div>
+    <div style="margin:10px 0;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn sm g" data-act="reveal" id="btnReveal">👁 揭晓字幕</button>
+      <label style="display:flex;align-items:center;gap:6px;font-size:14px"><input type="checkbox" class="ck" data-act="blinddone" ${p.blindDone?'checked':''}> 我已盲听完毕</label>
+    </div>
+    <div><button class="btn" data-act="tostage" data-v="${CUR.mode==='rev'?2:3}">进入复述 →</button></div></div>`;
+}
+/* —— 复述 —— */
+function stageRetell(){
+  const p=prog(CUR.no);
+  return `<div class="sec"><h2>段落复述</h2><div class="tip">合上原文，用自己的话把这一课讲出来（英语）。按「结构优先」：先说清开头→经过→结尾，不追求逐词还原。</div>
+    <div style="margin:8px 0"><button class="btn rd" data-act="rec" data-retell="1" id="btnRec">● 录复述</button>
+      <button class="btn sm g" data-act="abmine" id="btnMine" ${CUR.blob?'':'disabled'}>▶ 回放我的复述</button>
+      <span class="tip" id="recState" style="margin-left:8px">${CUR.blob?'已录 ✓':'未录制'}</span></div>
+    <div class="detail">自检三问：① 谁做了什么？② 中间发生了什么？③ 结局/结果如何？</div>
+    <label style="display:flex;align-items:center;gap:6px;font-size:14px;margin:8px 0">
+      <input type="checkbox" class="ck" data-act="retelldone" ${p.retellDone?'checked':''}> 我完成复述</label>
+    ${finBlock()}
+  </div>`;
+}
+function finBlock(){
+  const p=prog(CUR.no), rev=CUR.mode==='rev';
+  if(rev){
+    return `<div style="margin-top:10px"><button class="btn ok" data-act="revfin">✓ 完成第 ${p.reviews+1} 轮复习</button>
+      <div class="tip" style="margin-top:6px">完成后自动排入下一轮：${p.reviews+1<OFFSETS.length?OFFSETS[p.reviews+1]+' 天后':'全部 7 轮已通关'}</div></div>`;
+  }
+  if(p.firstLearnAt){
+    const nd=nextDue(p);
+    return `<div class="detail" style="margin-top:10px">✓ 首次学习已完成（${fmtDate(new Date(p.firstLearnAt).toLocaleString())}）。
+      ${nd?`下一轮复习：<b>${fmtDate(new Date(nd).toLocaleString())}</b>`:'7 轮复习全部完成，本课通关 🎉'}
+      <div style="margin-top:8px"><a href="#/home" class="btn sm g" style="text-decoration:none">回首页</a></div></div>`;
+  }
+  return `<div style="margin-top:10px"><button class="btn ok" data-act="fin">✓ 完成本课首次学习（排入 7 轮复习）</button></div>`;
+}
+/* —— 难句补练（复习模式第 2 步） —— */
+function stageHardDrill(){
+  const p=prog(CUR.no), d=CUR.data;
+  const hs=p.hard.length?p.hard:Object.keys(p.listened).map(Number).slice(0,3);
+  if(!hs.length) return '<div class="sec"><div class="empty">本课还没有收藏难句，直接进入复述即可</div></div>';
+  return `<div class="sec"><h2>难句补练</h2><div class="tip">只练收藏的 ${hs.length} 句：听 → 跟读 → 对比，每句至少 2 遍。</div>
+    ${hs.map(i=>{const s=d.sentences[i];return `<div class="sent">
+      <button class="play" data-act="plays" data-i="${i}">▶</button>
+      <div class="tt"><div class="en">${esc(s.en)}</div><div class="zh">${esc(s.zh)}</div></div>
+      <button class="star on" data-act="star" data-i="${i}">★</button></div>`;}).join('')}
+    <div style="margin-top:12px"><button class="btn" data-act="tostage" data-v="2">进入复述 →</button></div></div>`;
+}
+
+/* —— 交互（全局委托，事件→改状态→重渲染，渲染函数互不调用） —— */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const STT_AVAIL=!!SR;
+let REC=null,RECCHUNKS=[];
+function refreshStage(){ renderStage(); }
+
+document.addEventListener('click',async e=>{
+  const el=e.target.closest('[data-act]');
+  if(!el||!CUR.data) return;
+  const act=el.dataset.act, i=+el.dataset.i, p=prog(CUR.no), d=CUR.data;
+  if(act==='plays'){
+    const s=d.sentences[i];
+    if(p.stage===1||el.closest('.shadow')){
+      CUR.loopsLeft=CUR.loopsLeft??CUR.loops;
+      const once=()=>{ CUR.loopsLeft--; const ll=$('#loopLeft'); if(ll) ll.textContent='剩 '+Math.max(CUR.loopsLeft,0)+' 遍';
+        if(CUR.loopsLeft>0){ playSeg(s.t,s.t2,once); } else { CUR.loopsLeft=CUR.loops; } };
+      playSeg(s.t,s.t2,once);
+    }else{
+      playSeg(s.t,s.t2);
+    }
+        if(!rev){ p.si=i; if(CUR.si!=null)CUR.si=i; if(p.stage===0){ p.listened[i]=1; saveProgress(); const bt=el.closest('.sent'); if(bt&&bt.querySelector('.play'))bt.querySelector('.play').style.background='var(--acc)'; } else saveProgress(); }
+    else saveProgress();
+  }
+  else if(act==='det'){ const z=$('#zh'+i),dt=$('#det'+i); if(z)z.style.display=z.style.display==='none'?'block':'none'; if(dt)dt.style.display=dt.style.display==='none'?'block':'none'; }
+  else if(act==='star'){
+    const arr=p.hard, ix=arr.indexOf(i);
+    if(ix>=0){arr.splice(ix,1); store.setHard(store.getHard().filter(x=>!(x.no===CUR.no&&x.i===i)));}
+    else{arr.push(i); const s=d.sentences[i]; const hard=store.getHard(); hard.unshift({no:CUR.no,i,en:s.en,zh:s.zh,pat:s.pat||'',ts:Date.now()}); store.setHard(hard);}
+    saveProgress(); el.classList.toggle('on');
+  }
+  else if(act==='loop'){ CUR.loops=+el.dataset.v; CUR.loopsLeft=CUR.loops; refreshStage(); }
+  else if(act==='ps'){ if(CUR.si>0){CUR.si--;CUR.blob=null;CUR.grade='';refreshStage();} }
+  else if(act==='ns'){ if(CUR.si<d.sentences.length-1){CUR.si++;CUR.blob=null;CUR.grade='';refreshStage();} }
+  else if(act==='rate'){ p.shadow[CUR.si]=+el.dataset.v; STATS.shadowN=(STATS.shadowN||0)+1; saveProgress(); saveStats(); refreshStage(); }
+  else if(act==='aborig'){ const s=d.sentences[CUR.si??i]; playSeg(s.t,s.t2); }
+  else if(act==='abmine'){ if(CUR.blob){ AU.pause(); AU.src=URL.createObjectURL(CUR.blob); AU.play(); } }
+  else if(act==='rec'){
+    if(REC&&REC.state==='recording'){ REC.stop(); return; }
+    try{
+      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      RECCHUNKS=[]; REC=new MediaRecorder(stream);
+      REC.ondataavailable=ev=>RECCHUNKS.push(ev.data);
+      REC.onstop=()=>{
+        stream.getTracks().forEach(t=>t.stop());
+        CUR.blob=new Blob(RECCHUNKS,{type:REC.mimeType||'audio/webm'});
+        const key=el.dataset.retell?`${CUR.no}_retell`:`${CUR.no}_s${CUR.si}`;
+        recSave(key,CUR.blob);
+        STATS.recN=(STATS.recN||0)+1; saveStats();
+        el.textContent='● 录跟读'; el.classList.remove('recording');
+        const rs=$('#recState'); if(rs)rs.textContent='已录 ✓（重新录会覆盖）';
+        const bm=$('#btnMine'); if(bm)bm.disabled=false;
+      };
+      REC.start(); el.textContent='■ 停止'; el.classList.add('recording');
+    }catch(err){ alert('麦克风不可用：'+err.message); }
+  }
+  else if(act==='stt'){
+    if(!SR) return;
+    const target=d.sentences[CUR.si].en, btn=$('#btnStt');
+    btn.disabled=true; btn.textContent='聆听中…';
+    try{
+      const r=new SR(); r.lang='en-US'; r.interimResults=false; r.maxAlternatives=1;
+      r.onresult=ev=>{ const said=ev.results[0][0].transcript;
+        const norm=s=>s.toLowerCase().replace(/[^a-z' ]/g,'').split(/\s+/).filter(Boolean);
+        const tw=norm(target), sw=new Set(norm(said));
+        const hit=tw.filter(w=>sw.has(w)).length, ratio=hit/tw.length;
+        const grade=ratio>=0.85?'A':ratio>=0.65?'B':'C';
+        CUR.grade=`识别：「${said}」<br>命中 ${hit}/${tw.length} 词（${Math.round(ratio*100)}%）→ 评级 <b>${grade}</b>`;
+        const g=$('#grade'); if(g)g.innerHTML=CUR.grade;
+      };
+      r.onerror=ev=>{ CUR.grade='识别失败（'+ev.error+'）。Chrome 识别需联网；Safari/iOS 暂不支持，请用自评。';
+        const g=$('#grade'); if(g)g.textContent=CUR.grade; };
+      r.onend=()=>{ btn.disabled=false; btn.textContent='识别评分'; };
+      r.start();
+    }catch(err){ btn.disabled=false; btn.textContent='识别评分'; }
+  }
+  else if(act==='tostage'){ if(CUR.mode==='rev'){CUR.rstep=+el.dataset.v;} else {p.stage=+el.dataset.v; p.si=CUR.si??p.si; saveProgress();} CUR.blob=null; CUR.grade=''; CUR.loopsLeft=null; renderLesson(); }
+  else if(act==='jump'){
+    if(rev) CUR.rstep=+el.dataset.v; else { p.stage=+el.dataset.v; saveProgress(); }
+    renderLesson();
+  }
+  else if(act==='reveal'){ const b=$('#blindBox'); b.classList.toggle('blur'); el.textContent=b.classList.contains('blur')?'👁 揭晓字幕':'🙈 重新遮上'; }
+  else if(act==='blinddone'){ p.blindDone=el.checked; saveProgress(); }
+  else if(act==='retelldone'){ p.retellDone=el.checked; saveProgress(); }
+  else if(act==='fin'){
+    p.firstLearnAt=Date.now(); p.stage=3; saveProgress(); renderLesson();
+  }
+  else if(act==='revfin'){
+    p.reviews=Math.min(p.reviews+1,OFFSETS.length); p.lastReviewAt=Date.now(); saveProgress();
+    location.hash='#/home';
+  }
+  else if(act==='playall'){ playAll(); }
+});
+
+/* ================= 难句本 ================= */
+function renderHard(){
+  const hard=store.getHard();
+  let h=`<h1>难句本</h1><div class="sec"><div class="tip">精听时点 ★ 收藏的句子，全部课程汇总在此；点击回原课重练。</div>`;
+  if(!hard.length) h+='<div class="empty">还没有收藏，去精听里点亮星星吧</div>';
+  h+=hard.map((x,ix)=>`<div class="item">
+    <div class="tt"><div class="en">${esc(x.en)}</div>
+      <div class="zh">${esc(x.zh)}${x.pat?` · <span class="tag">${esc(x.pat)}</span>`:''} · L${x.no}</div></div>
+    <button class="btn sm g" data-act="goSent" data-no="${x.no}" data-i="${x.i}">重练</button>
+    <button class="star on" data-act="unstar" data-ix="${ix}">★</button></div>`).join('');
+  h+='</div>';
+  $('#app').innerHTML=h;
+}
+/* ================= 闪卡 ================= */
+function renderCards(){
+  const hard=store.getHard();
+  let h=`<h1>语境闪卡</h1><div class="tip">正面中文回忆 → 点卡翻转核对原句；🔊 在语境里重听。</div>`;
+  if(!hard.length){ h+='<div class="sec"><div class="empty">收藏难句后，这里会自动生成卡片</div></div>'; $('#app').innerHTML=h; return; }
+  h+='<div id="deck">'+hard.map((x,ix)=>`
+    <div class="card" data-act="flip" data-ix="${ix}"><div class="in">
+      <div class="f"><div class="pill">中文回忆</div><div style="font-size:18px;margin-top:8px">${esc(x.zh)||'（无译文）'}</div>
+        <div class="tip" style="margin-top:8px">L${x.no} ${x.pat?'· '+esc(x.pat):''}</div></div>
+      <div class="b"><div class="pill" style="background:#DBE4FF">原句</div>
+        <div class="en" style="font-size:17px;margin-top:8px">${esc(x.en)}</div>
+        <div class="tip" style="margin-top:8px"><button class="btn sm g" data-act="cardplay" data-no="${x.no}" data-i="${x.i}">🔊 语境重听</button></div></div>
+    </div></div>`).join('')+'</div>';
+  $('#app').innerHTML=h;
+}
+/* ================= 统计 ================= */
+function ringSvg(id,pct,color,label){
+  const C=2*Math.PI*46;
+  return `<div style="text-align:center"><svg class="ring" viewBox="0 0 110 110">
+    <circle cx="55" cy="55" r="46" fill="none" stroke="#EDF2F7" stroke-width="11"/>
+    <circle cx="55" cy="55" r="46" fill="none" stroke="${color}" stroke-width="11" stroke-linecap="round"
+      stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-pct/100)).toFixed(1)}" transform="rotate(-90 55 55)"/>
+    <text x="55" y="53" text-anchor="middle" font-size="19" fill="#212529">${pct}%</text>
+    <text x="55" y="73" text-anchor="middle" font-size="11" fill="#868E96">${label}</text></svg></div>`;
+}
+function renderStats(){
+  const learned=Object.keys(PROG).filter(k=>PROG[k].firstLearnAt).length;
+  const done=Object.keys(PROG).filter(k=>PROG[k].reviews>=OFFSETS.length).length;
+  const rounds=Object.values(PROG).reduce((a,p)=>a+(p.reviews||0),0);
+  const due=dueList().length;
+  const mins=Math.round((STATS.playSec||0)/60);
+  const days=[...Array(7)].map((_,k)=>{ const d=new Date(Date.now()-(6-k)*864e5);
+    const key=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+    return {label:'周'+'日一二三四五六'[d.getDay()],v:Math.round((STATS.days[key]||0)/60)}; });
+  const max=Math.max(5,...days.map(x=>x.v));
+  let h=`<h1>学习统计</h1>
+  <div class="sec"><div style="display:flex;justify-content:space-around">
+    ${ringSvg('a',Math.round(learned*100/96),'#4C6EF5','已学')}${ringSvg('b',Math.round(done*100/96),'#12B886','通关')}${ringSvg('c',learned?Math.min(100,Math.round(rounds*100/(learned*7))):0,'#F59F00','复习')}</div>
+    <div class="tip" style="text-align:center;margin-top:6px">已学 ${learned}/96 · 通关 ${done}/96 · 复习 ${rounds} 轮 · 待复习 ${due} 课</div></div>
+  <div class="sec"><h2>近 7 天练习（分钟）</h2>
+    <div style="display:flex;align-items:flex-end;gap:8px;height:120px;padding:0 4px">
+      ${days.map(x=>`<div style="flex:1;text-align:center"><div style="font-size:11px;color:var(--sub)">${x.v||''}</div>
+        <div style="background:var(--acc);border-radius:6px 6px 0 0;height:${Math.round(x.v/max*88)}px;min-height:3px"></div>
+        <div style="font-size:11px;color:var(--sub)">${x.label}</div></div>`).join('')}
+    </div></div>
+  <div class="sec"><div class="item"><div class="tt">累计收听</div><b>${mins} 分钟</b></div>
+    <div class="item"><div class="tt">跟读句子次数</div><b>${STATS.shadowN||0}</b></div>
+    <div class="item"><div class="tt">录音次数</div><b>${STATS.recN||0}</b></div></div>
+  <div class="sec no-print"><h2>数据管理</h2><div class="tip">学习记录存本机浏览器；换设备前先导出。</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn sm g" data-act="exp">导出 JSON 备份</button>
+      <button class="btn sm g" data-act="imp">导入恢复</button>
+      <input type="file" id="impFile" accept=".json" style="display:none">
+      <button class="btn sm g" data-act="clr">清空全部记录</button></div></div>`;
+  $('#app').innerHTML=h;
+}
+/* ================= 数据管理动作 ================= */
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]'); if(!el) return;
+  const act=el.dataset.act;
+  if(act==='flip'){ el.classList.toggle('flip'); }
+  else if(act==='goSent'){ location.hash='#/lesson/'+el.dataset.no; CUR.afterRender=()=>{ prog(+el.dataset.no).stage=0; renderLesson(); }; }
+  else if(act==='unstar'){
+    const hard=store.getHard(); const it=hard.splice(+el.dataset.ix,1)[0];
+    store.setHard(hard);
+    if(it&&PROG[it.no]){ const arr=PROG[it.no].hard; const k=arr.indexOf(it.i); if(k>=0){arr.splice(k,1); saveProgress();} }
+    renderHard();
+  }
+  else if(act==='cardplay'){ (async()=>{ const d=await loadLesson(+el.dataset.no);
+      const s=d.sentences[+el.dataset.i]; if(s) playSeg(s.t,s.t2); })(); }
+  else if(act==='exp'){
+    const blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),progress:PROG,hard:store.getHard(),stats:STATS},null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='nce2_loop备份_'+todayStr()+'.json'; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  }
+  else if(act==='imp'){ $('#impFile').click(); }
+  else if(act==='clr'){
+    if(!confirm('确定清空全部学习记录？（课程文件不受影响）')) return;
+    if(!confirm('再次确认：此操作不可恢复！')) return;
+    PROG={}; STATS={playSec:0,shadowN:0,recN:0,days:{}}; store.setHard([]);
+    saveProgress(); saveStats(); renderStats();
+  }
+});
+document.addEventListener('change',e=>{
+  if(e.target&&e.target.id==='impFile'&&e.target.files[0]){
+    const fr=new FileReader();
+    fr.onload=()=>{ try{ const d=JSON.parse(fr.result);
+        if(d.progress){ PROG=d.progress; saveProgress(); }
+        if(d.hard){ store.setHard(d.hard); }
+        if(d.stats){ STATS=Object.assign({playSec:0,shadowN:0,recN:0,days:{}},d.stats); saveStats(); }
+        alert('已导入'); location.hash='#/home'; router();
+      }catch(err){ alert('导入失败：'+err.message); } };
+    fr.readAsText(e.target.files[0]);
+  }
+});
+
+/* ================= 启动 ================= */
+router();
+</script>
+</body>
+</html>
