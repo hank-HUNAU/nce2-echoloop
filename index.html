@@ -161,15 +161,16 @@ async function recLoad(key){ try{ const db=await idb();
 /* ================= 音频引擎 ================= */
 const AU=$('#au'); let segStop=null,playT0=0;
 function audioSrcOf(a){ return /^audio\//.test(a) ? a : 'audio/'+a; }
-function playSeg(t,t2,onend){
-  AU.src=audioSrcOf(CUR.audio); AU.currentTime=t; AU.play();
+function curAudio(){ return audioSrcOf((CUR.data||{}).audio); }
+function playSeg(t,t2,onend,src){
+  AU.src=src||curAudio(); AU.currentTime=t; AU.play();
   playT0=Date.now();
   if(segStop) AU.removeEventListener('timeupdate',segStop);
   segStop=()=>{ if(AU.currentTime>=t2){ AU.pause(); AU.removeEventListener('timeupdate',segStop);
     statDay((Date.now()-playT0)/1000); if(onend)onend(); } };
   AU.addEventListener('timeupdate',segStop);
 }
-function playAll(onend){ AU.src=audioSrcOf(CUR.audio); AU.currentTime=0; AU.play(); playT0=Date.now();
+function playAll(onend){ AU.src=curAudio(); AU.currentTime=0; AU.play(); playT0=Date.now();
   if(segStop) AU.removeEventListener('timeupdate',segStop);
   segStop=()=>{ if(AU.ended){ AU.removeEventListener('timeupdate',segStop); statDay((Date.now()-playT0)/1000); if(onend)onend(); } };
   AU.addEventListener('timeupdate',segStop);
@@ -576,7 +577,7 @@ document.addEventListener('click',e=>{
     renderHard();
   }
   else if(act==='cardplay'){ (async()=>{ const d=await loadLesson(+el.dataset.no);
-      const s=d.sentences[+el.dataset.i]; if(s) playSeg(s.t,s.t2); })(); }
+      const s=d.sentences[+el.dataset.i]; if(s) playSeg(s.t,s.t2,null,audioSrcOf(d.audio)); })(); }
   else if(act==='exp'){
     const blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),progress:PROG,hard:store.getHard(),stats:STATS},null,2)],{type:'application/json'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='nce2_loop备份_'+todayStr()+'.json'; a.click();
