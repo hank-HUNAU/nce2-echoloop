@@ -235,6 +235,7 @@ async function syncFlush(){
   }catch(e){} /* 失败保留队列，下轮重试 */
 }
 setInterval(syncFlush,60000);
+window.syncFlush=syncFlush; /* 供调试/验收脚本触发 */
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) syncFlush(); });
 
 /* ================= 录音（IndexedDB：每句保留最新一条） ================= */
