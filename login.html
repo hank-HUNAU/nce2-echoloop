@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" href="data:,">
+<title>NCE2 Echo · 登录</title>
+<!-- 本工作台通过 Supabase Auth（think-workbench 项目）做账号认证，按角色分流到家长端/孩子端 -->
+<style>
+  :root{--acc:#10B981;--txt:#212529;--sub:#868E96;--line:#E9ECEF;--bad:#E03131}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans SC","Segoe UI",Roboto,sans-serif;
+       background:linear-gradient(160deg,#F8FAF9 0%,#EAF7F1 100%);min-height:100vh;
+       display:flex;align-items:center;justify-content:center;padding:20px;color:var(--txt)}
+  .card{background:#fff;border-radius:22px;box-shadow:0 18px 50px rgba(16,185,129,.14);
+        padding:34px 28px;width:100%;max-width:400px}
+  .logo{width:56px;height:56px;border-radius:16px;background:var(--acc);color:#fff;
+        display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;margin:0 auto 14px}
+  h1{font-size:20px;text-align:center;margin-bottom:4px}
+  .sub{font-size:13px;color:var(--sub);text-align:center;margin-bottom:22px}
+  label{display:block;font-size:13px;font-weight:600;margin:12px 0 6px}
+  input{width:100%;height:46px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;
+        font-size:16px;outline:none;background:#FBFCFD}
+  input:focus{border-color:var(--acc);background:#fff}
+  .chips{display:flex;gap:8px;margin-top:10px}
+  .chip{flex:1;height:40px;border:1.5px solid var(--line);border-radius:10px;background:#fff;
+        font-size:13px;color:var(--sub);cursor:pointer;min-height:44px}
+  .chip.on{border-color:var(--acc);color:var(--acc);font-weight:600}
+  button.go{width:100%;height:50px;border:0;border-radius:13px;background:var(--acc);color:#fff;
+        font-size:16px;font-weight:700;margin-top:20px;cursor:pointer}
+  button.go:disabled{opacity:.6}
+  .err{color:var(--bad);font-size:13px;min-height:18px;margin-top:10px;text-align:center}
+  .foot{font-size:11px;color:var(--sub);text-align:center;margin-top:18px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">E</div>
+  <h1>NCE2 Echo 账号登录</h1>
+  <div class="sub">家长进管理台 · 孩子进训练台 · 一个账号各自直达</div>
+  <form id="f">
+    <label for="em">账号邮箱</label>
+    <input id="em" type="email" autocomplete="username" placeholder="选一个或直接输入" required>
+    <div class="chips">
+      <button type="button" class="chip" id="cPar">家长 / 教师</button>
+      <button type="button" class="chip" id="cKid">孩子</button>
+    </div>
+    <label for="pw">密码</label>
+    <input id="pw" type="password" autocomplete="current-password" placeholder="密码" required>
+    <button class="go" id="go" type="submit">登 录</button>
+    <div class="err" id="err"></div>
+  </form>
+  <div class="foot">认证由 Supabase 托管 · 家长端 NCE2 EchoAdmin · 孩子端 NCE2 Loop<br>首次使用请联系家长获取密码</div>
+</div>
+<script>
+(function(){
+"use strict";
+var SB="https://zwatrfbqkrvxpqtypdgx.supabase.co";
+var KEY="sb_publishable_mnkBBrHF70guvwfUNXuhBg_sIok8eBc";
+var BOARD="https://workbuddy.link/p/5IJWFXAquhgIqOoyYLsimE";
+var EM={parent:"parent@echo.hank-hunau.dev",kid:"kid@echo.hank-hunau.dev"};
+function $(id){return document.getElementById(id);}
+/* 已有有效孩子会话 → 直接进 App */
+try{
+  var s=JSON.parse(localStorage.getItem("el2_session")||"null");
+  if(s&&s.role==="kid"&&s.expires_at>Date.now()&&location.pathname.indexOf("login")>=0){
+    $("go").textContent="继续上次学习 →";
+  }
+}catch(e){}
+$("cPar").onclick=function(){$("em").value=EM.parent;$("cPar").className="chip on";$("cKid").className="chip";};
+$("cKid").onclick=function(){$("em").value=EM.kid;$("cKid").className="chip on";$("cPar").className="chip";};
+$("f").onsubmit=function(ev){
+  ev.preventDefault();
+  var email=$("em").value.trim().toLowerCase(), pw=$("pw").value, err=$("err"), go=$("go");
+  err.textContent=""; go.disabled=true; go.textContent="登录中…";
+  fetch(SB+"/auth/v1/token?grant_type=password",{
+    method:"POST",
+    headers:{"apikey":KEY,"Authorization":"Bearer "+KEY,"Content-Type":"application/json"},
+    body:JSON.stringify({email:email,password:pw})
+  }).then(function(r){ return r.json().then(function(d){ return {ok:r.ok,d:d}; }); }).then(function(res){
+    if(!res.ok||!res.d.access_token){ throw new Error((res.d&&res.d.error_description)||res.d&&res.d.msg||"登录失败"); }
+    var t=res.d.access_token;
+    /* 读角色（RLS 只返回自己那行） */
+    return fetch(SB+"/rest/v1/el2_accounts?select=role",{
+      headers:{"apikey":KEY,"Authorization":"Bearer "+t}
+    }).then(function(r){ return r.json(); }).then(function(rows){
+      var role=rows&&rows[0]&&rows[0].role;
+      if(role==="kid"){
+        localStorage.setItem("el2_session",JSON.stringify({
+          access_token:res.d.access_token,refresh_token:res.d.refresh_token,
+          expires_at:Date.now()+(res.d.expires_in||3600)*1000,role:"kid",email:email}));
+        location.replace("./");
+      }else if(role==="parent"){
+        /* 家长端在另一域，token 经 URL 片段传递（不会发给服务器） */
+        location.replace(BOARD+"#t="+encodeURIComponent(t));
+      }else{ throw new Error("该账号未配置角色，请联系管理员"); }
+    });
+  }).catch(function(e){
+    err.textContent=String(e.message||e).replace("ApiError: ","");
+    go.disabled=false; go.textContent="登 录";
+  });
+};
+})();
+</script>
+</body>
+</html>
