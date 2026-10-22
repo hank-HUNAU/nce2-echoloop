@@ -140,7 +140,42 @@ function dueList(){
 
 /* 统计 */
 function statDay(sec){ const d=todayStr(); STATS.playSec=(STATS.playSec||0)+sec;
-  STATS.days[d]=(STATS.days[d]||0)+sec; saveStats(); }
+  STATS.days[d]=(STATS.days[d]||0)+sec; saveStats();
+  try{ const st=['intensive','shadow','blind','retell'];
+    const idx=(CUR.mode==='rev')?(CUR.rstep||0):((PROG[CUR.no]||{}).stage||0);
+    syncEnqueue(st[idx]||'intensive',sec,null); }catch(e){} }
+
+/* ================= 云同步（Supabase el2_events，匿名静默上报） ================= */
+const SYNC_URL='https://zwatrfbqkrvxpqtypdgx.supabase.co/rest/v1/el2_events';
+const SYNC_KEY='sb_publishable_mnkBBrHF70guvwfUNXuhBg_sIok8eBc';
+const SYNC_Q='el2_sync_q';
+function syncDid(){ let d=localStorage.getItem('el2_did');
+  if(!d){ d='did-'+Math.random().toString(36).slice(2,10)+Date.now().toString(36); localStorage.setItem('el2_did',d); }
+  return d; }
+function syncEnqueue(stage,duration_s,self_rating){
+  try{
+    if(!(CUR.no>=1&&CUR.no<=96)) return;
+    const q=JSON.parse(localStorage.getItem(SYNC_Q)||'[]');
+    q.push({device_id:syncDid(),lesson_no:CUR.no,stage,duration_s:Math.max(0,Math.round(duration_s||0)),
+      self_rating:self_rating||null,occurred_at:new Date().toISOString(),client_date:todayStr()});
+    while(q.length>500) q.shift();
+    localStorage.setItem(SYNC_Q,JSON.stringify(q));
+    clearTimeout(window.__syncT); window.__syncT=setTimeout(syncFlush,8000);
+  }catch(e){}
+}
+async function syncFlush(){
+  let q=[]; try{ q=JSON.parse(localStorage.getItem(SYNC_Q)||'[]'); }catch(e){}
+  if(!q.length||!navigator.onLine) return;
+  const batch=q.slice(0,50);
+  try{
+    const r=await fetch(SYNC_URL,{method:'POST',
+      headers:{'apikey':SYNC_KEY,'Authorization':'Bearer '+SYNC_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify(batch)});
+    if(r.ok){ localStorage.setItem(SYNC_Q,JSON.stringify(q.slice(batch.length))); }
+  }catch(e){} /* 失败保留队列，下轮重试 */
+}
+setInterval(syncFlush,60000);
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) syncFlush(); });
 
 /* ================= 录音（IndexedDB：每句保留最新一条） ================= */
 let IDB=null;
@@ -436,7 +471,7 @@ document.addEventListener('click',async e=>{
   else if(act==='loop'){ CUR.loops=+el.dataset.v; CUR.loopsLeft=CUR.loops; refreshStage(); }
   else if(act==='ps'){ if(CUR.si>0){CUR.si--;CUR.blob=null;CUR.grade='';refreshStage();} }
   else if(act==='ns'){ if(CUR.si<d.sentences.length-1){CUR.si++;CUR.blob=null;CUR.grade='';refreshStage();} }
-  else if(act==='rate'){ p.shadow[CUR.si]=+el.dataset.v; STATS.shadowN=(STATS.shadowN||0)+1; saveProgress(); saveStats(); refreshStage(); }
+  else if(act==='rate'){ p.shadow[CUR.si]=+el.dataset.v; STATS.shadowN=(STATS.shadowN||0)+1; saveProgress(); saveStats(); syncEnqueue('shadow',0,+el.dataset.v); refreshStage(); }
   else if(act==='aborig'){ const s=d.sentences[CUR.si??i]; playSeg(s.t,s.t2); }
   else if(act==='abmine'){ if(CUR.blob){ AU.pause(); AU.src=URL.createObjectURL(CUR.blob); AU.play(); } }
   else if(act==='rec'){
@@ -485,7 +520,7 @@ document.addEventListener('click',async e=>{
   }
   else if(act==='reveal'){ const b=$('#blindBox'); b.classList.toggle('blur'); el.textContent=b.classList.contains('blur')?'👁 揭晓字幕':'🙈 重新遮上'; }
   else if(act==='blinddone'){ p.blindDone=el.checked; saveProgress(); }
-  else if(act==='retelldone'){ p.retellDone=el.checked; saveProgress(); }
+  else if(act==='retelldone'){ p.retellDone=el.checked; saveProgress(); syncEnqueue('retell',0,null); }
   else if(act==='fin'){
     p.firstLearnAt=Date.now(); p.stage=3; saveProgress(); renderLesson();
   }
