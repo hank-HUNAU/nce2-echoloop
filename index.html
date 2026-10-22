@@ -102,7 +102,7 @@ audio{width:100%}
 /* ===== 登录门禁（孩子端）：无有效 kid 会话 → 回登录页 ===== */
 (function(){
   var s=null; try{ s=JSON.parse(localStorage.getItem('el2_session')||'null'); }catch(e){}
-  function kick(){ location.replace('login.html'); if(window.stop) window.stop(); }
+  function kick(){ window.__EL2_GATE__='deny'; location.replace('login.html'); }
   if(!s||s.role!=='kid'){ kick(); return; }
   window.EL2SESS=s;
   if(Date.now()>s.expires_at && navigator.onLine){
@@ -123,6 +123,9 @@ audio{width:100%}
 
 <script>
 /* ================= 状态与存储层 ================= */
+if(window.__EL2_GATE__==='deny'){ /* 已被门禁拦下，跳过初始化 */ }
+else
+{
 const LS='el2_';
 const OFFSETS=[0.25,1,2,4,7,14,28];          // 7 轮复习（天）
 const STAGES=['精听','跟读','盲听','复述'];
@@ -667,6 +670,7 @@ document.addEventListener('change',e=>{
 
 /* ================= 启动 ================= */
 router();
+}
 </script>
 </body>
 </html>
