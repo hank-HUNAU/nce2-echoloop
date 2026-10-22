@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NCE2 Loop">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#3B5BDB">
     <title>NCE2 Loop · 精听跟读复述复习</title>
 <style>
 :root{--acc:#4C6EF5;--accBtn:#3B5BDB;--ok:#12B886;--bad:#E03131;--warn:#F59F00;--ink:#212529;--sub:#6C757D;
@@ -676,6 +678,54 @@ document.addEventListener('change',e=>{
 
 /* ================= 启动 ================= */
 router();
+}
+</script>
+<script>
+/* ===== PWA 安装引导：安卓 beforeinstallprompt 弹横幅（可触发系统安装框）；iOS 弹「分享→添加到主屏幕」分步提示 ===== */
+(function(){
+  var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (standalone) return;                                   // 已安装，不打扰
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var KEY = 'el2_install_hide';
+  function canShow(){ try{ var t = +localStorage.getItem(KEY) || 0; return Date.now() > t; }catch(e){ return true; } }
+  function hide(days){ try{ localStorage.setItem(KEY, String(Date.now() + days * 864e5)); }catch(e){} }
+  function build(title, body, okText, onOk){
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:999;'
+      + 'background:#fff;border:1.5px solid #E9ECEF;border-radius:16px;box-shadow:0 10px 30px rgba(33,37,41,.18);padding:14px 16px;';
+    wrap.innerHTML = '<div style="display:flex;gap:12px;align-items:flex-start">'
+      + '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#3B5BDB" stroke-width="2" style="flex:0 0 34px;margin-top:2px">'
+      + '<rect x="5" y="2" width="14" height="20" rx="3"/><path d="M9 18h6"/></svg>'
+      + '<div style="flex:1"><div style="font-weight:700;font-size:15px;color:#212529">' + title + '</div>'
+      + '<div style="font-size:13px;color:#6C757D;line-height:1.55;margin-top:3px">' + body + '</div></div></div>'
+      + '<div style="display:flex;gap:10px;margin-top:10px">'
+      + '<button id="pwaOk" style="flex:1;min-height:50px;border:0;border-radius:12px;background:#3B5BDB;color:#fff;font-size:15px;font-weight:700;cursor:pointer">' + okText + '</button>'
+      + '<button id="pwaNo" style="min-width:88px;min-height:50px;border:1.5px solid #E9ECEF;border-radius:12px;background:#fff;color:#6C757D;font-size:14px;cursor:pointer">暂不</button></div>';
+    document.body.appendChild(wrap);
+    wrap.querySelector('#pwaOk').addEventListener('click', function(){ hide(365); wrap.remove(); if (onOk) onOk(); });
+    wrap.querySelector('#pwaNo').addEventListener('click', function(){ hide(7); wrap.remove(); });
+  }
+  var deferred = null;
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault(); deferred = e;
+    if (canShow()) build('安装 NCE2 Loop 到桌面', '像 App 一样全屏启动，听过一遍的课文离线也能学。', '立即安装', function(){
+      if (deferred) { deferred.prompt(); deferred = null; }
+    });
+  });
+  if (isIOS && canShow()) {
+    window.addEventListener('load', function(){
+      setTimeout(function(){
+        if (canShow()) build('添加到主屏幕（2 步）',
+          'iOS 不会自动弹安装框：① 点浏览器底部的「分享」按钮 ② 在列表里选「添加到主屏幕」。完成后从桌面图标全屏进入。',
+          '知道了', null);
+      }, 1500);
+    });
+  }
+})();
+/* Service Worker 注册（离线学习） */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
 }
 </script>
 </body>
