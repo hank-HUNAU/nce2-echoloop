@@ -10,7 +10,8 @@ self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
       .then(ks => Promise.all(ks.filter(k => k !== VER).map(k => caches.delete(k))))
-      .then(() => self.clients.claim())
+    /* 不调用 clients.claim()：不抢占当前页控制权，SW 从下一次加载才开始接管，
+       避免接管竞态中断在途 fetch（触发 router 数据加载失败） */
   );
 });
 self.addEventListener('fetch', e => {
