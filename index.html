@@ -29,7 +29,7 @@ h2{font-size:16px;margin:0 0 10px}
 .btn.sm{padding:7px 12px;min-height:50px;font-size:13px;border-radius:9px}
 .btn:disabled{opacity:.45;cursor:default}
 .pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;background:#EDF2FF;color:#364FC7}
-.tag{display:inline-block;border-radius:6px;padding:0 6px;font-size:11px;background:#EDF2FF;color:#364FC7;margin-right:4px}
+.tag{display:inline-block;border-radius:6px;padding:0 6px;font-size:12px;background:#EDF2FF;color:#364FC7;margin-right:4px}
 .tag.w{background:#E6FCF5;color:#087F5B}.tag.v{background:#F3F0FF;color:#6741D9}.tag.d{background:#FFF9DB;color:#E67700}
 .item{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px dashed var(--line)}
 .item:last-child{border-bottom:0}
@@ -44,14 +44,14 @@ h2{font-size:16px;margin:0 0 10px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px}
 .cell{border:1px solid var(--line);border-radius:12px;background:#fff;text-align:center;padding:8px 2px;cursor:pointer;position:relative}
 .cell b{font-size:15px;display:block}
-.cell span{font-size:10px;color:var(--sub);display:block}
+.cell span{font-size:11px;color:var(--sub);display:block}
 .cell.done{border-color:var(--ok);background:#F0FFF9}
 .cell.doing{border-color:var(--acc);background:#F0F4FF}
 .cell.due::after{content:"";position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--bad)}
 /* 底部导航 */
 nav.tabs{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
  display:flex;z-index:30;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
-nav.tabs a{flex:1;text-align:center;padding:10px 0 8px;font-size:11px;color:var(--sub);text-decoration:none;min-height:52px}
+nav.tabs a{flex:1;text-align:center;padding:10px 0 8px;font-size:12px;color:var(--sub);text-decoration:none;min-height:52px}
 nav.tabs a svg{width:22px;height:22px;display:block;margin:0 auto 2px}
 nav.tabs a.on{color:var(--acc)}
 /* 句子列表 */
@@ -397,6 +397,15 @@ async function router(){
   nav();
   const h=location.hash||'#/home';
   if(h.startsWith('#/lesson/')){
+    setTimeout(()=>{ const no=+h.match(/#\/lesson\/(\d+)/)[1];
+      if(!window.caches || !navigator.onLine) return;
+      const src='audio/L'+String(no).padStart(2,'0')+'.mp3';
+      caches.open('el2-pwa-v1').then(c=>c.match(src).then(m=>{
+        if(m) return;                       // 已缓存，跳过
+        return c.add(src);                  // 预取整课：fetch+落缓存
+      })).catch(()=>{});
+    }, 2500); // 开课 2.5s 后空闲预取整课音频，逐句播放本地命中
+
     const m=h.match(/#\/lesson\/(\d+)(\?m=rev)?/);
     CUR.mode=m[2]?'rev':'learn';
     const no=+m[1];
