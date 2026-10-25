@@ -341,12 +341,24 @@ function curAudio(){ return audioSrcOf((CUR.data||{}).audio); }
 function playSeg(t,t2,onend,src){
   AU.src=src||curAudio(); AU.currentTime=t; AU.play();
   playT0=Date.now();
+  if(segRaf){ cancelAnimationFrame(segRaf); segRaf=null; }
   if(segStop) AU.removeEventListener('timeupdate',segStop);
-  segStop=()=>{ if(AU.currentTime>=t2){ AU.pause(); AU.removeEventListener('timeupdate',segStop);
-    statDay((Date.now()-playT0)/1000); if(onend)onend(); } };
-  AU.addEventListener('timeupdate',segStop);
+  /* rAF 轮询（~16ms）替代 timeupdate（~250ms）：句尾过冲从 0.25s 降到 0.02s，
+     避免下一句起音漏进本句（L1 "interesting."/"I" 边界实测余量仅 0.12s） */
+  const step=()=>{
+    if(AU.paused){ segRaf=null; return; }
+    if(AU.currentTime>=t2){
+      AU.pause(); segRaf=null;
+      statDay((Date.now()-playT0)/1000); if(onend)onend();
+      return;
+    }
+    segRaf=requestAnimationFrame(step);
+  };
+  segRaf=requestAnimationFrame(step);
 }
+let segRaf=null;
 function playAll(onend){ AU.src=curAudio(); AU.currentTime=0; AU.play(); playT0=Date.now();
+  if(segRaf){ cancelAnimationFrame(segRaf); segRaf=null; }
   if(segStop) AU.removeEventListener('timeupdate',segStop);
   segStop=()=>{ if(AU.ended){ AU.removeEventListener('timeupdate',segStop); statDay((Date.now()-playT0)/1000); if(onend)onend(); } };
   AU.addEventListener('timeupdate',segStop);
