@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <link rel="icon" href="data:,">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -98,6 +98,7 @@ nav.tabs a.on{color:var(--acc)}
 audio{width:100%}
 @media (hover:none){.btn:active,.play:active,.star:active,nav.tabs a:active{transform:scale(.96)}}
 @media (hover:hover){.btn:hover,.play:hover{filter:brightness(1.05)}}
+@media (orientation:landscape) and (min-width:1000px){ .wrap{max-width:1100px} }
 @media print{nav.tabs{display:none}}
 </style>
 </head>
@@ -836,6 +837,19 @@ router();
       if (deferred) { deferred.prompt(); deferred = null; }
     });
   });
+  var isAndroid=/android/i.test(navigator.userAgent);
+  var hasInstallAPI='onbeforeinstallprompt' in window;
+  var isHuawei=/HuaweiBrowser|HarmonyOS|HUAWEI/i.test(navigator.userAgent);
+  var androidNoChrome=isAndroid && !/Chrome\/|Edg\/|SamsungBrowser/i.test(navigator.userAgent);
+  if ((isHuawei || androidNoChrome) && canShow()) {
+    window.addEventListener('load', function(){
+      setTimeout(function(){
+        if (canShow()) build('添加到桌面（2 步）',
+          '安卓浏览器不会自动弹安装框：① 点浏览器右上角「⋮」或底部「我的」打开菜单 ② 选「添加到桌面 / 添加到主屏幕」。完成后从桌面图标全屏进入，听课更流畅。',
+          '知道了', null);
+      }, 1500);
+    });
+  }
   if (isIOS && canShow()) {
     window.addEventListener('load', function(){
       setTimeout(function(){
