@@ -102,7 +102,6 @@ audio{width:100%}
 </style>
 </head>
 <body>
-<div id="topbar"></div>
 <div class="wrap" id="app"></div>
 <nav class="tabs" id="tabs"></nav>
 <audio id="au" preload="none"></audio>
@@ -148,9 +147,9 @@ audio{width:100%}
 
   /* 顶栏 + 登录弹窗 */
   var css=document.createElement('style');
-  css.textContent='#topbar{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:calc(12px + env(safe-area-inset-right,0px));z-index:60;display:flex;align-items:center;gap:10px}'
-    +'#topbar .tb{min-height:40px;padding:0 16px;border:1.5px solid #E9ECEF;border-radius:10px;background:#fff;color:#3B5BDB;font-size:14px;font-weight:600;cursor:pointer}'
-    +'#topbar .tb:active{transform:scale(.96)}#topbar .who{font-size:12px;color:#6C757D}'
+  css.textContent=''
+    +''
+    +''
     +'#loginMask{position:fixed;inset:0;background:rgba(33,37,41,.45);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}'
     +'#loginMask .lmCard{position:relative;background:#fff;border-radius:18px;padding:24px 22px;width:100%;max-width:360px;box-shadow:0 18px 50px rgba(0,0,0,.25)}'
     +'#loginMask h3{font-size:17px;margin-bottom:2px}#loginMask .sub{font-size:12px;color:#6C757D;margin-bottom:10px}'
@@ -172,20 +171,13 @@ audio{width:100%}
   function closeMask(){ mask.style.display='none'; }
   mask.querySelector('#lmx').addEventListener('click',closeMask);
   mask.addEventListener('click',function(e){ if(e.target===mask) closeMask(); });
-  function renderBar(){
-    var tb=document.getElementById('topbar');
-    if(window.EL2SESS){
-      var who=(window.EL2SESS.email||'').split('@')[0];
-      tb.innerHTML='<span class="who">已登录：'+esc(who)+'</span><button class="tb" id="tbOut">退出</button>';
-      document.getElementById('tbOut').addEventListener('click',function(){
-        try{ localStorage.removeItem('el2_session'); }catch(e){}
-        window.EL2SESS=null; renderBar();
-      });
-    }else{
-      tb.innerHTML='<button class="tb" id="tbIn">登录</button>';
-      document.getElementById('tbIn').addEventListener('click',function(){ mask.style.display='flex'; });
-    }
-  }
+  window.el2OpenLogin=function(){ mask.style.display='flex'; };
+  window.el2Logout=function(){
+    if(!window.confirm('退出登录？退出后学习记录将停止同步（本机进度保留）')) return;
+    try{ localStorage.removeItem('el2_session'); }catch(e){}
+    window.EL2SESS=null;
+    if(typeof nav==='function') nav();
+  };
   mask.querySelector('#lmGo').addEventListener('click',function(){
     var err=mask.querySelector('#lmErr'), go=mask.querySelector('#lmGo');
     var em=mask.querySelector('#lmEm').value.trim().toLowerCase(), pw=mask.querySelector('#lmPw').value;
@@ -205,7 +197,7 @@ audio{width:100%}
             s={access_token:res.d.access_token,refresh_token:res.d.refresh_token,
                expires_at:Date.now()+(res.d.expires_in||3600)*1000,role:'kid',
                family_code:row.family_code||'',uid:res.d.user?res.d.user.id:'',email:em};
-            save(); renderBar(); closeMask();
+            save(); closeMask(); if(typeof nav==='function') nav();
           }else if(row.role==='teacher'){
             location.replace(TEACHER+'#t='+encodeURIComponent(res.d.access_token));
           }else{
@@ -218,7 +210,6 @@ audio{width:100%}
       go.disabled=false; go.textContent='登 录';
     });
   });
-  renderBar();
   if(s && Date.now()>s.expires_at){ window.el2Refresh(); }
 })();
 </script>
@@ -381,8 +372,20 @@ const TABS=[
   ['#/stats','统计','<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'],
 ];
 function nav(){ const h=location.hash||'#/home';
+  const ME_ICON='<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/>';
+  let meTab;
+  if(window.EL2SESS){
+    const who=(window.EL2SESS.email||'').split('@')[0];
+    meTab=`<a href="javascript:void(0)" id="tabMe" title="${who}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ME_ICON}</svg>我的</a>`;
+  }else{
+    meTab=`<a href="javascript:void(0)" id="tabLogin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ME_ICON}</svg>登录</a>`;
+  }
   $('#tabs').innerHTML=TABS.map(t=>{const on=h.startsWith(t[0])?' class="on"':'';
-    return `<a href="${t[0]}"${on}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${t[2]}</svg>${t[1]}</a>`;}).join('');
+    return `<a href="${t[0]}"${on}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${t[2]}</svg>${t[1]}</a>`;}).join('')+meTab;
+  const tl=document.getElementById('tabLogin');
+  if(tl) tl.addEventListener('click',function(ev){ ev.preventDefault(); if(window.el2OpenLogin) window.el2OpenLogin(); });
+  const tm=document.getElementById('tabMe');
+  if(tm) tm.addEventListener('click',function(ev){ ev.preventDefault(); if(window.el2Logout) window.el2Logout(); });
 }
 async function router(){
   nav();
