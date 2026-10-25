@@ -196,7 +196,7 @@ audio{width:100%}
     .then(function(r){ return r.json().then(function(d){ return {ok:r.ok,d:d}; }); })
     .then(function(res){
       if(!res.ok||!res.d.access_token){ throw new Error(res.d.error_description||res.d.msg||'登录失败'); }
-      return fetch(SB+'/rest/v1/el2_accounts?select=role,family_code',{headers:{'apikey':KEY,'Authorization':'Bearer '+res.d.access_token}})
+      return fetch(SB+'/rest/v1/el2_accounts?uid=eq.'+encodeURIComponent(res.d.user.id)+'&select=role,family_code',{headers:{'apikey':KEY,'Authorization':'Bearer '+res.d.access_token}})
         .then(function(r){ return r.json(); })
         .then(function(rows){
           var row=rows&&rows[0];
