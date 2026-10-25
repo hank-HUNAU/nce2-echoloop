@@ -73,7 +73,7 @@ function api(path,opt){ return fetch(SB+path,opt).then(function(r){ return r.jso
 function authHeaders(t){ return {"apikey":KEY,"Authorization":"Bearer "+t,"Content-Type":"application/json"}; }
 
 function afterAuth(d){
-  return api("/rest/v1/el2_accounts?select=role,family_code",{headers:authHeaders(d.access_token)})
+  return api("/rest/v1/el2_accounts?uid=eq."+encodeURIComponent(d.user.id)+"&select=role,family_code",{headers:authHeaders(d.access_token)})
   .then(function(res){
     var row=res.d&&res.d[0];
     if(!row||!row.role){ throw new Error("该账号未配置角色，请联系管理员"); }
