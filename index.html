@@ -31,7 +31,7 @@ h2{font-size:18px;margin:0 0 10px}
 .pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:13px;background:#EDF2FF;color:#364FC7}
 .tag{display:inline-block;border-radius:6px;padding:0 6px;font-size:13px;background:#EDF2FF;color:#364FC7;margin-right:4px}
 .tag.w{background:#E6FCF5;color:#087F5B}.tag.v{background:#F3F0FF;color:#6741D9}.tag.d{background:#FFF9DB;color:#E67700}
-.item{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px dashed var(--line)}
+.item{display:flex;align-items:center;gap:10px;padding:12px 2px;border-bottom:1px dashed var(--line)}
 .item:last-child{border-bottom:0}
 .item .tt{flex:1;min-width:0}
 .item .meta{font-size:14px;color:var(--sub)}
@@ -60,6 +60,7 @@ nav.tabs a.on{color:var(--acc)}
 .sent .en{font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.7}
 .sent .zh{color:var(--sub);font-size:17px;line-height:1.65}
 .sent .idx{flex:0 0 26px;color:var(--sub);font-size:14px;padding-top:3px}
+.item .tt .en{font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.55}
 .star{background:none;border:0;font-size:28px;color:#CED4DA;cursor:pointer;padding:0;width:50px;height:50px;flex:0 0 50px;display:inline-flex;align-items:center;justify-content:center}
 .star.on{color:var(--warn)}
 .detail{background:#F8F9FC;border-radius:12px;padding:10px 12px;margin:6px 0;font-size:15px}
@@ -86,12 +87,13 @@ nav.tabs a.on{color:var(--acc)}
 .grade{font-size:14px;margin-top:6px}
 .bar{height:8px;border-radius:999px;background:#EDF2F7;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--ok)}
-.card{perspective:900px;height:190px;margin:10px 0}
-.card .in{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .45s;cursor:pointer}
+.card{perspective:900px;min-height:190px;margin:10px 0}
+.card .in{position:relative;width:100%;transform-style:preserve-3d;transition:transform .45s;cursor:pointer}
 .card.flip .in{transform:rotateY(180deg)}
-.card .f,.card .b{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;border:1px solid var(--line);
+.card .f,.card .b{backface-visibility:hidden;border-radius:16px;border:1px solid var(--line);
  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;text-align:center}
-.card .f{background:#fff}.card .b{background:#F0F4FF;transform:rotateY(180deg)}
+.card .f{position:relative;background:#fff;min-height:190px}
+.card .b{position:absolute;inset:0;background:#F0F4FF;transform:rotateY(180deg);overflow-y:auto}
 .ring{width:110px}
 .ring text{font-weight:700}
 .foot{color:var(--sub);font-size:12px;text-align:center;margin-top:14px}
@@ -152,13 +154,15 @@ audio{width:100%}
     +''
     +''
     +'#loginMask{position:fixed;inset:0;background:rgba(33,37,41,.45);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}'
-    +'#loginMask .lmCard{position:relative;background:#fff;border-radius:18px;padding:24px 22px;width:100%;max-width:360px;box-shadow:0 18px 50px rgba(0,0,0,.25)}'
-    +'#loginMask h3{font-size:17px;margin-bottom:2px}#loginMask .sub{font-size:12px;color:#6C757D;margin-bottom:10px}'
-    +'#loginMask label{display:block;font-size:13px;font-weight:600;margin:10px 0 5px}'
-    +'#loginMask input{width:100%;height:46px;border:1.5px solid #E9ECEF;border-radius:12px;padding:0 14px;font-size:16px;outline:none;background:#FBFCFD}'
+    +'#loginMask .lmCard{position:relative;background:#fff;border-radius:18px;padding:24px 22px;width:100%;max-width:min(400px,92vw);box-shadow:0 18px 50px rgba(0,0,0,.25)}'
+    +'#loginMask h3{font-size:20px;margin-bottom:2px}#loginMask .sub{font-size:14px;color:#6C757D;margin-bottom:10px}'
+    +'#loginMask label{display:block;font-size:14px;font-weight:600;margin:10px 0 5px}'
+    +'#loginMask input{width:100%;height:52px;border:1.5px solid #E9ECEF;border-radius:12px;padding:0 14px;font-size:17px;outline:none;background:#FBFCFD}'
     +'#loginMask input:focus{border-color:#3B5BDB;background:#fff}'
-    +'#loginMask .go{width:100%;height:50px;border:0;border-radius:13px;background:#3B5BDB;color:#fff;font-size:16px;font-weight:700;margin-top:16px;cursor:pointer}'
-    +'#loginMask .err{color:#E03131;font-size:13px;min-height:18px;margin-top:8px;text-align:center}'
+    +'#loginMask .go{width:100%;height:54px;border:0;border-radius:13px;background:#3B5BDB;color:#fff;font-size:17px;font-weight:700;margin-top:16px;cursor:pointer}'
+    +'#loginMask .err{color:#E03131;font-size:14px;min-height:18px;margin-top:8px;text-align:center}'
+    +'#loginMask.kb .lmCard{padding:14px 18px;max-height:62vh;overflow-y:auto}'
+    +'#loginMask.kb .sub{display:none}#loginMask.kb h3{margin-bottom:0}'
     +'#loginMask.kb{align-items:flex-start;padding-top:calc(48px + env(safe-area-inset-top,0px))}'
     +'#loginMask .x{position:absolute;top:10px;right:12px;border:0;background:none;font-size:20px;color:#6C757D;cursor:pointer}';
   document.head.appendChild(css);
@@ -723,10 +727,10 @@ function renderCards(){
   if(!hard.length){ h+='<div class="sec"><div class="empty">收藏难句后，这里会自动生成卡片</div></div>'; $('#app').innerHTML=h; return; }
   h+='<div id="deck">'+hard.map((x,ix)=>`
     <div class="card" data-act="flip" data-ix="${ix}"><div class="in">
-      <div class="f"><div class="pill">中文回忆</div><div style="font-size:18px;margin-top:8px">${esc(x.zh)||'（无译文）'}</div>
+      <div class="f"><div class="pill">中文回忆</div><div style="font-size:20px;font-weight:700;margin-top:8px">${esc(x.zh)||'（无译文）'}</div>
         <div class="tip" style="margin-top:8px">L${x.no} ${x.pat?'· '+esc(x.pat):''}</div></div>
       <div class="b"><div class="pill" style="background:#DBE4FF">原句</div>
-        <div class="en" style="font-size:17px;margin-top:8px">${esc(x.en)}</div>
+        <div class="en" style="font-family:Georgia,'Times New Roman',serif;font-size:18px;margin-top:8px">${esc(x.en)}</div>
         <div class="tip" style="margin-top:8px"><button class="btn sm g" data-act="cardplay" data-no="${x.no}" data-i="${x.i}">🔊 语境重听</button></div></div>
     </div></div>`).join('')+'</div>';
   $('#app').innerHTML=h;
