@@ -106,17 +106,21 @@ audio{width:100%}
 <nav class="tabs" id="tabs"></nav>
 <audio id="au" preload="none"></audio>
 
+<div id="topbar"></div>
 <script>
-/* ===== 登录门禁（孩子端）：无有效 kid 会话 → 回登录页；token 自动刷新 + 家庭码补全 ===== */
+/* ===== 会话与页内登录（学生）：不登录可学习（仅本地），登录后数据上云 ===== */
 (function(){
   var SB='https://zwatrfbqkrvxpqtypdgx.supabase.co';
   var KEY='sb_publishable_mnkBBrHF70guvwfUNXuhBg_sIok8eBc';
+  var BOARD='https://workbuddy.link/p/5IJWFXAquhgIqOoyYLsimE';
+  var TEACHER='teacher.html';
+  function esc(x){ return String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
   var s=null; try{ s=JSON.parse(localStorage.getItem('el2_session')||'null'); }catch(e){}
-  function kick(){ window.__EL2_GATE__='deny'; location.replace('login.html'); }
-  if(!s||s.role!=='kid'){ kick(); return; }
+  if(s && (s.role!=='kid' || (s.expires_at||0)<Date.now())) s=null;   /* 仅接受有效学生会话 */
   window.EL2SESS=s;
   function save(){ try{ localStorage.setItem('el2_session',JSON.stringify(s)); }catch(e){} window.EL2SESS=s; }
   window.el2Refresh=function(){
+    if(!s) return Promise.resolve(null);
     if(Date.now() < s.expires_at - 60000) return Promise.resolve(s.access_token);
     if(!navigator.onLine) return Promise.resolve(s.access_token);
     return fetch(SB+'/auth/v1/token?grant_type=refresh_token',{
@@ -128,20 +132,94 @@ audio{width:100%}
         s.expires_at=Date.now()+(d.expires_in||3600)*1000; save();
         return s.access_token;
       }
-      if(Date.now()>s.expires_at+864e5){ kick(); return null; }
+      s=null; save(); renderBar();   /* 刷新失败即视为未登录 */
       return null;
-    }).catch(function(){
-      if(Date.now()>s.expires_at+864e5){ kick(); return null; }
-      return null;
-    });
+    }).catch(function(){ return null; });
   };
-  if(!s.family_code && navigator.onLine){
-    fetch(SB+'/rest/v1/el2_accounts?select=family_code',{headers:{'apikey':KEY,'Authorization':'Bearer '+s.access_token}})
-      .then(function(r){ return r.json(); })
+  /* 旧会话迁移：补 uid / family_code */
+  if(s && (!s.uid || !s.family_code) && navigator.onLine){
+    fetch(SB+'/auth/v1/user',{headers:{'apikey':KEY,'Authorization':'Bearer '+s.access_token}})
+      .then(function(r){ return r.ok?r.json():null; })
+      .then(function(u){ if(u&&u.id){ s.uid=u.id; if(!s.email&&u.email) s.email=u.email; return api2('/rest/v1/el2_accounts?select=role,family_code'); } return null; })
       .then(function(rows){ if(rows&&rows[0]&&rows[0].family_code){ s.family_code=rows[0].family_code; save(); } })
       .catch(function(){});
+    function api2(path){ return fetch(SB+path,{headers:{'apikey':KEY,'Authorization':'Bearer '+s.access_token}}).then(function(r){ return r.json(); }); }
   }
-  if(Date.now()>s.expires_at){ window.el2Refresh(); }
+
+  /* 顶栏 + 登录弹窗 */
+  var css=document.createElement('style');
+  css.textContent='#topbar{max-width:880px;margin:8px auto 0;padding:0 14px;display:flex;justify-content:flex-end;gap:10px;align-items:center;min-height:34px}'
+    +'#topbar .tb{min-height:40px;padding:0 16px;border:1.5px solid #E9ECEF;border-radius:10px;background:#fff;color:#3B5BDB;font-size:14px;font-weight:600;cursor:pointer}'
+    +'#topbar .tb:active{transform:scale(.96)}#topbar .who{font-size:12px;color:#6C757D}'
+    +'#loginMask{position:fixed;inset:0;background:rgba(33,37,41,.45);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}'
+    +'#loginMask .card{background:#fff;border-radius:18px;padding:24px 22px;width:100%;max-width:360px;box-shadow:0 18px 50px rgba(0,0,0,.25)}'
+    +'#loginMask h3{font-size:17px;margin-bottom:2px}#loginMask .sub{font-size:12px;color:#6C757D;margin-bottom:10px}'
+    +'#loginMask label{display:block;font-size:13px;font-weight:600;margin:10px 0 5px}'
+    +'#loginMask input{width:100%;height:46px;border:1.5px solid #E9ECEF;border-radius:12px;padding:0 14px;font-size:16px;outline:none;background:#FBFCFD}'
+    +'#loginMask input:focus{border-color:#3B5BDB;background:#fff}'
+    +'#loginMask .go{width:100%;height:50px;border:0;border-radius:13px;background:#3B5BDB;color:#fff;font-size:16px;font-weight:700;margin-top:16px;cursor:pointer}'
+    +'#loginMask .err{color:#E03131;font-size:13px;min-height:18px;margin-top:8px;text-align:center}'
+    +'#loginMask .x{position:absolute;top:10px;right:12px;border:0;background:none;font-size:20px;color:#6C757D;cursor:pointer}';
+  document.head.appendChild(css);
+  var mask=document.createElement('div'); mask.id='loginMask'; mask.style.display='none';
+  mask.innerHTML='<div class="card" style="position:relative">'
+    +'<button class="x" id="lmx" title="关闭">×</button>'
+    +'<h3>学生登录</h3><div class="sub">登录后学习记录同步给家长与老师</div>'
+    +'<label for="lmEm">账号邮箱</label><input id="lmEm" type="email" autocomplete="username">'
+    +'<label for="lmPw">密码</label><input id="lmPw" type="password" autocomplete="current-password">'
+    +'<button class="go" id="lmGo">登 录</button><div class="err" id="lmErr"></div></div>';
+  document.body.appendChild(mask);
+  function closeMask(){ mask.style.display='none'; }
+  mask.querySelector('#lmx').addEventListener('click',closeMask);
+  mask.addEventListener('click',function(e){ if(e.target===mask) closeMask(); });
+  function renderBar(){
+    var tb=document.getElementById('topbar');
+    if(window.EL2SESS){
+      var who=(window.EL2SESS.email||'').split('@')[0];
+      tb.innerHTML='<span class="who">已登录：'+esc(who)+'</span><button class="tb" id="tbOut">退出</button>';
+      document.getElementById('tbOut').addEventListener('click',function(){
+        try{ localStorage.removeItem('el2_session'); }catch(e){}
+        window.EL2SESS=null; renderBar();
+      });
+    }else{
+      tb.innerHTML='<button class="tb" id="tbIn">登录</button>';
+      document.getElementById('tbIn').addEventListener('click',function(){ mask.style.display='flex'; });
+    }
+  }
+  mask.querySelector('#lmGo').addEventListener('click',function(){
+    var err=mask.querySelector('#lmErr'), go=mask.querySelector('#lmGo');
+    var em=mask.querySelector('#lmEm').value.trim().toLowerCase(), pw=mask.querySelector('#lmPw').value;
+    err.textContent=''; go.disabled=true; go.textContent='登录中…';
+    fetch(SB+'/auth/v1/token?grant_type=password',{method:'POST',
+      headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({email:em,password:pw})})
+    .then(function(r){ return r.json().then(function(d){ return {ok:r.ok,d:d}; }); })
+    .then(function(res){
+      if(!res.ok||!res.d.access_token){ throw new Error(res.d.error_description||res.d.msg||'登录失败'); }
+      return fetch(SB+'/rest/v1/el2_accounts?select=role,family_code',{headers:{'apikey':KEY,'Authorization':'Bearer '+res.d.access_token}})
+        .then(function(r){ return r.json(); })
+        .then(function(rows){
+          var row=rows&&rows[0];
+          if(!row||!row.role){ throw new Error('该账号未配置角色'); }
+          if(row.role==='kid'){
+            s={access_token:res.d.access_token,refresh_token:res.d.refresh_token,
+               expires_at:Date.now()+(res.d.expires_in||3600)*1000,role:'kid',
+               family_code:row.family_code||'',uid:res.d.user?res.d.user.id:'',email:em};
+            save(); renderBar(); closeMask();
+          }else if(row.role==='teacher'){
+            location.replace(TEACHER+'#t='+encodeURIComponent(res.d.access_token));
+          }else{
+            location.replace(BOARD+'#t='+encodeURIComponent(res.d.access_token)+'&f='+encodeURIComponent(row.family_code||''));
+          }
+        });
+    })
+    .catch(function(e){
+      err.textContent=String(e.message||e).replace('ApiError: ','');
+      go.disabled=false; go.textContent='登 录';
+    });
+  });
+  renderBar();
+  if(s && Date.now()>s.expires_at){ window.el2Refresh(); }
 })();
 </script>
 
@@ -209,6 +287,7 @@ function syncDid(){ let d=localStorage.getItem('el2_did');
 function syncEnqueue(stage,duration_s,self_rating){
   try{
     if(!(CUR.no>=1&&CUR.no<=96)) return;
+    if(!window.EL2SESS) return; /* 未登录：仅本地，不上云 */
     const q=JSON.parse(localStorage.getItem(SYNC_Q)||'[]');
     q.push({device_id:syncDid(),lesson_no:CUR.no,stage,duration_s:Math.max(0,Math.round(duration_s||0)),
       self_rating:self_rating||null,occurred_at:new Date().toISOString(),client_date:todayStr()});
@@ -225,7 +304,7 @@ async function syncFlush(){
   if(!fam) return; /* 家庭码未知（迁移中）→ 暂缓 */
   const token=await window.el2Refresh();
   if(!token) return; /* 无法取得有效 token → 保留队列 */
-  const batch=q.slice(0,50).map(x=>Object.assign({},x,{family_code:fam}));
+  const batch=q.slice(0,50).map(x=>Object.assign({},x,{family_code:fam,owner_uid:(window.EL2SESS||{}).uid||null}));
   try{
     const r=await fetch(SYNC_URL,{method:'POST',
       headers:{'apikey':SYNC_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},

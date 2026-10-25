@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <link rel="icon" href="data:,">
-<title>NCE2 Echo · 登录 / 注册</title>
-<!-- 账号认证：Supabase Auth（think-workbench）；注册走 el2_register RPC（邀请码制，免邮箱验证） -->
+<title>NCE2 Echo · 登录</title>
+<!-- 账号认证：Supabase Auth（think-workbench）；账号由教师在教师页创建，此处仅登录 -->
 <style>
   :root{--acc:#10B981;--btn:#3B5BDB;--txt:#212529;--sub:#6C757D;--line:#E9ECEF;--bad:#E03131}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -13,68 +13,47 @@
        background:linear-gradient(160deg,#F8FAF9 0%,#EAF7F1 100%);min-height:100vh;
        display:flex;align-items:center;justify-content:center;padding:20px;color:var(--txt)}
   .card{background:#fff;border-radius:22px;box-shadow:0 18px 50px rgba(59,91,219,.12);
-        padding:30px 28px;width:100%;max-width:420px}
+        padding:34px 28px;width:100%;max-width:400px}
   .logo{width:56px;height:56px;border-radius:16px;background:var(--btn);color:#fff;
         display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;margin:0 auto 14px}
   h1{font-size:20px;text-align:center;margin-bottom:4px}
-  .sub{font-size:13px;color:var(--sub);text-align:center;margin-bottom:18px}
-  .tabs{display:flex;gap:8px;margin-bottom:6px}
-  .tabs button{flex:1;height:48px;border:1.5px solid var(--line);border-radius:12px;background:#fff;
-        font-size:15px;font-weight:600;color:var(--sub);cursor:pointer}
-  .tabs button.on{border-color:var(--btn);color:var(--btn);background:#F0F4FF}
+  .sub{font-size:13px;color:var(--sub);text-align:center;margin-bottom:20px}
   label{display:block;font-size:13px;font-weight:600;margin:12px 0 6px}
   input{width:100%;height:46px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;
         font-size:16px;outline:none;background:#FBFCFD}
   input:focus{border-color:var(--btn);background:#fff}
-  .chips{display:flex;gap:8px;margin-top:4px}
-  .chip{flex:1;height:46px;border:1.5px solid var(--line);border-radius:10px;background:#fff;
-        font-size:14px;color:var(--sub);cursor:pointer}
+  .chips{display:flex;gap:8px;margin-top:10px}
+  .chip{flex:1;height:44px;border:1.5px solid var(--line);border-radius:10px;background:#fff;
+        font-size:13px;color:var(--sub);cursor:pointer}
   .chip.on{border-color:var(--btn);color:var(--btn);font-weight:600;background:#F0F4FF}
-  .hint{font-size:12px;color:var(--sub);margin-top:6px;line-height:1.5}
+  .hint{font-size:12px;color:var(--sub);margin-top:8px;text-align:center;line-height:1.5}
   button.go{width:100%;height:50px;border:0;border-radius:13px;background:var(--btn);color:#fff;
         font-size:16px;font-weight:700;margin-top:20px;cursor:pointer}
   button.go:disabled{opacity:.6}
   .err{color:var(--bad);font-size:13px;min-height:18px;margin-top:10px;text-align:center;line-height:1.5}
-  .foot{font-size:11px;color:var(--sub);text-align:center;margin-top:14px;line-height:1.6}
-  .hide{display:none}
+  .foot{font-size:11px;color:var(--sub);text-align:center;margin-top:16px;line-height:1.6}
 </style>
 </head>
 <body>
 <div class="card">
   <div class="logo">E</div>
-  <h1>NCE2 Echo 账号</h1>
-  <div class="sub">家长进管理台 · 孩子进训练台 · 学情实时同步</div>
-  <div class="tabs">
-    <button type="button" id="tabLogin" class="on">登 录</button>
-    <button type="button" id="tabReg">注 册</button>
-  </div>
-
+  <h1>NCE2 Echo 账号登录</h1>
+  <div class="sub">学生也可在训练页右上角「登录」进入，无需来此页</div>
   <form id="f" onsubmit="return false">
     <label for="em">账号邮箱</label>
     <input id="em" type="email" autocomplete="username" placeholder="you@example.com" required>
-    <div class="chips" id="quickChips">
+    <div class="chips">
+      <button type="button" class="chip" id="cKid">学生（快选）</button>
       <button type="button" class="chip" id="cPar">家长（快选）</button>
-      <button type="button" class="chip" id="cKid">孩子（快选）</button>
+      <button type="button" class="chip" id="cTea">教师（快选）</button>
     </div>
     <label for="pw">密码</label>
-    <input id="pw" type="password" autocomplete="current-password" placeholder="密码（注册需至少 8 位）" required>
-    <div id="regExtra" class="hide">
-      <label>我是……（选择角色）</label>
-      <div class="chips">
-        <button type="button" class="chip" id="rPar">家长</button>
-        <button type="button" class="chip" id="rKid">孩子</button>
-      </div>
-      <label for="fam">家庭邀请码</label>
-      <input id="fam" type="text" placeholder="向孩子的老师 / 家长获取" autocomplete="off" style="text-transform:uppercase">
-      <div class="hint">邀请码决定数据归属：同一个码的家庭，学情互通。</div>
-      <label for="dn">称呼（选填）</label>
-      <input id="dn" type="text" placeholder="如：Stuart 妈妈" maxlength="20" autocomplete="off">
-    </div>
+    <input id="pw" type="password" autocomplete="current-password" placeholder="密码" required>
     <button class="go" id="go" type="submit">登 录</button>
     <div class="err" id="err"></div>
   </form>
-  <div class="foot">认证由 Supabase 托管 · 家长端 NCE2 EchoAdmin · 孩子端 NCE2 Loop<br>
-  还没有家庭邀请码？请联系 Hank 获取</div>
+  <div class="hint">还没有账号？请联系老师开通（教师统一创建学生与家长账号）</div>
+  <div class="foot">认证由 Supabase 托管 · 学生端 NCE2 Loop · 家长端 EchoAdmin · 教师端账号管理</div>
 </div>
 <script>
 (function(){
@@ -82,31 +61,17 @@
 var SB="https://zwatrfbqkrvxpqtypdgx.supabase.co";
 var KEY="sb_publishable_mnkBBrHF70guvwfUNXuhBg_sIok8eBc";
 var BOARD="https://workbuddy.link/p/5IJWFXAquhgIqOoyYLsimE";
-var EM={parent:"parent@echo.hank-hunau.dev",kid:"kid@echo.hank-hunau.dev"};
+var TEACHER="https://hank-hunau.github.io/nce2-echoloop/teacher.html";
+var EM={kid:"kid@echo.hank-hunau.dev",parent:"parent@echo.hank-hunau.dev",teacher:"teacher@echo.hank-hunau.dev"};
 function $(id){return document.getElementById(id);}
-var mode="login";
-function setMode(m){
-  mode=m;
-  $("tabLogin").className=m==="login"?"on":"";
-  $("tabReg").className=m==="reg"?"on":"";
-  $("regExtra").className=m==="reg"?"":"hide";
-  $("quickChips").className=m==="login"?"chips":"chips hide";
-  $("go").textContent=m==="login"?"登 录":"注 册 并 登 录";
-  $("err").textContent="";
-  if(m==="login"){$("pw").setAttribute("autocomplete","current-password");}
-  else{$("pw").setAttribute("autocomplete","new-password");}
-}
-$("tabLogin").onclick=function(){setMode("login");};
-$("tabReg").onclick=function(){setMode("reg");};
-$("cPar").onclick=function(){$("em").value=EM.parent;$("cPar").className="chip on";$("cKid").className="chip";};
-$("cKid").onclick=function(){$("em").value=EM.kid;$("cKid").className="chip on";$("cPar").className="chip";};
-$("rPar").onclick=function(){$("rPar").className="chip on";$("rKid").className="chip";};
-$("rKid").onclick=function(){$("rKid").className="chip on";$("rPar").className="chip";};
+$("cKid").onclick=function(){$("em").value=EM.kid;mark(this);};
+$("cPar").onclick=function(){$("em").value=EM.parent;mark(this);};
+$("cTea").onclick=function(){$("em").value=EM.teacher;mark(this);};
+function mark(el){["cKid","cPar","cTea"].forEach(function(id){$(id).className="chip"+(id===el.id?" on":"");});}
 
 function api(path,opt){ return fetch(SB+path,opt).then(function(r){ return r.json().then(function(d){ return {ok:r.ok,d:d}; }); }); }
 function authHeaders(t){ return {"apikey":KEY,"Authorization":"Bearer "+t,"Content-Type":"application/json"}; }
 
-/* 认证成功后：读角色+家庭 → 分流 */
 function afterAuth(d){
   return api("/rest/v1/el2_accounts?select=role,family_code",{headers:authHeaders(d.access_token)})
   .then(function(res){
@@ -116,47 +81,25 @@ function afterAuth(d){
       expires_at:Date.now()+(d.expires_in||3600)*1000,role:row.role,
       family_code:row.family_code||"",email:d.user?d.user.email:""};
     if(row.role==="kid"){
+      /* 学生登录存同域会话 → 回训练页（页内弹窗/此页均可进） */
       localStorage.setItem("el2_session",JSON.stringify(sess));
       location.replace("./");
+    }else if(row.role==="teacher"){
+      location.replace(TEACHER+"#t="+encodeURIComponent(sess.access_token));
     }else{
-      /* 家长端在另一域：token 与家庭码经 URL 片段传递（不会发给服务器） */
       location.replace(BOARD+"#t="+encodeURIComponent(sess.access_token)+"&f="+encodeURIComponent(sess.family_code));
     }
   });
 }
-function doLogin(email,pw){
-  return api("/auth/v1/token?grant_type=password",{method:"POST",headers:authHeaders(KEY),body:JSON.stringify({email:email,password:pw})})
-    .then(function(res){ if(!res.ok||!res.d.access_token){ throw new Error(res.d.error_description||res.d.msg||"登录失败"); } return afterAuth(res.d); });
-}
-function doRegister(email,pw,role,fam,dn){
-  return api("/rest/v1/rpc/el2_register",{method:"POST",headers:authHeaders(KEY),
-    body:JSON.stringify({p_email:email,p_password:pw,p_role:role,p_family_code:fam,p_display:dn})})
-    .then(function(res){ if(!res.ok){ throw new Error(res.d.message||res.d.msg||"注册失败"); } return doLogin(email,pw); });
-}
-/* 已有有效孩子会话 → 提示直达 */
-try{
-  var s=JSON.parse(localStorage.getItem("el2_session")||"null");
-  if(s&&s.role==="kid"&&s.expires_at>Date.now()){ $("go").textContent="继续上次学习 →"; }
-}catch(e){}
-
 $("f").addEventListener("submit",function(ev){
   ev.preventDefault();
   var email=$("em").value.trim().toLowerCase(), pw=$("pw").value, err=$("err"), go=$("go");
-  err.textContent=""; go.disabled=true;
-  var p;
-  if(mode==="login"){
-    go.textContent="登录中…"; p=doLogin(email,pw);
-  }else{
-    var role=$("rPar").className.indexOf("on")>=0?"parent":($("rKid").className.indexOf("on")>=0?"kid":"");
-    var fam=$("fam").value.trim().toUpperCase(), dn=$("dn").value.trim();
-    if(!role){ err.textContent="请选择角色（家长 / 孩子）"; go.disabled=false; go.textContent="注 册 并 登 录"; return; }
-    if(!fam){ err.textContent="请填写家庭邀请码"; go.disabled=false; go.textContent="注 册 并 登 录"; return; }
-    go.textContent="注册中…";
-    p=doRegister(email,pw,role,fam,dn);
-  }
-  p.catch(function(e){
+  err.textContent=""; go.disabled=true; go.textContent="登录中…";
+  api("/auth/v1/token?grant_type=password",{method:"POST",headers:authHeaders(KEY),body:JSON.stringify({email:email,password:pw})})
+  .then(function(res){ if(!res.ok||!res.d.access_token){ throw new Error(res.d.error_description||res.d.msg||"登录失败"); } return afterAuth(res.d); })
+  .catch(function(e){
     err.textContent=String(e.message||e).replace("ApiError: ","");
-    go.disabled=false; go.textContent=mode==="login"?"登 录":"注 册 并 登 录";
+    go.disabled=false; go.textContent="登 录";
   });
 });
 })();
