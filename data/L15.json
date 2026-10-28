@@ -1,1 +1,391 @@
-{"no":15,"title":"Good News","titleZh":"佳音","audio":"audio/L15.mp3","duration":83.1,"question":{"en":"What was the good news?","zh":"好消息是什么？"},"sentences":[{"i":0,"t":13.11,"t2":17.94,"en":"What was the good news?","zh":"好消息是什么？","meta":true},{"i":1,"t":17.94,"t2":57.15,"en":"The secretary told me that","zh":"秘书告诉我，","chunks":[{"c":"VP","x":"told me that","g":"动词短语"},{"c":"NP","x":"The secretary","g":"冠词+名"}],"pat":"主谓宾","gp":["一般过去时","主谓宾句型"]},{"i":2,"t":57.15,"t2":60.15,"en":"Mr. Harmsworth would see me.","zh":"哈姆斯沃斯先生要见我。","chunks":[{"c":"VP","x":"would see me","g":"情态谓语"},{"c":"NP","x":"Mr. Harmsworth","g":"名词作定语/专名"}],"pat":"主谓宾","gp":["过去将来时","情态动词 would","主谓宾句型"]},{"i":3,"t":24.42,"t2":29.06,"en":"I felt very nervous when I went into his office.","zh":"我走进他的办公室时，感到非常紧张。","chunks":[{"c":"VP","x":"felt nervous","g":"动词短语"},{"c":"VP","x":"when went","g":"动词短语"},{"c":"PP","x":"into his office","g":"介词短语作定语/表语"},{"c":"SBAR","x":"when I went into his office","g":"状语从句"}],"pat":"主谓+状语","gp":["一般过去时","状语从句","主谓+状语句型"]},{"i":4,"t":29.06,"t2":33.31,"en":"He did not look up from his desk when I entered.","zh":"我进去的时候，他连头也没抬。","chunks":[{"c":"VP","x":"did not look up","g":"短语动词"},{"c":"VP","x":"when entered","g":"动词短语"},{"c":"PP","x":"from his desk","g":"介词短语作定语/表语"},{"c":"SBAR","x":"when I entered","g":"状语从句"}],"pat":"主谓+状语","gp":["状语从句","否定的 not","主谓+状语句型"]},{"i":5,"t":33.31,"t2":35.68,"en":"After I had sat down,","zh":"待我坐下后，","chunks":[{"c":"VP","x":"had sat down","g":"完成时态谓语"}],"pat":"主谓","gp":["过去完成时","主谓句型"]},{"i":6,"t":35.68,"t2":40.6,"en":"he said that business was very bad.","zh":"他说生意非常不景气。","chunks":[{"c":"VP","x":"was bad","g":"动词短语"},{"c":"SBAR","x":"that business was very bad","g":"宾语从句"},{"c":"ADJP","x":"very bad","g":"形容词短语"}],"pat":"主谓","gp":["一般过去时","宾语从句","主谓句型"]},{"i":7,"t":40.6,"t2":48.79,"en":"He told me that the firm could not afford to pay such large salaries.","zh":"他还告诉我，公司支付不起这么庞大的工资开支。","chunks":[{"c":"VP","x":"could not afford pay","g":"情态谓语"},{"c":"VP","x":"to pay salaries","g":"动词短语"},{"c":"VP","x":"told me","g":"动词短语"},{"c":"SBAR","x":"that the firm could not afford to pay such large salaries","g":"宾语从句"}],"pat":"主谓宾","gp":["一般过去时","情态动词 could","宾语从句"]},{"i":8,"t":48.79,"t2":52.31,"en":"Twenty people had already left.","zh":"已经有20个人离开了。","chunks":[{"c":"VP","x":"had already left","g":"完成时态谓语"},{"c":"NP","x":"Twenty people","g":"名词短语"}],"pat":"主谓+状语","gp":["过去完成时","主谓+状语句型"]},{"i":9,"t":52.31,"t2":57.14,"en":"I knew that my turn had come.","zh":"我知道这次该轮到我了。","chunks":[{"c":"VP","x":"had come","g":"完成时态谓语"},{"c":"SBAR","x":"that my turn had come","g":"宾语从句"},{"c":"NP","x":"my turn","g":"名词短语"}],"pat":"主谓","gp":["一般过去时","宾语从句","主谓句型"]},{"i":10,"t":57.14,"t2":63.55,"en":"'Mr. Harmsworth,' I said in a weak voice.","zh":"“哈姆斯沃斯先生，”我无力地说。","chunks":[{"c":"PP","x":"in a weak voice","g":"介词短语作定语/表语"},{"c":"NP","x":"a weak voice","g":"冠词+形+名"}],"pat":"主谓","gp":["一般过去时","主谓句型"]},{"i":11,"t":63.55,"t2":67.62,"en":"'Don't interrupt,' he said.","zh":"“不要打断我的话，”他说。","chunks":[{"c":"VP","x":"Do n't interrupt","g":"动词短语"},{"c":"SBAR","x":"Do n't interrupt","g":"宾语从句"}],"pat":"主谓","gp":["一般过去时","宾语从句","不定式"]},{"i":12,"t":67.62,"t2":70.76,"en":"Then he smiled and told me","zh":"然后他微笑了一下，告诉我说，","chunks":[{"c":"VP","x":"Then smiled","g":"动词短语"},{"c":"VP","x":"told me","g":"动词短语"}],"pat":"主谓+状语","gp":["一般过去时","主谓+状语句型","并列结构"]},{"i":13,"t":70.76,"t2":71.87,"en":"I would receive","zh":"我每年将得到","chunks":[{"c":"VP","x":"would receive","g":"情态谓语"}],"pat":"主谓","gp":["过去将来时","情态动词 would","主谓句型"]},{"i":14,"t":71.87,"t2":81.87,"en":"an extra thousand pounds a year!","zh":"1,000英镑的额外收入！","chunks":[{"c":"NP","x":"an extra thousand pounds","g":"形容词修饰名词"}],"pat":"主谓","gp":["感叹句","主谓句型"]}]}
+{
+ "no": 15,
+ "title": "Good News",
+ "titleZh": "佳音",
+ "audio": "audio/L15.mp3",
+ "duration": 83.1,
+ "question": {
+  "en": "What was the good news?",
+  "zh": "好消息是什么？"
+ },
+ "sentences": [
+  {
+   "i": 0,
+   "t": 13.11,
+   "t2": 17.94,
+   "en": "What was the good news?",
+   "zh": "好消息是什么？",
+   "meta": true
+  },
+  {
+   "i": 1,
+   "t": 17.94,
+   "t2": 57.15,
+   "en": "The secretary told me that",
+   "zh": "秘书告诉我，",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "told me that",
+     "g": "动词短语"
+    },
+    {
+     "c": "NP",
+     "x": "The secretary",
+     "g": "冠词+名"
+    }
+   ],
+   "pat": "主谓宾",
+   "gp": [
+    "一般过去时",
+    "主谓宾句型"
+   ]
+  },
+  {
+   "i": 2,
+   "t": 57.15,
+   "t2": 57.65,
+   "en": "Mr. Harmsworth would see me.",
+   "zh": "哈姆斯沃斯先生要见我。",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "would see me",
+     "g": "情态谓语"
+    },
+    {
+     "c": "NP",
+     "x": "Mr. Harmsworth",
+     "g": "名词作定语/专名"
+    }
+   ],
+   "pat": "主谓宾",
+   "gp": [
+    "过去将来时",
+    "情态动词 would",
+    "主谓宾句型"
+   ]
+  },
+  {
+   "i": 3,
+   "t": 24.42,
+   "t2": 29.06,
+   "en": "I felt very nervous when I went into his office.",
+   "zh": "我走进他的办公室时，感到非常紧张。",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "felt nervous",
+     "g": "动词短语"
+    },
+    {
+     "c": "VP",
+     "x": "when went",
+     "g": "动词短语"
+    },
+    {
+     "c": "PP",
+     "x": "into his office",
+     "g": "介词短语作定语/表语"
+    },
+    {
+     "c": "SBAR",
+     "x": "when I went into his office",
+     "g": "状语从句"
+    }
+   ],
+   "pat": "主谓+状语",
+   "gp": [
+    "一般过去时",
+    "状语从句",
+    "主谓+状语句型"
+   ]
+  },
+  {
+   "i": 4,
+   "t": 29.06,
+   "t2": 33.31,
+   "en": "He did not look up from his desk when I entered.",
+   "zh": "我进去的时候，他连头也没抬。",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "did not look up",
+     "g": "短语动词"
+    },
+    {
+     "c": "VP",
+     "x": "when entered",
+     "g": "动词短语"
+    },
+    {
+     "c": "PP",
+     "x": "from his desk",
+     "g": "介词短语作定语/表语"
+    },
+    {
+     "c": "SBAR",
+     "x": "when I entered",
+     "g": "状语从句"
+    }
+   ],
+   "pat": "主谓+状语",
+   "gp": [
+    "状语从句",
+    "否定的 not",
+    "主谓+状语句型"
+   ]
+  },
+  {
+   "i": 5,
+   "t": 33.31,
+   "t2": 35.68,
+   "en": "After I had sat down,",
+   "zh": "待我坐下后，",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "had sat down",
+     "g": "完成时态谓语"
+    }
+   ],
+   "pat": "主谓",
+   "gp": [
+    "过去完成时",
+    "主谓句型"
+   ]
+  },
+  {
+   "i": 6,
+   "t": 35.68,
+   "t2": 40.6,
+   "en": "he said that business was very bad.",
+   "zh": "他说生意非常不景气。",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "was bad",
+     "g": "动词短语"
+    },
+    {
+     "c": "SBAR",
+     "x": "that business was very bad",
+     "g": "宾语从句"
+    },
+    {
+     "c": "ADJP",
+     "x": "very bad",
+     "g": "形容词短语"
+    }
+   ],
+   "pat": "主谓",
+   "gp": [
+    "一般过去时",
+    "宾语从句",
+    "主谓句型"
+   ]
+  },
+  {
+   "i": 7,
+   "t": 40.6,
+   "t2": 48.79,
+   "en": "He told me that the firm could not afford to pay such large salaries.",
+   "zh": "他还告诉我，公司支付不起这么庞大的工资开支。",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "could not afford pay",
+     "g": "情态谓语"
+    },
+    {
+     "c": "VP",
+     "x": "to pay salaries",
+     "g": "动词短语"
+    },
+    {
+     "c": "VP",
+     "x": "told me",
+     "g": "动词短语"
+    },
+    {
+     "c": "SBAR",
+     "x": "that the firm could not afford to pay such large salaries",
+     "g": "宾语从句"
+    }
+   ],
+   "pat": "主谓宾",
+   "gp": [
+    "一般过去时",
+    "情态动词 could",
+    "宾语从句"
+   ]
+  },
+  {
+   "i": 8,
+   "t": 48.79,
+   "t2": 52.31,
+   "en": "Twenty people had already left.",
+   "zh": "已经有20个人离开了。",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "had already left",
+     "g": "完成时态谓语"
+    },
+    {
+     "c": "NP",
+     "x": "Twenty people",
+     "g": "名词短语"
+    }
+   ],
+   "pat": "主谓+状语",
+   "gp": [
+    "过去完成时",
+    "主谓+状语句型"
+   ]
+  },
+  {
+   "i": 9,
+   "t": 52.31,
+   "t2": 57.14,
+   "en": "I knew that my turn had come.",
+   "zh": "我知道这次该轮到我了。",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "had come",
+     "g": "完成时态谓语"
+    },
+    {
+     "c": "SBAR",
+     "x": "that my turn had come",
+     "g": "宾语从句"
+    },
+    {
+     "c": "NP",
+     "x": "my turn",
+     "g": "名词短语"
+    }
+   ],
+   "pat": "主谓",
+   "gp": [
+    "一般过去时",
+    "宾语从句",
+    "主谓句型"
+   ]
+  },
+  {
+   "i": 10,
+   "t": 57.14,
+   "t2": 63.55,
+   "en": "'Mr. Harmsworth,' I said in a weak voice.",
+   "zh": "“哈姆斯沃斯先生，”我无力地说。",
+   "chunks": [
+    {
+     "c": "PP",
+     "x": "in a weak voice",
+     "g": "介词短语作定语/表语"
+    },
+    {
+     "c": "NP",
+     "x": "a weak voice",
+     "g": "冠词+形+名"
+    }
+   ],
+   "pat": "主谓",
+   "gp": [
+    "一般过去时",
+    "主谓句型"
+   ]
+  },
+  {
+   "i": 11,
+   "t": 63.55,
+   "t2": 67.62,
+   "en": "'Don't interrupt,' he said.",
+   "zh": "“不要打断我的话，”他说。",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "Do n't interrupt",
+     "g": "动词短语"
+    },
+    {
+     "c": "SBAR",
+     "x": "Do n't interrupt",
+     "g": "宾语从句"
+    }
+   ],
+   "pat": "主谓",
+   "gp": [
+    "一般过去时",
+    "宾语从句",
+    "不定式"
+   ]
+  },
+  {
+   "i": 12,
+   "t": 67.62,
+   "t2": 70.76,
+   "en": "Then he smiled and told me",
+   "zh": "然后他微笑了一下，告诉我说，",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "Then smiled",
+     "g": "动词短语"
+    },
+    {
+     "c": "VP",
+     "x": "told me",
+     "g": "动词短语"
+    }
+   ],
+   "pat": "主谓+状语",
+   "gp": [
+    "一般过去时",
+    "主谓+状语句型",
+    "并列结构"
+   ]
+  },
+  {
+   "i": 13,
+   "t": 70.76,
+   "t2": 71.87,
+   "en": "I would receive",
+   "zh": "我每年将得到",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "would receive",
+     "g": "情态谓语"
+    }
+   ],
+   "pat": "主谓",
+   "gp": [
+    "过去将来时",
+    "情态动词 would",
+    "主谓句型"
+   ]
+  },
+  {
+   "i": 14,
+   "t": 71.87,
+   "t2": 81.87,
+   "en": "an extra thousand pounds a year!",
+   "zh": "1,000英镑的额外收入！",
+   "chunks": [
+    {
+     "c": "NP",
+     "x": "an extra thousand pounds",
+     "g": "形容词修饰名词"
+    }
+   ],
+   "pat": "主谓",
+   "gp": [
+    "感叹句",
+    "主谓句型"
+   ]
+  }
+ ]
+}

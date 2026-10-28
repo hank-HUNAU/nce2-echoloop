@@ -8,6 +8,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NCE2 Loop">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-startup-image" media="(device-width:1024px) and (device-height:1366px) and (-webkit-device-pixel-ratio:2) and (orientation:portrait)" href="splash-2048x2732.png">
+<link rel="apple-touch-startup-image" media="(device-width:1024px) and (device-height:1366px) and (-webkit-device-pixel-ratio:2) and (orientation:landscape)" href="splash-2732x2048.png">
+<link rel="apple-touch-startup-image" media="(device-width:430px) and (device-height:932px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)" href="splash-1290x2796.png">
+<link rel="apple-touch-startup-image" media="(device-width:430px) and (device-height:932px) and (-webkit-device-pixel-ratio:3) and (orientation:landscape)" href="splash-2796x1290.png">
+<link rel="apple-touch-startup-image" href="splash-1290x2796.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#3B5BDB">
     <title>NCE2 Loop · 精听跟读复述复习</title>
@@ -39,7 +44,7 @@ h2{font-size:18px;margin:0 0 10px}
 .play.on{background:var(--bad)}
 .ck{width:22px;height:22px;accent-color:var(--ok)}
 .late{color:var(--bad);font-weight:600}
-.empty{color:var(--sub);text-align:center;padding:16px 0;font-size:14px}
+.empty{color:var(--sub);text-align:center;padding:10px 0;font-size:14px}
 /* 课程网格 */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px}
 .cell{border:1px solid var(--line);border-radius:12px;background:#fff;text-align:center;padding:8px 2px;cursor:pointer;position:relative}
@@ -208,6 +213,7 @@ audio{width:100%}
                expires_at:Date.now()+(res.d.expires_in||3600)*1000,role:'kid',
                family_code:row.family_code||'',uid:res.d.user?res.d.user.id:'',email:em};
             save(); closeMask(); if(typeof nav==='function') nav();
+            var _g=document.getElementById('lmGo'); if(_g){ _g.disabled=false; _g.textContent='登 录'; }
           }else if(row.role==='teacher'){
             location.replace(TEACHER+'#t='+encodeURIComponent(res.d.access_token));
           }else{
@@ -375,6 +381,7 @@ async function loadLesson(no){
 
 /* ================= 路由 ================= */
 let CUR={no:0,data:null,stage:0,mode:'learn'};
+const TITLES=["A Private Conversation", "Breakfast or Lunch?", "Please Send Me a Card", "An Exciting Trip", "No Wrong Numbers", "Percy Buttons", "Too Late", "The Best and the Worst", "A Cold Welcome", "Not for Jazz", "One Good Turn Deserves Another", "Goodbye and Good Luck", "The Greenwood Boys", "Do You Speak English?", "Good News", "A Polite Request", "Always Young", "He Often does This!", "Sold Out", "One Man in a Boat", "Mad or Not?", "A Glass Envelope", "A New House", "It Could be Worse", "Do the English Speak English?", "The Best Art Critics", "A Wet Night", "No Parking", "Taxi!", "Football or Polo?", "Success Story", "Shopping Made Easy", "Out of the Darkness", "Quick Work", "Stop Thief!", "Across the Channel", "The Olympic Games", "Everything Except the Weather", "Am I All Right?", "Food and Talk", "Do You Call That a Hat?", "Not Very Musical", "Over the South Pole", "Through the Forest", "A Clear Conscience", "Expensive and Uncomfortable", "A Thirsty Ghost", "Did You Want to Tell Me Something?", "The End of a Dream", "Taken for a Ride", "Reward for Virtue", "A Pretty Carpet", "Hot Snake", "Sticky Fingers", "Not a Gold Mine", "Faster Than Sound!", "Can I Help You, Madam?", "A Blessing in Disguise?", "In or Out?", "The Future", "Trouble with the Hubble", "After the Fire", "She Was Not Amused", "The Channel Tunnel", "Jumbo Versus the Police", "Sweet as Honey!", "Volcanoes", "Persistent", "But not Murder!", "Red for Danger", "A Famous Clock", "A Car Called Bluebird", "The Record-Holder", "Out of the Limelight", "SOS", "April Fools' Day", "A Successful Operation", "The Last One?", "By Air", "The Crystal Palace", "Escape", "Monster or Fish?", "After the Elections", "On Strike", "Never Too Old To Learn", "Out of Control", "A Perfect Alibi", "Trapped in a Mine", "A Slip of the Tongue", "What's for Supper?", "Three Men in a Basket", "Asking for Trouble", "A Noble Gift", "Future Champions", "A Fantasy", "The Dead Return"];
 const TABS=[
   ['#/home','首页','<path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"/>'],
   ['#/hard','难句','<path d="M12 21s-7-4.6-9.5-8.5C.6 9.5 2.4 6 5.7 6c2 0 3.4 1.1 4.3 2.6h4c.9-1.5 2.3-2.6 4.3-2.6 3.3 0 5.1 3.5 3.2 6.5C19 16.4 12 21 12 21z"/>'],
@@ -386,7 +393,8 @@ function nav(){ const h=location.hash||'#/home';
   let meTab;
   if(window.EL2SESS){
     const who=(window.EL2SESS.email||'').split('@')[0];
-    meTab=`<a href="javascript:void(0)" id="tabMe" title="${who}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ME_ICON}</svg>我的</a>`;
+    const on=h==='#/me'?' class="on"':'';
+    meTab=`<a href="#/me"${on} title="${who}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ME_ICON}</svg>我的</a>`;
   }else{
     meTab=`<a href="javascript:void(0)" id="tabLogin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ME_ICON}</svg>登录</a>`;
   }
@@ -418,6 +426,7 @@ async function router(){
   }else if(h.startsWith('#/hard')) renderHard();
   else if(h.startsWith('#/cards')) renderCards();
   else if(h.startsWith('#/stats')) renderStats();
+  else if(h.startsWith('#/me')) renderMe();
   else renderHome();
 }
 window.addEventListener('hashchange',router);
@@ -443,12 +452,14 @@ function renderHome(){
   <div class="sec"><h2>继续学习</h2>
     <div class="item"><div class="tt"><div class="en">L${cont||1}${cont?'':'（未开始）'}</div>
       <div class="meta">已学 ${learned}/96 · 通关 ${done}/96</div></div>
-      <button class="btn sm" data-go="#/lesson/${cont||1}">继续</button>
+      <button class="btn sm" data-go="#/lesson/${cont||1}">${learned?'继续':'开始'}</button>
       <button class="btn sm g" data-go="#/lesson/${cont?cont+1<=96?cont+1:1:1}">下一课</button></div>
     <div class="bar" style="margin-top:10px"><i style="width:${Math.round(learned*100/total)}%"></i></div>
     <div class="tip" style="margin-top:4px">总进度 ${Math.round(learned*100/total)}%</div>
   </div>
-  <div class="sec"><h2>全部课程</h2><div class="grid">${cells()}</div></div>
+  <div class="sec"><h2>全部课程</h2>
+    <input id="cellQ" placeholder="搜索课号或标题（如 12 / dolphin）" autocomplete="off" style="width:100%;height:46px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;font-size:16px;outline:none;background:#FBFCFD;margin-bottom:10px">
+    <div class="grid">${cells()}</div></div>
   <div class="foot">盲听 → 跟读 → 精听 → 复述 → 间隔复习 · 数据存本机浏览器</div>`;
   $('#app').innerHTML=h;
 }
@@ -458,14 +469,22 @@ function cells(){
   for(let n=1;n<=96;n++){
     const p=PROG[n], cls=p?(p.reviews>=OFFSETS.length?'done':p.firstLearnAt?'doing':''):'';
     const due=dueSet.has(n);
-    const label=p?(p.reviews>=OFFSETS.length?'通关':'第'+(p.reviews+1)+'轮'):'未学';
-    h+=`<div class="cell ${cls} ${due?'due':''}" data-go="#/lesson/${n}"><b>L${n}</b><span>${label}</span></div>`;
+    const label=(p&&p.firstLearnAt)?(p.reviews>=OFFSETS.length?'通关':'第'+(p.reviews+1)+'轮'):'未学';
+    h+=`<div class="cell ${cls} ${due?'due':''}" data-go="#/lesson/${n}" data-t="${(TITLES[n-1]||'').toLowerCase()}"><b>L${n}</b><span>${label}</span></div>`;
   }
   return h;
 }
 document.addEventListener('click',e=>{
   const el=e.target.closest('[data-go]');
   if(el){ location.hash=el.getAttribute('data-go'); }
+});
+document.addEventListener('input',e=>{
+  if(e.target.id!=='cellQ') return;
+  const q=e.target.value.trim().toLowerCase();
+  document.querySelectorAll('#app .cell').forEach(c=>{
+    const t=(c.getAttribute('data-t')||'')+' '+c.textContent.toLowerCase();
+    c.style.display=(!q||t.includes(q))?'':'none';
+  });
 });
 
 /* ================= 课程页（精听/跟读/盲听/复述 + 复习模式） ================= */
@@ -744,6 +763,26 @@ function ringSvg(id,pct,color,label){
       stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-pct/100)).toFixed(1)}" transform="rotate(-90 55 55)"/>
     <text x="55" y="53" text-anchor="middle" font-size="19" fill="#212529">${pct}%</text>
     <text x="55" y="73" text-anchor="middle" font-size="11" fill="#868E96">${label}</text></svg></div>`;
+}
+function renderMe(){
+  if(!window.EL2SESS){ location.hash='#/home'; return; }
+  const learned=Object.keys(PROG).filter(k=>PROG[k].firstLearnAt).length;
+  const done=Object.keys(PROG).filter(k=>PROG[k].reviews>=OFFSETS.length).length;
+  const rounds=Object.values(PROG).reduce((a,p)=>a+(p.reviews||0),0);
+  const mins=Math.round((STATS.playSec||0)/60);
+  let h=`<h1>我的</h1>
+  <div class="sec"><h2>账号</h2><div class="item"><div class="tt">
+    <div class="en">${esc(window.EL2SESS.email||'')}</div>
+    <div class="meta">学生账号 · 学习记录已同步家长端与教师端</div></div></div></div>
+  <div class="sec"><h2>学习概览</h2>
+    <div class="item"><div class="tt"><div class="en">已学 ${learned}/96 · 通关 ${done}/96</div>
+      <div class="meta">累计复习 ${rounds} 轮 · 累计听读 ${mins} 分钟</div></div></div>
+    <div class="tip">未登录期间的本地进度不会补传；登录后新学习实时上云。</div></div>
+  <div class="sec"><button class="btn" id="meOut2">退出登录</button>
+    <div class="tip" style="margin-top:8px">退出后本机进度保留，仅停止云同步。</div></div>`;
+  $('#app').innerHTML=h;
+  const b=document.getElementById('meOut2');
+  if(b) b.addEventListener('click',()=>{ if(window.el2Logout) window.el2Logout(); });
 }
 function renderStats(){
   const learned=Object.keys(PROG).filter(k=>PROG[k].firstLearnAt).length;

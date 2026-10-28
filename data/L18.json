@@ -1,1 +1,415 @@
-{"no":18,"title":"He Often does This!","titleZh":"他经常干这种事！","audio":"audio/L18.mp3","duration":82.32,"question":{"en":"What had happened to the writer's bag?","zh":"作者的提包怎么了？"},"sentences":[{"i":0,"t":14.59,"t2":20.49,"en":"What had happened to the writer's bag?","zh":"作者的提包怎么了？","meta":true},{"i":1,"t":20.49,"t2":24.25,"en":"After I had had lunch at a village pub,","zh":"我在一家乡村小酒馆吃过午饭后，","chunks":[{"c":"VP","x":"had had lunch","g":"完成时态谓语"},{"c":"PP","x":"at a village pub","g":"介词短语作定语/表语"},{"c":"NP","x":"a village pub","g":"冠词+名"}],"pat":"主谓宾","gp":["过去完成时","主谓宾句型"]},{"i":2,"t":24.25,"t2":27.44,"en":"I looked for my bag.","zh":"就找我的提包。","chunks":[{"c":"PP","x":"for my bag","g":"介词短语作定语/表语"},{"c":"NP","x":"my bag","g":"名词短语"}],"pat":"主谓","gp":["一般过去时","主谓句型"]},{"i":3,"t":27.44,"t2":34.73,"en":"I had left it on a chair beside the door and now it wasn't there!","zh":"我曾把它放在门边的椅子上，可这会儿不见了！","chunks":[{"c":"VP","x":"now was n't there","g":"动词短语"},{"c":"VP","x":"had left it","g":"完成时态谓语"},{"c":"PP","x":"on a chair beside the door","g":"介词短语作定语/表语"},{"c":"PP","x":"beside the door","g":"介词短语作定语/表语"}],"pat":"主谓宾","gp":["过去完成时","感叹句","否定的 not"]},{"i":4,"t":34.73,"t2":40.13,"en":"As I was looking for it, the landlord came in.","zh":"当我正在寻找时，酒馆老板走了进来。","chunks":[{"c":"VP","x":"was looking","g":"进行时态谓语"},{"c":"VP","x":"came in","g":"短语动词"},{"c":"PP","x":"for it","g":"介词短语作定语/表语"},{"c":"SBAR","x":"As I was looking for it","g":"状语从句"}],"pat":"主谓+状语","gp":["一般过去时","原因状语从句","现在分词作修饰/状语"]},{"i":5,"t":40.13,"t2":44.47,"en":"'Did you have a good meal?' he asked.","zh":"“您吃得好吗？”他问。","chunks":[{"c":"VP","x":"Did have meal","g":"动词短语"},{"c":"SBAR","x":"Did you have a good meal","g":"宾语从句"},{"c":"NP","x":"a good meal","g":"冠词+形+名"}],"pat":"主谓","gp":["一般过去时","宾语从句","不定式"]},{"i":6,"t":44.47,"t2":47.79,"en":"'Yes, thank you,' I answered,","zh":"“很好，谢谢，”我回答，","chunks":[{"c":"VP","x":"thank you","g":"动词短语"},{"c":"SBAR","x":"Yes thank you","g":"宾语从句"}],"pat":"主谓","gp":["一般过去时","宾语从句","主谓句型"]},{"i":7,"t":47.79,"t2":53.64,"en":"'but I can't pay the bill. I haven't got my bag.'","zh":"“但我付不了账，我的提包没有了。”","chunks":[{"c":"VP","x":"ca n't pay bill","g":"情态谓语"},{"c":"VP","x":"have n't got bag","g":"完成时态谓语"},{"c":"NP","x":"the bill","g":"冠词+名"},{"c":"NP","x":"my bag","g":"名词短语"}],"pat":"主谓宾","gp":["一般现在时","情态动词 can","否定的 not"]},{"i":8,"t":53.64,"t2":56.64,"en":"The landlord smiled","zh":"老板笑了笑，","chunks":[{"c":"NP","x":"The landlord","g":"冠词+名"}],"pat":"主谓","gp":["一般过去时","主谓句型"]},{"i":9,"t":53.64,"t2":59.33,"en":"and immediately went out.","zh":"马上走了出去。","chunks":[{"c":"VP","x":"immediately went out","g":"短语动词"}],"pat":"主谓+状语","gp":["一般过去时","主谓+状语句型","并列结构"]},{"i":10,"t":59.33,"t2":62.78,"en":"In a few minutes he returned with my bag","zh":"一会儿工夫他拿着我的提包回来了，","chunks":[{"c":"PP","x":"In a few minutes","g":"介词短语作定语/表语"},{"c":"PP","x":"with my bag","g":"介词短语作定语/表语"},{"c":"NP","x":"a few minutes","g":"冠词+形+名"},{"c":"NP","x":"my bag","g":"名词短语"}],"pat":"主谓","gp":["一般过去时","主谓句型"]},{"i":11,"t":62.78,"t2":65.38,"en":"and gave it back to me.","zh":"把它还给了我。","chunks":[{"c":"VP","x":"gave it back","g":"动词短语"},{"c":"PP","x":"to me","g":"介词短语作定语/表语"}],"pat":"主谓宾","gp":["一般过去时","主谓宾句型","并列结构"]},{"i":12,"t":65.38,"t2":68.8,"en":"'I'm very sorry,' he said.","zh":"“实在抱歉，”他说。","chunks":[{"c":"VP","x":"'m sorry","g":"动词短语"},{"c":"SBAR","x":"I 'm very sorry","g":"宾语从句"},{"c":"ADJP","x":"very sorry","g":"形容词短语"}],"pat":"主谓","gp":["一般过去时","宾语从句","主谓句型"]},{"i":13,"t":68.8,"t2":72.54,"en":"'My dog had taken it into the garden.","zh":"“我的狗把它弄到花园里去了，","chunks":[{"c":"VP","x":"had taken it","g":"完成时态谓语"},{"c":"PP","x":"into the garden","g":"介词短语作定语/表语"},{"c":"NP","x":"My dog","g":"名词短语"},{"c":"NP","x":"the garden","g":"冠词+名"}],"pat":"主谓宾","gp":["过去完成时","主谓宾句型"]},{"i":14,"t":72.54,"t2":82.54,"en":"He often does this!'","zh":"他常干这种事！”","chunks":[{"c":"VP","x":"often does this","g":"动词短语"}],"pat":"主谓宾","gp":["一般现在时","主谓宾句型"]}]}
+{
+ "no": 18,
+ "title": "He Often does This!",
+ "titleZh": "他经常干这种事！",
+ "audio": "audio/L18.mp3",
+ "duration": 82.32,
+ "question": {
+  "en": "What had happened to the writer's bag?",
+  "zh": "作者的提包怎么了？"
+ },
+ "sentences": [
+  {
+   "i": 0,
+   "t": 14.59,
+   "t2": 20.49,
+   "en": "What had happened to the writer's bag?",
+   "zh": "作者的提包怎么了？",
+   "meta": true
+  },
+  {
+   "i": 1,
+   "t": 20.49,
+   "t2": 24.25,
+   "en": "After I had had lunch at a village pub,",
+   "zh": "我在一家乡村小酒馆吃过午饭后，",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "had had lunch",
+     "g": "完成时态谓语"
+    },
+    {
+     "c": "PP",
+     "x": "at a village pub",
+     "g": "介词短语作定语/表语"
+    },
+    {
+     "c": "NP",
+     "x": "a village pub",
+     "g": "冠词+名"
+    }
+   ],
+   "pat": "主谓宾",
+   "gp": [
+    "过去完成时",
+    "主谓宾句型"
+   ]
+  },
+  {
+   "i": 2,
+   "t": 24.25,
+   "t2": 27.44,
+   "en": "I looked for my bag.",
+   "zh": "就找我的提包。",
+   "chunks": [
+    {
+     "c": "PP",
+     "x": "for my bag",
+     "g": "介词短语作定语/表语"
+    },
+    {
+     "c": "NP",
+     "x": "my bag",
+     "g": "名词短语"
+    }
+   ],
+   "pat": "主谓",
+   "gp": [
+    "一般过去时",
+    "主谓句型"
+   ]
+  },
+  {
+   "i": 3,
+   "t": 27.44,
+   "t2": 34.73,
+   "en": "I had left it on a chair beside the door and now it wasn't there!",
+   "zh": "我曾把它放在门边的椅子上，可这会儿不见了！",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "now was n't there",
+     "g": "动词短语"
+    },
+    {
+     "c": "VP",
+     "x": "had left it",
+     "g": "完成时态谓语"
+    },
+    {
+     "c": "PP",
+     "x": "on a chair beside the door",
+     "g": "介词短语作定语/表语"
+    },
+    {
+     "c": "PP",
+     "x": "beside the door",
+     "g": "介词短语作定语/表语"
+    }
+   ],
+   "pat": "主谓宾",
+   "gp": [
+    "过去完成时",
+    "感叹句",
+    "否定的 not"
+   ]
+  },
+  {
+   "i": 4,
+   "t": 34.73,
+   "t2": 40.13,
+   "en": "As I was looking for it, the landlord came in.",
+   "zh": "当我正在寻找时，酒馆老板走了进来。",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "was looking",
+     "g": "进行时态谓语"
+    },
+    {
+     "c": "VP",
+     "x": "came in",
+     "g": "短语动词"
+    },
+    {
+     "c": "PP",
+     "x": "for it",
+     "g": "介词短语作定语/表语"
+    },
+    {
+     "c": "SBAR",
+     "x": "As I was looking for it",
+     "g": "状语从句"
+    }
+   ],
+   "pat": "主谓+状语",
+   "gp": [
+    "一般过去时",
+    "原因状语从句",
+    "现在分词作修饰/状语"
+   ]
+  },
+  {
+   "i": 5,
+   "t": 40.13,
+   "t2": 44.47,
+   "en": "'Did you have a good meal?' he asked.",
+   "zh": "“您吃得好吗？”他问。",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "Did have meal",
+     "g": "动词短语"
+    },
+    {
+     "c": "SBAR",
+     "x": "Did you have a good meal",
+     "g": "宾语从句"
+    },
+    {
+     "c": "NP",
+     "x": "a good meal",
+     "g": "冠词+形+名"
+    }
+   ],
+   "pat": "主谓",
+   "gp": [
+    "一般过去时",
+    "宾语从句",
+    "不定式"
+   ]
+  },
+  {
+   "i": 6,
+   "t": 44.47,
+   "t2": 47.79,
+   "en": "'Yes, thank you,' I answered,",
+   "zh": "“很好，谢谢，”我回答，",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "thank you",
+     "g": "动词短语"
+    },
+    {
+     "c": "SBAR",
+     "x": "Yes thank you",
+     "g": "宾语从句"
+    }
+   ],
+   "pat": "主谓",
+   "gp": [
+    "一般过去时",
+    "宾语从句",
+    "主谓句型"
+   ]
+  },
+  {
+   "i": 7,
+   "t": 47.79,
+   "t2": 53.64,
+   "en": "'but I can't pay the bill. I haven't got my bag.'",
+   "zh": "“但我付不了账，我的提包没有了。”",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "ca n't pay bill",
+     "g": "情态谓语"
+    },
+    {
+     "c": "VP",
+     "x": "have n't got bag",
+     "g": "完成时态谓语"
+    },
+    {
+     "c": "NP",
+     "x": "the bill",
+     "g": "冠词+名"
+    },
+    {
+     "c": "NP",
+     "x": "my bag",
+     "g": "名词短语"
+    }
+   ],
+   "pat": "主谓宾",
+   "gp": [
+    "一般现在时",
+    "情态动词 can",
+    "否定的 not"
+   ]
+  },
+  {
+   "i": 8,
+   "t": 53.64,
+   "t2": 54.14,
+   "en": "The landlord smiled",
+   "zh": "老板笑了笑，",
+   "chunks": [
+    {
+     "c": "NP",
+     "x": "The landlord",
+     "g": "冠词+名"
+    }
+   ],
+   "pat": "主谓",
+   "gp": [
+    "一般过去时",
+    "主谓句型"
+   ]
+  },
+  {
+   "i": 9,
+   "t": 53.64,
+   "t2": 59.33,
+   "en": "and immediately went out.",
+   "zh": "马上走了出去。",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "immediately went out",
+     "g": "短语动词"
+    }
+   ],
+   "pat": "主谓+状语",
+   "gp": [
+    "一般过去时",
+    "主谓+状语句型",
+    "并列结构"
+   ]
+  },
+  {
+   "i": 10,
+   "t": 59.33,
+   "t2": 62.78,
+   "en": "In a few minutes he returned with my bag",
+   "zh": "一会儿工夫他拿着我的提包回来了，",
+   "chunks": [
+    {
+     "c": "PP",
+     "x": "In a few minutes",
+     "g": "介词短语作定语/表语"
+    },
+    {
+     "c": "PP",
+     "x": "with my bag",
+     "g": "介词短语作定语/表语"
+    },
+    {
+     "c": "NP",
+     "x": "a few minutes",
+     "g": "冠词+形+名"
+    },
+    {
+     "c": "NP",
+     "x": "my bag",
+     "g": "名词短语"
+    }
+   ],
+   "pat": "主谓",
+   "gp": [
+    "一般过去时",
+    "主谓句型"
+   ]
+  },
+  {
+   "i": 11,
+   "t": 62.78,
+   "t2": 65.38,
+   "en": "and gave it back to me.",
+   "zh": "把它还给了我。",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "gave it back",
+     "g": "动词短语"
+    },
+    {
+     "c": "PP",
+     "x": "to me",
+     "g": "介词短语作定语/表语"
+    }
+   ],
+   "pat": "主谓宾",
+   "gp": [
+    "一般过去时",
+    "主谓宾句型",
+    "并列结构"
+   ]
+  },
+  {
+   "i": 12,
+   "t": 65.38,
+   "t2": 68.8,
+   "en": "'I'm very sorry,' he said.",
+   "zh": "“实在抱歉，”他说。",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "'m sorry",
+     "g": "动词短语"
+    },
+    {
+     "c": "SBAR",
+     "x": "I 'm very sorry",
+     "g": "宾语从句"
+    },
+    {
+     "c": "ADJP",
+     "x": "very sorry",
+     "g": "形容词短语"
+    }
+   ],
+   "pat": "主谓",
+   "gp": [
+    "一般过去时",
+    "宾语从句",
+    "主谓句型"
+   ]
+  },
+  {
+   "i": 13,
+   "t": 68.8,
+   "t2": 72.54,
+   "en": "'My dog had taken it into the garden.",
+   "zh": "“我的狗把它弄到花园里去了，",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "had taken it",
+     "g": "完成时态谓语"
+    },
+    {
+     "c": "PP",
+     "x": "into the garden",
+     "g": "介词短语作定语/表语"
+    },
+    {
+     "c": "NP",
+     "x": "My dog",
+     "g": "名词短语"
+    },
+    {
+     "c": "NP",
+     "x": "the garden",
+     "g": "冠词+名"
+    }
+   ],
+   "pat": "主谓宾",
+   "gp": [
+    "过去完成时",
+    "主谓宾句型"
+   ]
+  },
+  {
+   "i": 14,
+   "t": 72.54,
+   "t2": 82.04,
+   "en": "He often does this!'",
+   "zh": "他常干这种事！”",
+   "chunks": [
+    {
+     "c": "VP",
+     "x": "often does this",
+     "g": "动词短语"
+    }
+   ],
+   "pat": "主谓宾",
+   "gp": [
+    "一般现在时",
+    "主谓宾句型"
+   ]
+  }
+ ]
+}
