@@ -57,6 +57,8 @@ h2{font-size:18px;margin:0 0 10px}
 nav.tabs{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
  display:flex;z-index:30;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
 nav.tabs a{flex:1;text-align:center;padding:9px 0 8px;font-size:14px;color:var(--sub);text-decoration:none;min-height:56px}
+nav.tabs a{position:relative}
+nav.tabs a .bdg{position:absolute;top:6px;left:calc(50% + 4px);width:9px;height:9px;border-radius:50%;background:#E03131;border:1.5px solid #fff}
 nav.tabs a svg{width:26px;height:26px;display:block;margin:0 auto 2px}
 nav.tabs a.on{color:var(--acc)}
 /* 句子列表 */
@@ -105,6 +107,8 @@ nav.tabs a.on{color:var(--acc)}
 audio{width:100%}
 @media (hover:none){.btn:active,.play:active,.star:active,nav.tabs a:active{transform:scale(.96)}}
 @media (hover:hover){.btn:hover,.play:hover{filter:brightness(1.05)}}
+.skel{height:16px;border-radius:8px;margin:10px 0;background:linear-gradient(90deg,#EEF0F3 25%,#F8F9FA 45%,#EEF0F3 65%);background-size:200% 100%;animation:skm 1.2s infinite}
+@keyframes skm{to{background-position:-200% 0}}
 @media (orientation:landscape) and (min-width:1000px){ .wrap{max-width:1100px} .wrap .sec{max-width:920px;margin-left:auto;margin-right:auto} }
 @media print{nav.tabs{display:none}}
 </style>
@@ -400,6 +404,10 @@ function nav(){ const h=location.hash||'#/home';
   }
   $('#tabs').innerHTML=TABS.map(t=>{const on=h.startsWith(t[0])?' class="on"':'';
     return `<a href="${t[0]}"${on}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${t[2]}</svg>${t[1]}</a>`;}).join('')+meTab;
+  if(dueList().length>0 && h!=='#/home'){
+    const hm=document.querySelector('nav.tabs a[href="#/home"]');
+    if(hm && !hm.querySelector('.bdg')){ const b=document.createElement('i'); b.className='bdg'; hm.appendChild(b); }
+  }
   const tl=document.getElementById('tabLogin');
   if(tl) tl.addEventListener('click',function(ev){ ev.preventDefault(); if(window.el2OpenLogin) window.el2OpenLogin(); });
   const tm=document.getElementById('tabMe');
@@ -421,7 +429,11 @@ async function router(){
     const m=h.match(/#\/lesson\/(\d+)(\?m=rev)?/);
     CUR.mode=m[2]?'rev':'learn';
     const no=+m[1];
-    if(CUR.no!==no||!CUR.data){ CUR.no=no; CUR.data=await loadLesson(no); }
+    if(CUR.no!==no||!CUR.data){
+      CUR.no=no;
+      $('#app').innerHTML='<h1>L'+no+'</h1><div class="sec"><div class="skel" style="width:70%"></div><div class="skel"></div><div class="skel"></div><div class="skel" style="width:85%"></div><div class="skel"></div><div class="skel" style="width:60%"></div></div>';
+      CUR.data=await loadLesson(no);
+    }
     renderLesson();
   }else if(h.startsWith('#/hard')) renderHard();
   else if(h.startsWith('#/cards')) renderCards();
@@ -430,6 +442,19 @@ async function router(){
   else renderHome();
 }
 window.addEventListener('hashchange',router);
+/* 返回键保护：back 永远回到首页（防学习误退）；退出用系统手势/后台划掉 */
+(function(){
+  function arm(){ history.pushState({l2g:1}, '', '#/home'); }
+  window.addEventListener('popstate', function(){
+    const hh = location.hash || '#/home';
+    if (hh === '#/home') arm();
+  });
+  window.addEventListener('hashchange', function(){
+    const hh = location.hash || '#/home';
+    if (hh === '#/home') arm();
+  });
+  arm();
+})();
 
 /* ================= 首页 ================= */
 function renderHome(){
@@ -457,6 +482,13 @@ function renderHome(){
     <div class="bar" style="margin-top:10px"><i style="width:${Math.round(learned*100/total)}%"></i></div>
     <div class="tip" style="margin-top:4px">总进度 ${Math.round(learned*100/total)}%</div>
   </div>
+  ${(()=>{ try{ if(localStorage.getItem(LS+'intro')) return ''; }catch(e){ return ''; }
+    return `<div class="sec" id="introBox"><h2>怎么用？三步就上手</h2>
+      <div class="item"><div class="tt"><div class="en">① 盲听整课</div><div class="meta">先读题预测，不看字幕完整听一遍，听大意</div></div></div>
+      <div class="item"><div class="tt"><div class="en">② 跟读 → 精听</div><div class="meta">逐句跟着读；再点 ▶ 抠懂每句话，难句点 ★ 收藏</div></div></div>
+      <div class="item"><div class="tt"><div class="en">③ 复述 → 等 7 轮复习</div><div class="meta">脱稿说出来；系统自动排 7 轮复习提醒（红点提示）</div></div></div>
+      <button class="btn" id="introGo" style="width:100%;margin-top:6px">我知道了，开始学习</button></div>`;
+  })()}
   <div class="sec"><h2>全部课程</h2>
     <input id="cellQ" placeholder="搜索课号或标题（如 12 / dolphin）" autocomplete="off" style="width:100%;height:46px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;font-size:16px;outline:none;background:#FBFCFD;margin-bottom:10px">
     <div class="grid">${cells()}</div></div>
@@ -477,6 +509,9 @@ function cells(){
 document.addEventListener('click',e=>{
   const el=e.target.closest('[data-go]');
   if(el){ location.hash=el.getAttribute('data-go'); }
+});
+document.addEventListener('click',e=>{
+  if(e.target.id==='introGo'){ try{ localStorage.setItem(LS+'intro','1'); }catch(err){} const b=document.getElementById('introBox'); if(b) b.remove(); }
 });
 document.addEventListener('input',e=>{
   if(e.target.id!=='cellQ') return;
