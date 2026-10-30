@@ -76,6 +76,7 @@ nav.tabs a.on{color:var(--acc)}
 .blur{filter:blur(7px);transition:filter .3s;user-select:none}
 /* 阶段条 */
 .stepper{display:flex;gap:6px;margin:12px 0}
+.blurred{filter:blur(9px);user-select:none;pointer-events:none;transition:filter .25s}
 .stepper .st{flex:1;text-align:center;font-size:15px;padding:11px 2px;border-radius:10px;background:#F1F3F5;color:var(--sub)}
 .stepper .st.on{color:#fff;font-weight:600}
 .stepper .st.ok{background:#E6FCF5;color:#087F5B}
@@ -444,16 +445,15 @@ async function router(){
 window.addEventListener('hashchange',router);
 /* 返回键保护：back 永远回到首页（防学习误退）；退出用系统手势/后台划掉 */
 (function(){
-  function arm(){ history.pushState({l2g:1}, '', '#/home'); }
-  window.addEventListener('popstate', function(){
-    const hh = location.hash || '#/home';
-    if (hh === '#/home') arm();
+  function arm(){ history.pushState({l2g:1}, ''); }   /* 不带 URL：保留当前地址 */
+  window.addEventListener('popstate', function(ev){
+    /* 仅当落点是「首页陷阱层」时重新布防；fragment 导航的 popstate(state=null) 不干预 */
+    if((location.hash||'#/home')==='#/home' && ev.state && ev.state.l2g) arm();
   });
   window.addEventListener('hashchange', function(){
-    const hh = location.hash || '#/home';
-    if (hh === '#/home') arm();
+    if((location.hash||'#/home')==='#/home') arm();
   });
-  arm();
+  if((location.hash||'#/home')==='#/home') arm();
 })();
 
 /* ================= 首页 ================= */
@@ -553,19 +553,17 @@ function renderStage(){
 function stageIntensive(){
   const p=prog(CUR.no), d=CUR.data;
   const n=Object.keys(p.listened).length, total=d.sentences.length;
-  let h=`<div class="sec"><h2>逐句精听</h2><div class="tip">点 ▶ 逐句听懂；点句子展开意群/句型/译文。整段盲听建立大意后，逐句抠细节。</div>
+  let h=`<div class="sec"><h2>逐句精听</h2><div class="tip">点句子播放；播放后下方显示中文核对。听不懂的句子点 ★ 收藏。</div>
     <div class="bar"><i style="width:${Math.round(n*100/total)}%"></i></div>
     <div class="tip" style="margin-top:4px">${n}/${total}</div>`;
   d.sentences.forEach((s,i)=>{
     const star=p.hard.includes(i)?' on':'';
-    h+=`<div class="sent ${p.si===i?'cur':''}" id="sn${i}">
+    h+=`<div class="sent ${p.si===i?'cur':''}" id="sn${i}" data-act="plays" data-i="${i}" style="cursor:pointer">
       <span class="idx">${i+1}</span>
-      <button class="play ${p.listened[i]?'':'g'}" data-act="plays" data-i="${i}" style="${p.listened[i]?'':'background:#CED4DA'}">▶</button>
-      <div class="tt" data-act="det" data-i="${i}" style="cursor:pointer">
+      <div class="tt">
         <div class="en">${esc(s.en)}</div><div class="zh" id="zh${i}" style="display:none">${esc(s.zh)}</div>
-        <div id="det${i}" style="display:none">${sentDetail(s)}</div>
       </div>
-      <button class="star${star}" data-act="star" data-i="${i}">★</button>
+      <button class="star${star}" data-act="star" data-i="${i}" title="收藏难句">★</button>
     </div>`;
   });
   h+=`<div style="margin-top:12px"><button class="btn" data-act="tostage" data-v="3">进入复述 →</button></div></div>`;
@@ -583,6 +581,7 @@ function stageShadow(){
   const p=prog(CUR.no), d=CUR.data;
   if(CUR.si==null) CUR.si=p.si||0;
   if(!CUR.loops) CUR.loops=1;
+  if(CUR.shReveal===undefined) CUR.shReveal=false;   /* 盲跟档：默认遮原文 */
   const s=d.sentences[CUR.si];
   const n=Object.values(p.shadow).filter(v=>v>0).length;
   return `<div class="shadow">
@@ -591,9 +590,8 @@ function stageShadow(){
       <b style="flex:1;text-align:center">${CUR.si+1} / ${d.sentences.length}</b>
       <button class="btn sm g" data-act="ns">下一句 →</button></div>
     <div class="bar" style="margin:10px 0"><i style="width:${Math.round(n*100/d.sentences.length)}%"></i></div>
-    <div class="big" data-act="det" data-i="${CUR.si}">${esc(s.en)}</div>
-    <div class="tip" id="zhx">参考中文：${esc(s.zh)}</div>
-    ${s.chunks?`<div>${s.chunks.map(c=>`<span class="tag v">${esc(c.x)}<i style="font-style:normal;opacity:.7"> ${esc(c.g||c.c)}</i></span>`).join(' ')}</div>`:''}
+    <div id="shTxt" class="${CUR.shReveal?'':'blurred'}"><div class="big">${esc(s.en)}</div><div class="tip" id="zhx">参考中文：${esc(s.zh)}</div></div>
+    <div style="margin:6px 0"><button class="btn sm" data-act="revsh">${CUR.shReveal?'🙈 隐藏原文（盲跟）':'👁 揭示原文核对'}</button></div>
     <div class="cnt">循环
       ${[1,3,5].map(n=>`<button class="btn sm ${CUR.loops===n?'':'g'}" data-act="loop" data-v="${n}">×${n}</button>`).join('')}
       <span class="pill" id="loopLeft">剩 ${CUR.loopsLeft??CUR.loops} 遍</span>
@@ -618,7 +616,6 @@ function stageBlind(){
     <div style="margin:8px 0"><button class="btn" data-act="playall">▶ 完整播放</button></div>
     <div id="blindBox" class="${p.blindDone?'':'blur'}" style="padding:4px 0">
       ${d.sentences.map((s,i)=>`<div class="sent"><span class="idx">${i+1}</span>
-        <button class="play" style="background:#CED4DA" data-act="plays" data-i="${i}">▶</button>
         <div class="tt"><div class="en">${esc(s.en)}</div><div class="zh">${esc(s.zh)}</div></div></div>`).join('')}
     </div>
     <div style="margin:10px 0;display:flex;gap:8px;flex-wrap:wrap">
@@ -629,11 +626,13 @@ function stageBlind(){
 }
 /* —— 复述 —— */
 function stageRetell(){
-  const p=prog(CUR.no);
+  const p=prog(CUR.no), d=CUR.data;
   return `<div class="sec"><h2>段落复述</h2><div class="tip">合上原文，用自己的话把这一课讲出来（英语）。按「结构优先」：先说清开头→经过→结尾，不追求逐词还原。</div>
     <div style="margin:8px 0"><button class="btn rd" data-act="rec" data-retell="1" id="btnRec">● 录复述</button>
       <button class="btn sm g" data-act="abmine" id="btnMine" ${CUR.blob?'':'disabled'}>▶ 回放我的复述</button>
       <span class="tip" id="recState" style="margin-left:8px">${CUR.blob?'已录 ✓':'未录制'}</span></div>
+    <div style="margin:8px 0"><button class="btn sm g" data-act="retellhint">${CUR.retellHint?'隐藏提示（脱稿）':'🔑 看提示复述'}</button></div>
+    ${CUR.retellHint?`<div class="detail">${d.sentences.map((ss,i)=>`<div style="margin:3px 0"><b>${i+1}.</b> ${esc(ss.en.split(/\s+/).slice(0,4).join(' '))}…</div>`).join('')}</div>`:''}
     <div class="detail">自检三问：① 谁做了什么？② 中间发生了什么？③ 结局/结果如何？</div>
     <label style="display:flex;align-items:center;gap:6px;font-size:14px;margin:8px 0">
       <input type="checkbox" class="ck" data-act="retelldone" ${p.retellDone?'checked':''}> 我完成复述</label>
@@ -688,6 +687,7 @@ document.addEventListener('click',async e=>{
     }else{
       playSeg(s.t,s.t2);
     }
+    const zz=$('#zh'+i); if(zz) zz.style.display='block';
         if(!rev){ p.si=i; if(CUR.si!=null)CUR.si=i; if(p.stage===2){ p.listened[i]=1; saveProgress(); const bt=el.closest('.sent'); if(bt&&bt.querySelector('.play'))bt.querySelector('.play').style.background='var(--accBtn)'; } else saveProgress(); }
     else saveProgress();
   }
@@ -776,16 +776,21 @@ function renderHard(){
 }
 /* ================= 闪卡 ================= */
 function renderCards(){
-  const hard=store.getHard();
-  let h=`<h1>语境闪卡</h1><div class="tip">正面中文回忆 → 点卡翻转核对原句；🔊 在语境里重听。</div>`;
+  const now=Date.now();
+  const hard=store.getHard().slice().sort((a,b)=>(a.due||0)-(b.due||0));
+  const dueN=hard.filter(x=>!x.due||x.due<=now).length;
+  let h=`<h1>语境闪卡</h1><div class="tip">正面中文回忆 → 点卡翻转核对原句 → 自评「记住了/没记住」。没记住的 12 小时后再出现，记住了 3 天后再见。今日待复习 ${dueN} 张。</div>`;
   if(!hard.length){ h+='<div class="sec"><div class="empty">收藏难句后，这里会自动生成卡片</div></div>'; $('#app').innerHTML=h; return; }
   h+='<div id="deck">'+hard.map((x,ix)=>`
-    <div class="card" data-act="flip" data-ix="${ix}"><div class="in">
-      <div class="f"><div class="pill">中文回忆</div><div style="font-size:20px;font-weight:700;margin-top:8px">${esc(x.zh)||'（无译文）'}</div>
+    <div class="card" data-act="flip" data-ix="${ix}" style="${(x.due&&x.due>now)?'opacity:.55':''}"><div class="in">
+      <div class="f"><div class="pill">中文回忆${(x.due&&x.due>now)?' · 已排程':''}</div><div style="font-size:20px;font-weight:700;margin-top:8px">${esc(x.zh)||'（无译文）'}</div>
         <div class="tip" style="margin-top:8px">L${x.no} ${x.pat?'· '+esc(x.pat):''}</div></div>
       <div class="b"><div class="pill" style="background:#DBE4FF">原句</div>
         <div class="en" style="font-family:Georgia,'Times New Roman',serif;font-size:18px;margin-top:8px">${esc(x.en)}</div>
-        <div class="tip" style="margin-top:8px"><button class="btn sm g" data-act="cardplay" data-no="${x.no}" data-i="${x.i}">🔊 语境重听</button></div></div>
+        <div class="tip" style="margin-top:8px"><button class="btn sm g" data-act="cardplay" data-no="${x.no}" data-i="${x.i}">🔊 语境重听</button></div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn sm" style="flex:1" data-act="cardno" data-ix="${ix}">没记住</button>
+          <button class="btn sm ok" style="flex:1;background:var(--ok)" data-act="cardok" data-ix="${ix}">记住了</button></div></div>
     </div></div>`).join('')+'</div>';
   $('#app').innerHTML=h;
 }
@@ -856,6 +861,15 @@ document.addEventListener('click',e=>{
   const el=e.target.closest('[data-act]'); if(!el) return;
   const act=el.dataset.act;
   if(act==='logout'){ localStorage.removeItem('el2_session'); location.replace('login.html'); return; }
+  if(act==='revsh'){ CUR.shReveal=!CUR.shReveal; renderLesson(); return; }
+  if(act==='retellhint'){ CUR.retellHint=!CUR.retellHint; renderLesson(); return; }
+  if(act==='cardok'||act==='cardno'){
+    const hard=store.getHard(); const it=hard[+el.dataset.ix]; if(!it) return;
+    it.due = Date.now() + (act==='cardok'?3*864e5:12*36e5);
+    store.setHard(hard);
+    const cd=el.closest('.card'); cd.classList.remove('flip'); cd.style.opacity=.4; cd.style.pointerEvents='none';
+    return;
+  }
   if(act==='flip'){ el.classList.toggle('flip'); }
   else if(act==='goSent'){ location.hash='#/lesson/'+el.dataset.no; CUR.afterRender=()=>{ prog(+el.dataset.no).stage=0; renderLesson(); }; }
   else if(act==='unstar'){
