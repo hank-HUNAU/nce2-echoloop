@@ -76,6 +76,8 @@ nav.tabs a.on{color:var(--acc)}
 .blur{filter:blur(7px);transition:filter .3s;user-select:none}
 /* 阶段条 */
 .stepper{display:flex;gap:6px;margin:12px 0}
+.tipq{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line);background:#fff;color:var(--sub);font-size:13px;font-weight:700;cursor:pointer;vertical-align:middle;flex:0 0 26px}
+.tipd .tip{background:#F8F9FC;border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-top:6px}
 .blurred{filter:blur(9px);user-select:none;pointer-events:none;transition:filter .25s}
 .stepper .st{flex:1;text-align:center;font-size:15px;padding:11px 2px;border-radius:10px;background:#F1F3F5;color:var(--sub)}
 .stepper .st.on{color:#fff;font-weight:600}
@@ -386,6 +388,9 @@ async function loadLesson(no){
 
 /* ================= 路由 ================= */
 let CUR={no:0,data:null,stage:0,mode:'learn'};
+function tipQ(key,text){
+  return `<span class="tipq" data-act="tipq" data-tk="${key}" title="说明">?</span><div class="tipd" id="tipd-${key}" style="display:none"><div class="tip">${text}</div></div>`;
+}
 const TITLES=["A Private Conversation", "Breakfast or Lunch?", "Please Send Me a Card", "An Exciting Trip", "No Wrong Numbers", "Percy Buttons", "Too Late", "The Best and the Worst", "A Cold Welcome", "Not for Jazz", "One Good Turn Deserves Another", "Goodbye and Good Luck", "The Greenwood Boys", "Do You Speak English?", "Good News", "A Polite Request", "Always Young", "He Often does This!", "Sold Out", "One Man in a Boat", "Mad or Not?", "A Glass Envelope", "A New House", "It Could be Worse", "Do the English Speak English?", "The Best Art Critics", "A Wet Night", "No Parking", "Taxi!", "Football or Polo?", "Success Story", "Shopping Made Easy", "Out of the Darkness", "Quick Work", "Stop Thief!", "Across the Channel", "The Olympic Games", "Everything Except the Weather", "Am I All Right?", "Food and Talk", "Do You Call That a Hat?", "Not Very Musical", "Over the South Pole", "Through the Forest", "A Clear Conscience", "Expensive and Uncomfortable", "A Thirsty Ghost", "Did You Want to Tell Me Something?", "The End of a Dream", "Taken for a Ride", "Reward for Virtue", "A Pretty Carpet", "Hot Snake", "Sticky Fingers", "Not a Gold Mine", "Faster Than Sound!", "Can I Help You, Madam?", "A Blessing in Disguise?", "In or Out?", "The Future", "Trouble with the Hubble", "After the Fire", "She Was Not Amused", "The Channel Tunnel", "Jumbo Versus the Police", "Sweet as Honey!", "Volcanoes", "Persistent", "But not Murder!", "Red for Danger", "A Famous Clock", "A Car Called Bluebird", "The Record-Holder", "Out of the Limelight", "SOS", "April Fools' Day", "A Successful Operation", "The Last One?", "By Air", "The Crystal Palace", "Escape", "Monster or Fish?", "After the Elections", "On Strike", "Never Too Old To Learn", "Out of Control", "A Perfect Alibi", "Trapped in a Mine", "A Slip of the Tongue", "What's for Supper?", "Three Men in a Basket", "Asking for Trouble", "A Noble Gift", "Future Champions", "A Fantasy", "The Dead Return"];
 const TABS=[
   ['#/home','首页','<path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"/>'],
@@ -465,7 +470,7 @@ function renderHome(){
   for(const k in PROG){ const p=PROG[k]; const sc=p.stage*100+(p.si||0); if(sc>best){best=sc;cont=+k;} }
   const lastTouched=Object.keys(PROG).map(Number).sort((a,b)=>b-a)[0]||1;
   let h=`<h1>NCE2 Loop</h1>
-  <div class="sec"><h2>今天要处理</h2><div class="tip">间隔复习 7 轮自动排程：6小时 → 1天 → 2天 → 4天 → 7天 → 14天 → 28天</div>`;
+  <div class="sec"><h2>今天要处理 ${tipQ('sched','到期复习由系统自动排程：学完一课后，按 6小时 → 1天 → 2天 → 4天 → 7天 → 14天 → 28天 排 7 轮复习。')}</h2>`;
   if(due.length){
     h+=due.map(d=>`<div class="item"><div class="tt"><div class="en">L${d.no} · 第 ${d.round} 轮复习</div>
       <div class="meta">${d.overdueDays>0?`<span class="late">已逾期 ${d.overdueDays} 天</span>`:'今日到期'} · 盲听+难句补练+复述</div></div>
@@ -492,7 +497,7 @@ function renderHome(){
   <div class="sec"><h2>全部课程</h2>
     <input id="cellQ" placeholder="搜索课号或标题（如 12 / dolphin）" autocomplete="off" style="width:100%;height:46px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;font-size:16px;outline:none;background:#FBFCFD;margin-bottom:10px">
     <div class="grid">${cells()}</div></div>
-  <div class="foot">盲听 → 跟读 → 精听 → 复述 → 间隔复习 · 数据存本机浏览器</div>`;
+  <div class="foot">盲听 → 跟读 → 精听 → 复述 → 间隔复习</div>`;
   $('#app').innerHTML=h;
 }
 function cells(){
@@ -553,7 +558,7 @@ function renderStage(){
 function stageIntensive(){
   const p=prog(CUR.no), d=CUR.data;
   const n=Object.keys(p.listened).length, total=d.sentences.length;
-  let h=`<div class="sec"><h2>逐句精听</h2><div class="tip">点句子播放；播放后下方显示中文核对。听不懂的句子点 ★ 收藏。</div>
+  let h=`<div class="sec"><h2>逐句精听</h2>${tipQ('int','点句子播放，句子下方会显示中文核对。听不懂的句子点 ★ 收藏，卡片页会自动生成记忆卡。')}
     <div class="bar"><i style="width:${Math.round(n*100/total)}%"></i></div>
     <div class="tip" style="margin-top:4px">${n}/${total}</div>`;
   d.sentences.forEach((s,i)=>{
@@ -611,7 +616,7 @@ function stageShadow(){
 /* —— 盲听 —— */
 function stageBlind(){
   const p=prog(CUR.no), d=CUR.data;
-  return `<div class="sec"><h2>盲听整段</h2><div class="tip">先读题预测内容，再不看字幕完整听一遍，检验整体理解。听不出的地方先忍住，听完再揭晓。</div>
+  return `<div class="sec"><h2>盲听整段 ${tipQ('blind','先看问题预测内容，再不看字幕完整听一遍，检验自己听懂了多少。听不出来先忍住，听完再揭晓字幕。')}</h2>
     ${d.question?`<div class="detail"><b>📢 本课问题 · 听前先预测</b><div class="en">${esc(d.question.en)}</div><div class="zh">${esc(d.question.zh)}</div></div>`:''}
     <div style="margin:8px 0"><button class="btn" data-act="playall">▶ 完整播放</button></div>
     <div id="blindBox" class="${p.blindDone?'':'blur'}" style="padding:4px 0">
@@ -627,7 +632,7 @@ function stageBlind(){
 /* —— 复述 —— */
 function stageRetell(){
   const p=prog(CUR.no), d=CUR.data;
-  return `<div class="sec"><h2>段落复述</h2><div class="tip">合上原文，用自己的话把这一课讲出来（英语）。按「结构优先」：先说清开头→经过→结尾，不追求逐词还原。</div>
+  return `<div class="sec"><h2>段落复述</h2>${tipQ('retell','合上原文，用自己的话把这一课讲出来（英语）。先说清开头 → 经过 → 结尾，不追求逐词还原，说出意思就是成功。')}
     <div style="margin:8px 0"><button class="btn rd" data-act="rec" data-retell="1" id="btnRec">● 录复述</button>
       <button class="btn sm g" data-act="abmine" id="btnMine" ${CUR.blob?'':'disabled'}>▶ 回放我的复述</button>
       <span class="tip" id="recState" style="margin-left:8px">${CUR.blob?'已录 ✓':'未录制'}</span></div>
@@ -658,7 +663,7 @@ function stageHardDrill(){
   const p=prog(CUR.no), d=CUR.data;
   const hs=p.hard.length?p.hard:Object.keys(p.listened).map(Number).slice(0,3);
   if(!hs.length) return '<div class="sec"><div class="empty">本课还没有收藏难句，直接进入复述即可</div></div>';
-  return `<div class="sec"><h2>难句补练</h2><div class="tip">只练收藏的 ${hs.length} 句：听 → 跟读 → 对比，每句至少 2 遍。</div>
+  return `<div class="sec"><h2>难句补练</h2>${tipQ('drill','只练你收藏的难句：听 → 跟读 → 对比自己的录音，每句至少 2 遍。')}
     ${hs.map(i=>{const s=d.sentences[i];return `<div class="sent">
       <button class="play" data-act="plays" data-i="${i}">▶</button>
       <div class="tt"><div class="en">${esc(s.en)}</div><div class="zh">${esc(s.zh)}</div></div>
@@ -764,7 +769,7 @@ document.addEventListener('click',async e=>{
 /* ================= 难句本 ================= */
 function renderHard(){
   const hard=store.getHard();
-  let h=`<h1>难句本</h1><div class="sec"><div class="tip">精听时点 ★ 收藏的句子，全部课程汇总在此；点击回原课重练。</div>`;
+  let h=`<h1>难句本</h1><div class="sec"><h2>难句本 ${tipQ('hard','精听时点 ★ 收藏的句子都汇总在这里，点「重练」回到原课再练一遍。')}</h2>`;
   if(!hard.length) h+='<div class="empty">还没有收藏，去精听里点亮星星吧</div>';
   h+=hard.map((x,ix)=>`<div class="item">
     <div class="tt"><div class="en">${esc(x.en)}</div>
@@ -779,7 +784,7 @@ function renderCards(){
   const now=Date.now();
   const hard=store.getHard().slice().sort((a,b)=>(a.due||0)-(b.due||0));
   const dueN=hard.filter(x=>!x.due||x.due<=now).length;
-  let h=`<h1>语境闪卡</h1><div class="tip">正面中文回忆 → 点卡翻转核对原句 → 自评「记住了/没记住」。没记住的 12 小时后再出现，记住了 3 天后再见。今日待复习 ${dueN} 张。</div>`;
+  let h=`<h1>语境闪卡 ${tipQ('cards','看中文回忆英文 → 点卡翻转核对 → 自评。没记住的 12 小时后再出现，记住了 3 天后再见。')}</h1><div class="tip">今日待复习 ${dueN} 张。</div>`;
   if(!hard.length){ h+='<div class="sec"><div class="empty">收藏难句后，这里会自动生成卡片</div></div>'; $('#app').innerHTML=h; return; }
   h+='<div id="deck">'+hard.map((x,ix)=>`
     <div class="card" data-act="flip" data-ix="${ix}" style="${(x.due&&x.due>now)?'opacity:.55':''}"><div class="in">
@@ -813,13 +818,13 @@ function renderMe(){
   let h=`<h1>我的</h1>
   <div class="sec"><h2>账号</h2><div class="item"><div class="tt">
     <div class="en">${esc(window.EL2SESS.email||'')}</div>
-    <div class="meta">学生账号 · 学习记录已同步家长端与教师端</div></div></div></div>
+    <div class="meta">学习记录会同步给爸爸妈妈和老师</div></div></div></div>
   <div class="sec"><h2>学习概览</h2>
     <div class="item"><div class="tt"><div class="en">已学 ${learned}/96 · 通关 ${done}/96</div>
       <div class="meta">累计复习 ${rounds} 轮 · 累计听读 ${mins} 分钟</div></div></div>
-    <div class="tip">未登录期间的本地进度不会补传；登录后新学习实时上云。</div></div>
+    <div class="tip">现在已登录，学的内容会自动同步 ✓</div></div>
   <div class="sec"><button class="btn" id="meOut2">退出登录</button>
-    <div class="tip" style="margin-top:8px">退出后本机进度保留，仅停止云同步。</div></div>`;
+    <div class="tip" style="margin-top:8px">退出后，已学的内容还留在平板里。</div></div>`;
   $('#app').innerHTML=h;
   const b=document.getElementById('meOut2');
   if(b) b.addEventListener('click',()=>{ if(window.el2Logout) window.el2Logout(); });
@@ -847,7 +852,7 @@ function renderStats(){
   <div class="sec"><div class="item"><div class="tt">累计收听</div><b>${mins} 分钟</b></div>
     <div class="item"><div class="tt">跟读句子次数</div><b>${STATS.shadowN||0}</b></div>
     <div class="item"><div class="tt">录音次数</div><b>${STATS.recN||0}</b></div></div>
-  <div class="sec no-print"><h2>数据管理</h2><div class="tip">学习记录存本机浏览器；换设备前先导出。</div>
+  <div class="sec no-print"><h2>数据管理</h2><div class="tip">换新平板前，先点「导出备份」保存记录。</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn sm g" data-act="exp">导出 JSON 备份</button>
       <button class="btn sm g" data-act="imp">导入恢复</button>
@@ -863,6 +868,7 @@ document.addEventListener('click',e=>{
   if(act==='logout'){ localStorage.removeItem('el2_session'); location.replace('login.html'); return; }
   if(act==='revsh'){ CUR.shReveal=!CUR.shReveal; renderLesson(); return; }
   if(act==='retellhint'){ CUR.retellHint=!CUR.retellHint; renderLesson(); return; }
+  if(act==='tipq'){ const dEl=document.getElementById('tipd-'+el.dataset.tk); if(dEl) dEl.style.display=dEl.style.display==='none'?'block':'none'; return; }
   if(act==='cardok'||act==='cardno'){
     const hard=store.getHard(); const it=hard[+el.dataset.ix]; if(!it) return;
     it.due = Date.now() + (act==='cardok'?3*864e5:12*36e5);
