@@ -1,0 +1,122 @@
+[
+ {
+  "no": 2,
+  "i": 8,
+  "en": "'It's raining again.'",
+  "t": 45.79,
+  "t2": 48.79,
+  "prevT2": 44.95,
+  "nextT": 48.81,
+  "match": 0.5
+ },
+ {
+  "no": 26,
+  "i": 15,
+  "en": "'It's all right,' she said, 'but isn't it upside down?'",
+  "t": 91.34,
+  "t2": 99.95,
+  "prevT2": 90.19,
+  "nextT": 99.97,
+  "match": 0.5
+ },
+ {
+  "no": 40,
+  "i": 7,
+  "en": "'No,' she answered.",
+  "t": 60.29,
+  "t2": 64.09,
+  "prevT2": 58.99,
+  "nextT": 64.33,
+  "match": 0.5
+ },
+ {
+  "no": 40,
+  "i": 9,
+  "en": "'No,' she answered.",
+  "t": 71.0,
+  "t2": 75.83,
+  "prevT2": 69.22,
+  "nextT": 76.0,
+  "match": 0.5
+ },
+ {
+  "no": 40,
+  "i": 11,
+  "en": "'No,' she answered.",
+  "t": 80.34,
+  "t2": 84.67,
+  "prevT2": 79.05,
+  "nextT": 84.69,
+  "match": 0.5
+ },
+ {
+  "no": 45,
+  "i": 14,
+  "en": "'Only 25 per cent a thief now!'",
+  "t": 77.25,
+  "t2": 82.02,
+  "prevT2": 75.23,
+  "nextT": 82.04,
+  "match": 0.5
+ },
+ {
+  "no": 64,
+  "i": 2,
+  "en": "Aime Thome de Gamond,",
+  "t": 22.88,
+  "t2": 26.93,
+  "prevT2": 22.86,
+  "nextT": 26.95,
+  "match": 0.25
+ },
+ {
+  "no": 74,
+  "i": 17,
+  "en": "'Well, I'm Brinksley Meers,",
+  "t": 119.35,
+  "t2": 121.95,
+  "prevT2": 118.61,
+  "nextT": 121.97,
+  "match": 0.5
+ },
+ {
+  "no": 81,
+  "i": 9,
+  "en": "At that moment, a large black car with four officers inside it, stoppe",
+  "t": 58.03,
+  "t2": 68.18,
+  "prevT2": 56.13,
+  "nextT": 68.2,
+  "match": 0.53
+ },
+ {
+  "no": 87,
+  "i": 11,
+  "en": "'Of course not.'",
+  "t": 79.52,
+  "t2": 82.72,
+  "prevT2": 78.07,
+  "nextT": 82.92,
+  "match": 0.5
+ },
+ {
+  "no": 92,
+  "i": 14,
+  "en": "'You see, I've forgotten my key.'",
+  "t": 96.1,
+  "t2": 99.94,
+  "prevT2": 95.37,
+  "nextT": 100.27,
+  "match": 0.57
+ },
+ {
+  "no": 95,
+  "i": 7,
+  "en": "'Good heavens!' exclaimed his wife.",
+  "t": 48.49,
+  "t2": 53.22,
+  "prevT2": 47.12,
+  "nextT": 53.4,
+  "match": 0.5
+ }
+]
