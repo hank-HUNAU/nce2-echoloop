@@ -11,16 +11,16 @@
  "sentences": [
   {
    "i": 0,
-   "t": 14.59,
-   "t2": 20.49,
+   "t": 14.52,
+   "t2": 17.75,
    "en": "What had happened to the writer's bag?",
    "zh": "作者的提包怎么了？",
    "meta": true
   },
   {
    "i": 1,
-   "t": 20.49,
-   "t2": 24.25,
+   "t": 20.13,
+   "t2": 23.6,
    "en": "After I had had lunch at a village pub,",
    "zh": "我在一家乡村小酒馆吃过午饭后，",
    "chunks": [
@@ -48,8 +48,8 @@
   },
   {
    "i": 2,
-   "t": 24.25,
-   "t2": 27.44,
+   "t": 24.03,
+   "t2": 25.8,
    "en": "I looked for my bag.",
    "zh": "就找我的提包。",
    "chunks": [
@@ -72,8 +72,8 @@
   },
   {
    "i": 3,
-   "t": 27.44,
-   "t2": 34.73,
+   "t": 27.03,
+   "t2": 32.9,
    "en": "I had left it on a chair beside the door and now it wasn't there!",
    "zh": "我曾把它放在门边的椅子上，可这会儿不见了！",
    "chunks": [
@@ -107,8 +107,8 @@
   },
   {
    "i": 4,
-   "t": 34.73,
-   "t2": 40.13,
+   "t": 34.45,
+   "t2": 38.7,
    "en": "As I was looking for it, the landlord came in.",
    "zh": "当我正在寻找时，酒馆老板走了进来。",
    "chunks": [
@@ -142,8 +142,8 @@
   },
   {
    "i": 5,
-   "t": 40.13,
-   "t2": 44.47,
+   "t": 40.32,
+   "t2": 43.27,
    "en": "'Did you have a good meal?' he asked.",
    "zh": "“您吃得好吗？”他问。",
    "chunks": [
@@ -172,8 +172,8 @@
   },
   {
    "i": 6,
-   "t": 44.47,
-   "t2": 47.79,
+   "t": 44.91,
+   "t2": 46.86,
    "en": "'Yes, thank you,' I answered,",
    "zh": "“很好，谢谢，”我回答，",
    "chunks": [
@@ -197,8 +197,8 @@
   },
   {
    "i": 7,
-   "t": 47.79,
-   "t2": 53.64,
+   "t": 48.03,
+   "t2": 51.9,
    "en": "'but I can't pay the bill. I haven't got my bag.'",
    "zh": "“但我付不了账，我的提包没有了。”",
    "chunks": [
@@ -232,8 +232,8 @@
   },
   {
    "i": 8,
-   "t": 53.64,
-   "t2": 54.14,
+   "t": 53.41,
+   "t2": 55.24,
    "en": "The landlord smiled",
    "zh": "老板笑了笑，",
    "chunks": [
@@ -251,8 +251,8 @@
   },
   {
    "i": 9,
-   "t": 53.64,
-   "t2": 59.33,
+   "t": 55.61,
+   "t2": 57.58,
    "en": "and immediately went out.",
    "zh": "马上走了出去。",
    "chunks": [
@@ -271,8 +271,8 @@
   },
   {
    "i": 10,
-   "t": 59.33,
-   "t2": 62.78,
+   "t": 59.2,
+   "t2": 62.53,
    "en": "In a few minutes he returned with my bag",
    "zh": "一会儿工夫他拿着我的提包回来了，",
    "chunks": [
@@ -305,8 +305,8 @@
   },
   {
    "i": 11,
-   "t": 62.78,
-   "t2": 65.38,
+   "t": 62.66,
+   "t2": 64.23,
    "en": "and gave it back to me.",
    "zh": "把它还给了我。",
    "chunks": [
@@ -330,8 +330,8 @@
   },
   {
    "i": 12,
-   "t": 65.38,
-   "t2": 68.8,
+   "t": 65.72,
+   "t2": 67.99,
    "en": "'I'm very sorry,' he said.",
    "zh": "“实在抱歉，”他说。",
    "chunks": [
@@ -360,8 +360,8 @@
   },
   {
    "i": 13,
-   "t": 68.8,
-   "t2": 72.54,
+   "t": 68.97,
+   "t2": 71.68,
    "en": "'My dog had taken it into the garden.",
    "zh": "“我的狗把它弄到花园里去了，",
    "chunks": [
@@ -394,8 +394,8 @@
   },
   {
    "i": 14,
-   "t": 72.54,
-   "t2": 82.04,
+   "t": 72.41,
+   "t2": 73.86,
    "en": "He often does this!'",
    "zh": "他常干这种事！”",
    "chunks": [

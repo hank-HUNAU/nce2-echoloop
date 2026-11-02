@@ -11,16 +11,16 @@
  "sentences": [
   {
    "i": 0,
-   "t": 13.11,
-   "t2": 17.94,
+   "t": 13.04,
+   "t2": 15.25,
    "en": "What was the good news?",
    "zh": "好消息是什么？",
    "meta": true
   },
   {
    "i": 1,
-   "t": 17.94,
-   "t2": 57.15,
+   "t": 17.76,
+   "t2": 20.31,
    "en": "The secretary told me that",
    "zh": "秘书告诉我，",
    "chunks": [
@@ -43,8 +43,8 @@
   },
   {
    "i": 2,
-   "t": 57.15,
-   "t2": 57.65,
+   "t": 20.33,
+   "t2": 22.91,
    "en": "Mr. Harmsworth would see me.",
    "zh": "哈姆斯沃斯先生要见我。",
    "chunks": [
@@ -68,8 +68,8 @@
   },
   {
    "i": 3,
-   "t": 24.42,
-   "t2": 29.06,
+   "t": 24.11,
+   "t2": 27.86,
    "en": "I felt very nervous when I went into his office.",
    "zh": "我走进他的办公室时，感到非常紧张。",
    "chunks": [
@@ -103,8 +103,8 @@
   },
   {
    "i": 4,
-   "t": 29.06,
-   "t2": 33.31,
+   "t": 28.9,
+   "t2": 32.23,
    "en": "He did not look up from his desk when I entered.",
    "zh": "我进去的时候，他连头也没抬。",
    "chunks": [
@@ -138,8 +138,8 @@
   },
   {
    "i": 5,
-   "t": 33.31,
-   "t2": 35.68,
+   "t": 32.25,
+   "t2": 35.2,
    "en": "After I had sat down,",
    "zh": "待我坐下后，",
    "chunks": [
@@ -157,8 +157,8 @@
   },
   {
    "i": 6,
-   "t": 35.68,
-   "t2": 40.6,
+   "t": 35.57,
+   "t2": 38.9,
    "en": "he said that business was very bad.",
    "zh": "他说生意非常不景气。",
    "chunks": [
@@ -187,8 +187,8 @@
   },
   {
    "i": 7,
-   "t": 40.6,
-   "t2": 48.79,
+   "t": 40.16,
+   "t2": 46.39,
    "en": "He told me that the firm could not afford to pay such large salaries.",
    "zh": "他还告诉我，公司支付不起这么庞大的工资开支。",
    "chunks": [
@@ -222,8 +222,8 @@
   },
   {
    "i": 8,
-   "t": 48.79,
-   "t2": 52.31,
+   "t": 48.62,
+   "t2": 51.17,
    "en": "Twenty people had already left.",
    "zh": "已经有20个人离开了。",
    "chunks": [
@@ -246,8 +246,8 @@
   },
   {
    "i": 9,
-   "t": 52.31,
-   "t2": 57.14,
+   "t": 52.05,
+   "t2": 54.54,
    "en": "I knew that my turn had come.",
    "zh": "我知道这次该轮到我了。",
    "chunks": [
@@ -276,8 +276,8 @@
   },
   {
    "i": 10,
-   "t": 57.14,
-   "t2": 63.55,
+   "t": 59.92,
+   "t2": 62.21,
    "en": "'Mr. Harmsworth,' I said in a weak voice.",
    "zh": "“哈姆斯沃斯先生，”我无力地说。",
    "chunks": [
@@ -300,8 +300,8 @@
   },
   {
    "i": 11,
-   "t": 63.55,
-   "t2": 67.62,
+   "t": 63.84,
+   "t2": 66.09,
    "en": "'Don't interrupt,' he said.",
    "zh": "“不要打断我的话，”他说。",
    "chunks": [
@@ -325,8 +325,8 @@
   },
   {
    "i": 12,
-   "t": 67.62,
-   "t2": 70.76,
+   "t": 67.55,
+   "t2": 70.8,
    "en": "Then he smiled and told me",
    "zh": "然后他微笑了一下，告诉我说，",
    "chunks": [
@@ -350,8 +350,8 @@
   },
   {
    "i": 13,
-   "t": 70.76,
-   "t2": 71.87,
+   "t": 70.82,
+   "t2": 71.82,
    "en": "I would receive",
    "zh": "我每年将得到",
    "chunks": [
@@ -370,8 +370,8 @@
   },
   {
    "i": 14,
-   "t": 71.87,
-   "t2": 81.87,
+   "t": 71.84,
+   "t2": 74.64,
    "en": "an extra thousand pounds a year!",
    "zh": "1,000英镑的额外收入！",
    "chunks": [

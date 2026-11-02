@@ -11,16 +11,16 @@
  "sentences": [
   {
    "i": 0,
-   "t": 12.27,
-   "t2": 17.23,
+   "t": 9.31,
+   "t2": 14.7,
    "en": "What kind of fish are they?",
    "zh": "它们是什么鱼？",
    "meta": true
   },
   {
    "i": 1,
-   "t": 17.23,
-   "t2": 22.23,
+   "t": 17.47,
+   "t2": 21.28,
    "en": "Fish and chips has always been a favourite dish in Britain,",
    "zh": "炸鱼和炸土豆片一直是英国人喜爱的一道菜，",
    "chunks": [
@@ -49,8 +49,8 @@
   },
   {
    "i": 2,
-   "t": 22.23,
-   "t2": 28.54,
+   "t": 21.3,
+   "t2": 27.44,
    "en": "but as the oceans have been overfished, fish has become more and more expensive.",
    "zh": "但由于海洋被过度捕捞，鱼越来越贵了。",
    "chunks": [
@@ -84,8 +84,8 @@
   },
   {
    "i": 3,
-   "t": 28.54,
-   "t2": 37.41,
+   "t": 27.46,
+   "t2": 36.23,
    "en": "So it comes as a surprise to learn that giant fish are terrifying the divers on North Sea oil rigs.",
    "zh": "因此听说北海石油钻井平台上的潜水员被巨型鱼吓得要命，令人吃惊。",
    "chunks": [
@@ -119,8 +119,8 @@
   },
   {
    "i": 4,
-   "t": 37.41,
-   "t2": 44.69,
+   "t": 36.53,
+   "t2": 44.44,
    "en": "Oil rigs have to be repaired frequently and divers, who often have to work in darkness",
    "zh": "钻井平台需要经常修理，潜水员常常得在黑暗中",
    "chunks": [
@@ -154,8 +154,8 @@
   },
   {
    "i": 5,
-   "t": 44.69,
-   "t2": 55.23,
+   "t": 44.46,
+   "t2": 53.42,
    "en": "a hundred feet under water, have been frightened out of their wits by giant fish bumping into them as they work.",
    "zh": "水下100英尺处工作，干活时撞上他们的巨型鱼把他们吓得魂不附体。",
    "chunks": [
@@ -189,8 +189,8 @@
   },
   {
    "i": 6,
-   "t": 55.23,
-   "t2": 61.05,
+   "t": 54.24,
+   "t2": 59.61,
    "en": "Now they have had special cages made to protect them from these monsters.",
    "zh": "现在他们让人做了特殊的笼子，以保护自己不受这些怪物的伤害。",
    "chunks": [
@@ -224,8 +224,8 @@
   },
   {
    "i": 7,
-   "t": 61.05,
-   "t2": 64.84,
+   "t": 59.63,
+   "t2": 64.01,
    "en": "The fish are not sharks or killer whales,",
    "zh": "这些鱼不是鲨鱼或逆戟鲸，",
    "chunks": [
@@ -254,8 +254,8 @@
   },
   {
    "i": 8,
-   "t": 64.84,
-   "t2": 71.8,
+   "t": 64.03,
+   "t2": 71.6,
    "en": "but favourite eating varieties like cod and skate which grow to unnatural sizes,",
    "zh": "而是人们爱吃的鳕鱼、鳐鱼之类，它们长到了异乎寻常的大小，",
    "chunks": [
@@ -289,8 +289,8 @@
   },
   {
    "i": 9,
-   "t": 71.8,
-   "t2": 76.73,
+   "t": 71.62,
+   "t2": 75.42,
    "en": "sometimes as much as twelve feet in length.",
    "zh": "有时长达十二英尺。",
    "chunks": [
@@ -312,8 +312,8 @@
   },
   {
    "i": 10,
-   "t": 76.73,
-   "t2": 81.21,
+   "t": 75.78,
+   "t2": 80.03,
    "en": "Three factors have caused these fish to grow so large:",
    "zh": "有三个因素使这些鱼长得如此之大：",
    "chunks": [
@@ -347,8 +347,8 @@
   },
   {
    "i": 11,
-   "t": 81.21,
-   "t2": 86.2,
+   "t": 80.05,
+   "t2": 85.32,
    "en": "the warm water round the hot oil pipes under the sea;",
    "zh": "海底热油管周围温暖的海水；",
    "chunks": [
@@ -378,8 +378,8 @@
   },
   {
    "i": 12,
-   "t": 86.2,
-   "t2": 91.98,
+   "t": 85.34,
+   "t2": 91.13,
    "en": "the plentiful supply of food thrown overboard by the crews on the rigs;",
    "zh": "平台上船员扔进海里的大量食物；",
    "chunks": [
@@ -411,8 +411,8 @@
   },
   {
    "i": 13,
-   "t": 91.98,
-   "t2": 96.37,
+   "t": 91.15,
+   "t2": 95.6,
    "en": "the total absence of fishing boats around the oil rigs.",
    "zh": "钻井平台周围根本没有渔船。",
    "chunks": [
@@ -442,8 +442,8 @@
   },
   {
    "i": 14,
-   "t": 96.37,
-   "t2": 103.16,
+   "t": 95.62,
+   "t2": 102.45,
    "en": "As a result, the fish just eat and eat and grow and grow in the lovely warm water.",
    "zh": "结果，这些鱼在温暖宜人的海水里就是不停地吃、不停地长。",
    "chunks": [
@@ -477,8 +477,8 @@
   },
   {
    "i": 15,
-   "t": 103.16,
-   "t2": 112.47,
+   "t": 102.47,
+   "t2": 104.3,
    "en": "Who eats who?",
    "zh": "到底是谁吃谁呢？",
    "chunks": [

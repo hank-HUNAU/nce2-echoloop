@@ -1,0 +1,89 @@
+﻿1
+00:00:00,000 --> 00:00:10,910
+What was wrong with the man's story?
+这个人的说法有什么问题？
+
+2
+00:00:10,910 --> 00:00:16,540
+What was wrong with the man's story?
+这个人的说法有什么问题？
+
+3
+00:00:16,560 --> 00:00:27,200
+'At the time the murder was committed I was travelling on the 8 o'clock train to London,' said the man.
+“凶杀发生时，我正坐在8点钟开往伦敦的火车上，”那人说。
+
+4
+00:00:28,700 --> 00:00:33,670
+'Do you always catch such an early train?' asked the inspector.
+“你总是赶这么早的火车吗？”探长问。
+
+5
+00:00:35,060 --> 00:00:38,050
+'Of course I do,' answered the man.
+“当然，”那人回答说。
+
+6
+00:00:38,890 --> 00:00:41,100
+'I must be at work at 10 o'clock.
+“我必须在10点钟上班。
+
+7
+00:00:41,450 --> 00:00:45,800
+My employer will confirm that I was there on time.'
+我的雇主会证实我是准时到的。”
+
+8
+00:00:48,200 --> 00:00:53,490
+'Would a later train get you to work on time?' asked the inspector.
+“坐晚一点的火车也能准时上班吗？”探长问。
+
+9
+00:00:55,270 --> 00:00:59,580
+'I suppose it would, but I never catch a later train.'
+“我想可以，不过我从来不坐晚一点的车。”
+
+10
+00:01:02,100 --> 00:01:04,990
+'At what time did you arrive at the station?'
+“你是什么时候到车站的？”
+
+11
+00:01:07,300 --> 00:01:12,150
+'At ten to eight. I bought a paper and waited for the train.'
+“八点差十分。我买了份报纸，然后等车。”
+
+12
+00:01:14,680 --> 00:01:18,070
+'And you didn't notice anything unusual?'
+“你没有注意到什么异常情况吗？”
+
+13
+00:01:19,520 --> 00:01:22,720
+'Of course not.'
+“当然没有。”
+
+14
+00:01:22,920 --> 00:01:28,170
+'I suggest,' said the inspector,' that you are not telling the truth.
+“我认为，”探长说，“你讲的不是实话。
+
+15
+00:01:28,190 --> 00:01:33,500
+I suggest that you did not catch the 8 o'clock train,
+我认为你没赶上8点钟的火车，
+
+16
+00:01:33,520 --> 00:01:39,700
+but that you caught the 8.25 which would still get you to work on time.
+而是赶上了8点25分的车，坐那趟车照样能准时上班。
+
+17
+00:01:39,720 --> 00:01:47,550
+You see, on the morning of the murder, the 8 o'clock train did not run at all.
+你要知道，凶杀发生的那天早上，8点钟的火车根本没开。
+
+18
+00:01:47,570 --> 00:01:53,390
+It broke down at Ferngreen station and was taken off the line.'
+它在芬格林车站出了故障，被取消了。”

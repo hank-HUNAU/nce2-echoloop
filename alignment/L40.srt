@@ -1,0 +1,74 @@
+﻿1
+00:00:00,000 --> 00:00:13,500
+Was Mrs. Rumbold a good companion at dinner?
+兰博尔德夫人是饭桌上的好同伴吗？
+
+2
+00:00:13,500 --> 00:00:17,910
+Was Mrs. Rumbold a good companion at dinner?
+兰博尔德夫人是饭桌上的好同伴吗？
+
+3
+00:00:20,440 --> 00:00:26,460
+Last week at a dinner party, the hostess asked me to sit next to Mrs. Rumbold.
+上星期在一次宴会上，女主人要我坐在兰博尔德夫人旁边。
+
+4
+00:00:27,990 --> 00:00:34,680
+Mrs. Rumbold was a large, unsmiling lady in a tight black dress.
+兰博尔德夫人是一位身材高大、不苟言笑的女人，穿着一件紧身黑裙。
+
+5
+00:00:34,700 --> 00:00:40,420
+She did not even look up when I took my seat beside her.
+当我在她身旁坐下时，她甚至连头都没抬。
+
+6
+00:00:41,650 --> 00:00:47,000
+Her eyes were fixed on her plate and in a short time, she was busy eating.
+她的眼睛盯着盘子，不一会儿就忙着吃起来。
+
+7
+00:00:48,340 --> 00:00:50,370
+I tried to make conversation.
+我试图找个话题。
+
+8
+00:00:53,620 --> 00:00:58,990
+'A new play is coming to "The Globe" soon,' I said.  'Will you be seeing it? '
+“一出新戏很快就要在‘环球剧场’上演，”我说，“您去看吗？”
+
+9
+00:01:00,290 --> 00:01:04,090
+'No,' she answered.
+“不，”她回答。
+
+10
+00:01:04,330 --> 00:01:09,220
+'Will you be spending your holidays abroad this year? ' I asked.
+“您今年要到国外度假吗？”我问。
+
+11
+00:01:11,000 --> 00:01:15,830
+'No,' she answered.
+“不，”她回答。
+
+12
+00:01:16,000 --> 00:01:19,050
+'Will you be staying in England? ' I asked.
+“您就留在英国吗？”我问。
+
+13
+00:01:20,340 --> 00:01:24,670
+'No,' she answered.
+“不，”她回答。
+
+14
+00:01:24,690 --> 00:01:29,210
+In despair, I asked her whether she was enjoying her dinner.
+失望之中，我问她这顿饭是否吃得满意。
+
+15
+00:01:30,650 --> 00:01:39,000
+'Young man,' she answered,'if you ate more and talked less, we would both enjoy our dinner!'
+“年轻人，”她回答说，“如果你多吃点、少说点，我们俩都会吃得开心！”
