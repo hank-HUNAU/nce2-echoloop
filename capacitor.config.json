@@ -1,0 +1,12 @@
+{
+  "appId": "com.hank.nce2loop",
+  "appName": "NCE2 Loop",
+  "webDir": "www",
+  "server": {
+    "url": "https://hank-hunau.github.io/nce2-echoloop/",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}
