@@ -1,7 +1,7 @@
 /* NCE2 Loop Service Worker：离线学习 + PWA 可安装
    策略：HTML/JSON 网络优先（保更新），音频/图片缓存优先（边听边存）；Supabase API 不缓存 */
-const VER = 'el2-pwa-v1';
-const CORE = ['./', './index.html', './login.html', './manifest.json', './apple-touch-icon.png', './icon-192.png', './icon-512.png'];
+const VER = 'el2-pwa-v2';
+const CORE = ['./', './index.html', './login.html', './manifest.json', './apple-touch-icon.png', './icon-192.png', './icon-512.png', './covers/nce1_s.jpg', './covers/nce2_s.jpg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VER).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
