@@ -486,6 +486,8 @@ function renderHome(){
       <button class="btn sm g" data-go="#/lesson/${cont?cont+1<=96?cont+1:1:1}">下一课</button></div>
     <div class="bar" style="margin-top:10px"><i style="width:${Math.round(learned*100/total)}%"></i></div>
     <div class="tip" style="margin-top:4px">总进度 ${Math.round(learned*100/total)}%</div>
+    <div style="margin-top:10px"><button class="btn sm g" id="homeOlBtn">📥 下载离线包</button>
+      <span class="tip" style="margin:0 0 0 8px">下载后断网也能学</span></div>
   </div>
   ${(()=>{ try{ if(localStorage.getItem(LS+'intro')) return ''; }catch(e){ return ''; }
     return `<div class="sec" id="introBox"><h2>怎么用？三步就上手</h2>
@@ -499,6 +501,10 @@ function renderHome(){
     <div class="grid">${cells()}</div></div>
   <div class="foot">盲听 → 跟读 → 精听 → 复述 → 间隔复习</div>`;
   $('#app').innerHTML=h;
+  (function(){ const o=(function(){ try{ return JSON.parse(localStorage.getItem('el2_offline')||'null'); }catch(e){ return null; } })();
+    const hb2=document.getElementById('homeOlBtn');
+    if(hb2&&o){ const d=new Date(o.at); hb2.textContent='📥 更新离线包'; }
+  })();
 }
 function cells(){
   const dueSet=new Set(dueList().map(d=>d.no));
@@ -517,6 +523,9 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('click',e=>{
   if(e.target.id==='introGo'){ try{ localStorage.setItem(LS+'intro','1'); }catch(err){} const b=document.getElementById('introBox'); if(b) b.remove(); }
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest('#homeOlBtn')||e.target.closest('#olBtn')){ if(window.dlOffline) window.dlOffline(); }
 });
 document.addEventListener('input',e=>{
   if(e.target.id!=='cellQ') return;
@@ -819,6 +828,12 @@ function renderMe(){
   <div class="sec"><h2>账号</h2><div class="item"><div class="tt">
     <div class="en">${esc(window.EL2SESS.email||'')}</div>
     <div class="meta">学习记录会同步给爸爸妈妈和老师</div></div></div></div>
+  <div class="sec"><h2>离线包</h2>
+    <div class="item"><div class="tt"><div class="en" id="olState">…</div>
+      <div class="meta">新概念 2 全部课文与音频 · 约 80MB · 下载后可完全离线学习</div></div></div>
+    <div class="pbar" id="olBar" style="display:none;margin:8px 0 4px"><i style="width:0%"></i></div>
+    <button class="btn" id="olBtn" style="margin-top:4px">下载离线包</button>
+    <div class="tip" style="margin-top:8px">下载后出门、断网都能正常学习；点「更新」可拉取最新课文数据。</div></div>
   <div class="sec"><h2>学习概览</h2>
     <div class="item"><div class="tt"><div class="en">已学 ${learned}/96 · 通关 ${done}/96</div>
       <div class="meta">累计复习 ${rounds} 轮 · 累计听读 ${mins} 分钟</div></div></div>
@@ -828,7 +843,46 @@ function renderMe(){
   $('#app').innerHTML=h;
   const b=document.getElementById('meOut2');
   if(b) b.addEventListener('click',()=>{ if(window.el2Logout) window.el2Logout(); });
+  refreshOlUI();
 }
+/* ===== 离线包下载器（设备级，不依赖登录） ===== */
+function olState(){ try{ return JSON.parse(localStorage.getItem('el2_offline')||'null'); }catch(e){ return null; } }
+function refreshOlUI(){
+  const o=olState(); const btn=$('#olBtn'); if(!btn) return;
+  if(o){ const d=new Date(o.at); btn.textContent='更新离线包（上次 '+(d.getMonth()+1)+'月'+d.getDate()+'日）'; $('#olState').textContent='✓ 离线包已就绪'; }
+}
+window.dlOffline=async function(){
+  const btn=$('#olBtn'), home=document.getElementById('homeOlBtn');
+  if((btn&&btn.dataset.busy)||(home&&home.dataset.busy)) return;
+  if(btn) btn.dataset.busy='1'; if(home) home.dataset.busy='1';
+  if(navigator.storage && navigator.storage.persist){ try{ navigator.storage.persist(); }catch(e){} }
+  const bar=$('#olBar'), fill=bar?bar.querySelector('i'):null;
+  if(bar) bar.style.display='block';
+  try{
+    const c=await caches.open('el2-pwa-v1');
+    const jobs=[];
+    for(let k=1;k<=96;k++) jobs.push('data/L'+String(k).padStart(2,'0')+'.json');
+    for(let k=1;k<=96;k++) jobs.push('audio/L'+String(k).padStart(2,'0')+'.mp3');
+    let done=0;
+    for(const jp of jobs){
+      try{ await c.add(jp); }catch(e){}
+      done++;
+      const pct=Math.round(done*100/jobs.length)+'%';
+      if(fill) fill.style.width=pct;
+      const txt='下载中 '+done+'/'+jobs.length;
+      if(btn) btn.textContent=txt; if(home) home.textContent='📥 '+txt;
+    }
+    localStorage.setItem('el2_offline', JSON.stringify({at:Date.now()}));
+    if(btn) btn.textContent='✓ 已下载 · 点此更新';
+    if(home) home.textContent='📥 更新离线包';
+    if($('#olState')) $('#olState').textContent='✓ 离线包已就绪';
+    if(bar) setTimeout(()=>{ bar.style.display='none'; },1500);
+  }catch(e){
+    if(btn) btn.textContent='下载失败，点此重试';
+  }
+  if(btn) btn.dataset.busy=''; if(home) home.dataset.busy='';
+  refreshOlUI();
+};
 function renderStats(){
   const learned=Object.keys(PROG).filter(k=>PROG[k].firstLearnAt).length;
   const done=Object.keys(PROG).filter(k=>PROG[k].reviews>=OFFSETS.length).length;
