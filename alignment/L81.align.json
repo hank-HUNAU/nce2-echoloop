@@ -149,13 +149,14 @@
    "zh": "就在这时，一辆载着四名军官的黑色大轿车停在营房门口。",
    "t_lrc": 58.03,
    "t2_lrc": 68.18,
-   "t": 58.03,
-   "t2": 68.18,
-   "source": "lrc_snap",
-   "method": "静音带吸附",
-   "grade": "F",
+   "t": 57.86,
+   "t2": 66.21,
+   "source": "asr_window",
+   "method": "窗口修复",
+   "grade": "M",
    "match": 0.53,
-   "wpm": null
+   "wpm": null,
+   "winWords": 10
   },
   {
    "i": 10,

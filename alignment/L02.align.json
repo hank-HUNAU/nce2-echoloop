@@ -134,13 +134,14 @@
    "zh": "“又下雨了。”",
    "t_lrc": 45.79,
    "t2_lrc": 48.79,
-   "t": 45.79,
-   "t2": 48.79,
-   "source": "lrc_snap",
-   "method": "静音带吸附",
-   "grade": "F",
+   "t": 45.66,
+   "t2": 46.31,
+   "source": "asr_window",
+   "method": "窗口修复",
+   "grade": "M",
    "match": 0.5,
-   "wpm": null
+   "wpm": null,
+   "winWords": 4
   },
   {
    "i": 9,

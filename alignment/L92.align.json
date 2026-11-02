@@ -224,13 +224,14 @@
    "zh": "“您瞧，我忘了带钥匙。”",
    "t_lrc": 96.1,
    "t2_lrc": 99.94,
-   "t": 96.1,
-   "t2": 99.94,
-   "source": "lrc_snap",
-   "method": "静音带吸附",
-   "grade": "F",
+   "t": 95.95,
+   "t2": 96.55,
+   "source": "asr_window",
+   "method": "窗口修复",
+   "grade": "M",
    "match": 0.57,
-   "wpm": null
+   "wpm": null,
+   "winWords": 7
   },
   {
    "i": 15,

@@ -44,13 +44,14 @@
    "zh": "艾梅·托梅·德·加蒙",
    "t_lrc": 22.88,
    "t2_lrc": 26.93,
-   "t": 22.88,
-   "t2": 26.93,
-   "source": "lrc_snap",
-   "method": "静音带吸附",
-   "grade": "F",
+   "t": 25.68,
+   "t2": 26.33,
+   "source": "asr_window",
+   "method": "窗口修复",
+   "grade": "M",
    "match": 0.25,
-   "wpm": null
+   "wpm": null,
+   "winWords": 5
   },
   {
    "i": 3,

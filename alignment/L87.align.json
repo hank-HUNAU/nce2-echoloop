@@ -179,13 +179,14 @@
    "zh": "“当然没有。”",
    "t_lrc": 79.52,
    "t2_lrc": 82.72,
-   "t": 79.52,
-   "t2": 82.72,
-   "source": "lrc_snap",
-   "method": "静音带吸附",
-   "grade": "F",
+   "t": 78.09,
+   "t2": 79.23,
+   "source": "asr_window",
+   "method": "窗口修复",
+   "grade": "M",
    "match": 0.5,
-   "wpm": null
+   "wpm": null,
+   "winWords": 4
   },
   {
    "i": 12,
