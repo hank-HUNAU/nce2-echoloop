@@ -7,6 +7,10 @@
    - 设 ANDROID_HOME 环境变量
 3. Node.js ✅（已有）
 
+## 也可以：一键装 SDK 脚本
+
+运行 `android-build/setup-sdk.ps1`（右键 → 使用 PowerShell 运行），自动完成：下载 commandline-tools → 解压到 `C:\Android` → 写 ANDROID_HOME → 装组件并自动确认许可。装完直接进入下方构建四条命令。
+
 ## 构建（四条命令）
 ```bash
 cd nce2-echoloop

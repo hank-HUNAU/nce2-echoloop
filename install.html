@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NCE2 Loop · 安装引导</title>
+<style>
+  :root{--btn:#3B5BDB;--txt:#212529;--sub:#6C757D;--line:#E9ECEF;--ok:#12B886}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans SC","Segoe UI",sans-serif;background:#F5F6F8;color:var(--txt);padding:20px 16px 40px;max-width:520px;margin:0 auto}
+  .logo{width:56px;height:56px;border-radius:14px;background:var(--btn);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;margin:8px auto 10px}
+  h1{font-size:19px;text-align:center;margin-bottom:4px}
+  .sub{font-size:12px;color:var(--sub);text-align:center;margin-bottom:18px}
+  .card{background:#fff;border-radius:16px;padding:18px 16px;margin-bottom:14px;border:1px solid var(--line)}
+  .card h2{font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .tag{font-size:11px;border-radius:999px;padding:2px 10px;color:#fff}
+  .step{display:flex;gap:10px;margin:10px 0;align-items:flex-start}
+  .num{flex:0 0 24px;height:24px;border-radius:50%;background:var(--btn);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .step p{font-size:14px;line-height:1.6;margin:0}
+  .step small{display:block;color:var(--sub);font-size:12px;margin-top:2px}
+  .btn{display:block;width:100%;height:52px;border:0;border-radius:13px;background:var(--btn);color:#fff;font-size:16px;font-weight:700;margin-top:12px;cursor:pointer;text-align:center;line-height:52px;text-decoration:none}
+  .btn.dis{background:#CED4DA;color:#868E96;pointer-events:none}
+  .note{font-size:12px;color:var(--sub);line-height:1.7;margin-top:10px}
+  .wx{background:#FFF7E6;border:1px solid #FFE8B3;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.7;display:none}
+  .hide{display:none}
+</style>
+</head>
+<body>
+<div class="logo">N2</div>
+<h1>NCE2 Loop 安装引导</h1>
+<div class="sub">新概念英语 · 逐句精听跟读训练工具</div>
+
+<div class="wx" id="wxTip">⚠️ 你正在<b>微信内</b>打开本页。请点击右上角「···」→ 选择「<b>在浏览器中打开</b>」，再按下方步骤操作（微信内无法完成安装）。</div>
+
+<div class="card" id="cardAndroid">
+  <h2>安卓手机 / 平板 <span class="tag" style="background:var(--ok)">推荐</span></h2>
+  <div class="step"><span class="num">1</span><p>先装网页版（立即可用）：<small>点下面「安装网页版」按钮 → 浏览器菜单选「添加到主屏幕」</small></p></div>
+  <div class="step"><span class="num">2</span><p>下载 App 安装包：<small>出现「未知来源应用」提示时，选择允许安装即可，只需设置一次</small></p></div>
+  <a class="btn" href="https://hank-hunau.github.io/nce2-echoloop/">安装网页版（PWA）</a>
+  <a class="btn dis" href="app.apk">下载 App 安装包（打包中，敬请期待）</a>
+  <p class="note">两个版本功能相同；安装包版本稍后发布，发布后此按钮自动变为可下载。</p>
+</div>
+
+<div class="card" id="cardIOS">
+  <h2>iPhone / iPad <span class="tag" style="background:var(--btn)">PWA</span></h2>
+  <div class="step"><span class="num">1</span><p>用 <b>Safari</b> 打开本页（其他浏览器无法添加到主屏幕）</p></div>
+  <div class="step"><span class="num">2</span><p>点底部「分享」按钮 <small>（方框加向上箭头图标）</small></p></div>
+  <div class="step"><span class="num">3</span><p>选「添加到主屏幕」→ 确认</p></div>
+  <a class="btn" href="https://hank-hunau.github.io/nce2-echoloop/">打开 NCE2 Loop</a>
+  <p class="note">iPhone/iPad 版本以网页应用（PWA）形式运行：功能完整、离线可用、支持离线包下载。首次添加后从主屏幕图标进入即全屏运行。</p>
+</div>
+
+<p class="note" style="text-align:center">学习数据登录后自动云同步 · 卸载重装登录即恢复<br>新概念英语配套训练工具</p>
+
+<script>
+(function(){
+  var ua=navigator.userAgent;
+  var isWeChat=/MicroMessenger/i.test(ua);
+  var isIOS=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  var isAndroid=/Android/i.test(ua);
+  if(isWeChat) document.getElementById('wxTip').style.display='block';
+  if(isIOS){
+    document.getElementById('cardAndroid').classList.add('hide');
+    if(!/Safari/i.test(ua)){
+      var s=document.createElement('div');s.className='wx';s.innerHTML='⚠️ iPhone/iPad 请使用 <b>Safari</b> 打开本页（当前浏览器不支持添加到主屏幕）。';document.body.insertBefore(s,document.body.children[2]);
+    }
+  } else if(isAndroid){
+    document.getElementById('cardIOS').classList.add('hide');
+  }
+})();
+</script>
+</body>
+</html>
