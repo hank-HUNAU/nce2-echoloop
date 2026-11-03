@@ -33,6 +33,7 @@ h2{font-size:18px;margin:0 0 10px}
 .btn.ok{background:var(--ok)} .btn.rd{background:var(--bad)}
 .btn.sm{padding:7px 12px;min-height:50px;font-size:14px;border-radius:9px}
 .btn:disabled{opacity:.45;cursor:default}
+.btn .ic{width:20px;height:20px;display:block}
 .pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:13px;background:#EDF2FF;color:#364FC7}
 .tag{display:inline-block;border-radius:6px;padding:0 6px;font-size:13px;background:#EDF2FF;color:#364FC7;margin-right:4px}
 .tag.w{background:#E6FCF5;color:#087F5B}.tag.v{background:#F3F0FF;color:#6741D9}.tag.d{background:#FFF9DB;color:#E67700}
@@ -659,6 +660,8 @@ function renderCourses(){
   const firstCid=(due[0]&&due[0].cid)||(my[0]||DEF_COURSE);
   const firstStat=progStat(firstCid);
   const contNo=firstStat.cont||firstStat.last||1;
+  const IC_CHEV='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
+  const IC_ARROW='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 5.5l6.5 6.5-6.5 6.5"/></svg>';
   let h=`<div class="topbar"><h1>课程中心</h1><button class="hbtn" data-go="#/store">＋ 选择课程</button></div>
   <div class="sec"><h2>今日任务</h2>`;
   if(due.length){
@@ -668,7 +671,7 @@ function renderCourses(){
   }else{
     h+=`<div class="item"><div class="tt"><div class="en">${esc((catCourse(firstCid)||{}).name||firstCid)} · 继续精听 L${contNo}</div>
       <div class="meta">今天没有到期复习</div></div>
-      <button class="btn sm" data-go="${lessonHref(contNo,firstCid)}">继续 →</button></div>`;
+      <button class="btn sm" data-go="${lessonHref(contNo,firstCid)}" aria-label="继续">${IC_ARROW}</button></div>`;
   }
   h+=`</div>
   <div class="sec"><h2>我的课程</h2>`;
@@ -682,7 +685,7 @@ function renderCourses(){
       return `<div class="item" data-act="openc" data-c="${c.id}" style="cursor:pointer">
         <img class="bk2" src="${c.cover}" alt="${esc(c.name)}"${c.ready?'':' style="opacity:.7"'}>
         <div class="tt"><div class="en oneline">${esc(c.name)}</div><div class="meta">${meta}</div></div>
-        <button class="btn sm${c.ready?'':' g'}">${c.ready?'进入':'筹备中'}</button></div>`;
+        <button class="btn sm${c.ready?'':' g'}"${c.ready?' aria-label="进入"':''}>${c.ready?IC_CHEV:'筹备中'}</button></div>`;
     }).join('');
   }
   h+=`</div>
