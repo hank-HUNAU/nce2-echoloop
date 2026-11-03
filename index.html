@@ -93,6 +93,12 @@ nav.tabs a.on{color:var(--acc)}
 .coBtn.gray{background:#F1F3F5;color:var(--accBtn)}
 .coBtn:disabled{opacity:.5;cursor:default}
 .coRm{font-size:12px;color:var(--sub);margin-top:8px;text-decoration:underline;display:inline-block;cursor:pointer}
+/* 难句/卡片 的课程筛选 */
+.hchips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+.hchips::-webkit-scrollbar{display:none}
+.hchip{flex:0 0 auto;min-height:44px;border:1.5px solid var(--line);background:#fff;color:var(--sub);border-radius:999px;padding:0 14px;font-size:14.5px;font-family:inherit;cursor:pointer}
+.hchip.on{border-color:var(--acc);background:var(--acc);color:#fff}
+.hchip i{font-style:normal;font-size:13px;opacity:.8;margin-left:3px}
 .cap{font-size:12.5px;color:var(--sub);margin-top:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .cap b{width:7px;height:7px;border-radius:50%;background:var(--ok);display:inline-block;flex:0 0 7px}
 .cap b.no{background:#CED4DA}
@@ -331,6 +337,21 @@ function progStatAll(){
   const ids=(typeof myCourses==='function')?myCourses():Object.keys(PROG.courses||{});
   ids.forEach(c=>{ const s=progStat(c); a.learned+=s.learned; a.done+=s.done; a.rounds+=s.rounds; });
   return a;
+}
+/* 难句/卡片 的课程筛选（内存态，不持久化；只有存在多门课的难句时才出现） */
+let HARDF='all';
+function hardList(){
+  const a=hardAll();
+  return HARDF==='all'?a:a.filter(x=>(x.cid||DEF_COURSE)===HARDF);
+}
+function hardChips(){
+  const a=hardAll();
+  const cids=[...new Set(a.map(x=>x.cid||DEF_COURSE))];
+  if(cids.length<2) return '';
+  const cnt=id=>a.filter(x=>(x.cid||DEF_COURSE)===id).length;
+  const chip=(v,label,n)=>`<button class="hchip${HARDF===v?' on':''}" data-act="hardf" data-v="${v}">${label}<i>${n}</i></button>`;
+  return `<div class="hchips">${chip('all','全部',a.length)}`+
+    cids.map(id=>{ const c=catCourse(id)||{}; return chip(id,c.short||id,cnt(id)); }).join('')+`</div>`;
 }
 /* 难句本：v3 前没有 cid 字段（只可能是 NCE2），读取时补默认课程 */
 function hardAll(){
@@ -1033,34 +1054,39 @@ document.addEventListener('click',async e=>{
 
 /* ================= 难句本 ================= */
 function renderHard(){
-  const hard=hardAll();
-  let h=`<h1>难句本</h1><div class="sec"><h2>难句本 ${tipQ('hard','精听时点 ★ 收藏的句子都汇总在这里，点「重练」回到原课再练一遍。')}</h2>`;
-  if(!hard.length) h+='<div class="empty">还没有收藏，去精听里点亮星星吧</div>';
-  h+=hard.map((x,ix)=>`<div class="item">
+  const hard=hardList();
+  let h=`<h1>难句本</h1><div class="sec"><h2>难句本 ${tipQ('hard','精听时点 ★ 收藏的句子都汇总在这里，点「重练」回到原课再练一遍。')}</h2>${hardChips()}`;
+  if(!hard.length) h+= HARDF==='all'
+    ? '<div class="empty">还没有收藏，去精听里点亮星星吧</div>'
+    : '<div class="empty">这门课还没有收藏的难句</div>';
+  h+=hard.map(x=>{
+    const c=catCourse(x.cid||DEF_COURSE)||{};
+    return `<div class="item">
     <div class="tt"><div class="en">${esc(x.en)}</div>
-      <div class="zh">${esc(x.zh)}${x.pat?` · <span class="tag">${esc(x.pat)}</span>`:''} · L${x.no}</div></div>
+      <div class="zh">${esc(x.zh)}${x.pat?` · <span class="tag">${esc(x.pat)}</span>`:''} · <span style="color:var(--accBtn);font-weight:600">${esc(c.short||x.cid||DEF_COURSE)}</span> L${x.no}</div></div>
     <button class="btn sm g" data-act="goSent" data-no="${x.no}" data-c="${x.cid||DEF_COURSE}" data-i="${x.i}">重练</button>
-    <button class="star on" data-act="unstar" data-ix="${ix}">★</button></div>`).join('');
+    <button class="star on" data-act="unstar" data-c="${x.cid||DEF_COURSE}" data-no="${x.no}" data-i="${x.i}">★</button></div>`;}).join('');
   h+='</div>';
   $('#app').innerHTML=h;
 }
 /* ================= 闪卡 ================= */
 function renderCards(){
   const now=Date.now();
-  const hard=hardAll().slice().sort((a,b)=>(a.due||0)-(b.due||0));
+  const hard=hardList().slice().sort((a,b)=>(a.due||0)-(b.due||0));
   const dueN=hard.filter(x=>!x.due||x.due<=now).length;
-  let h=`<h1>语境闪卡 ${tipQ('cards','看中文回忆英文 → 点卡翻转核对 → 自评。没记住的 12 小时后再出现，记住了 3 天后再见。')}</h1><div class="tip">今日待复习 ${dueN} 张。</div>`;
-  if(!hard.length){ h+='<div class="sec"><div class="empty">收藏难句后，这里会自动生成卡片</div></div>'; $('#app').innerHTML=h; return; }
+  let h=`<h1>语境闪卡 ${tipQ('cards','看中文回忆英文 → 点卡翻转核对 → 自评。没记住的 12 小时后再出现，记住了 3 天后再见。')}</h1>
+  ${hardChips()}<div class="tip">今日待复习 ${dueN} / ${hard.length} 张。</div>`;
+  if(!hard.length){ h+=`<div class="sec"><div class="empty">${HARDF==='all'?'收藏难句后，这里会自动生成卡片':'这门课还没有收藏的难句'}</div></div>`; $('#app').innerHTML=h; return; }
   h+='<div id="deck">'+hard.map((x,ix)=>`
     <div class="card" data-act="flip" data-ix="${ix}" style="${(x.due&&x.due>now)?'opacity:.55':''}"><div class="in">
       <div class="f"><div class="pill">中文回忆${(x.due&&x.due>now)?' · 已排程':''}</div><div style="font-size:20px;font-weight:700;margin-top:8px">${esc(x.zh)||'（无译文）'}</div>
-        <div class="tip" style="margin-top:8px">L${x.no} ${x.pat?'· '+esc(x.pat):''}</div></div>
+        <div class="tip" style="margin-top:8px"><span style="color:var(--accBtn);font-weight:600">${esc((catCourse(x.cid||DEF_COURSE)||{}).short||x.cid||DEF_COURSE)}</span> · L${x.no} ${x.pat?'· '+esc(x.pat):''}</div></div>
       <div class="b"><div class="pill" style="background:#DBE4FF">原句</div>
         <div class="en" style="font-family:Georgia,'Times New Roman',serif;font-size:18px;margin-top:8px">${esc(x.en)}</div>
         <div class="tip" style="margin-top:8px"><button class="btn sm g" data-act="cardplay" data-no="${x.no}" data-c="${x.cid||DEF_COURSE}" data-i="${x.i}">🔊 语境重听</button></div>
         <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="btn sm" style="flex:1" data-act="cardno" data-ix="${ix}">没记住</button>
-          <button class="btn sm ok" style="flex:1;background:var(--ok)" data-act="cardok" data-ix="${ix}">记住了</button></div></div>
+          <button class="btn sm" style="flex:1" data-act="cardno" data-c="${x.cid||DEF_COURSE}" data-no="${x.no}" data-i="${x.i}">没记住</button>
+          <button class="btn sm ok" style="flex:1;background:var(--ok)" data-act="cardok" data-c="${x.cid||DEF_COURSE}" data-no="${x.no}" data-i="${x.i}">记住了</button></div></div>
     </div></div>`).join('')+'</div>';
   $('#app').innerHTML=h;
 }
@@ -1241,8 +1267,15 @@ document.addEventListener('click',e=>{
   if(act==='revsh'){ CUR.shReveal=!CUR.shReveal; renderLesson(); return; }
   if(act==='retellhint'){ CUR.retellHint=!CUR.retellHint; renderLesson(); return; }
   if(act==='tipq'){ const dEl=document.getElementById('tipd-'+el.dataset.tk); if(dEl) dEl.style.display=dEl.style.display==='none'?'block':'none'; return; }
+  if(act==='hardf'){ HARDF=el.dataset.v||'all';
+    if((location.hash||'').startsWith('#/hard')) renderHard();
+    else if((location.hash||'').startsWith('#/cards')) renderCards();
+    return;
+  }
   if(act==='cardok'||act==='cardno'){
-    const hard=hardAll(); const it=hard[+el.dataset.ix]; if(!it) return;
+    const hard=hardAll();
+    const cid=el.dataset.c||DEF_COURSE, no=+el.dataset.no, si=+el.dataset.i;
+    const it=hard.filter(x=>(x.cid||DEF_COURSE)===cid&&x.no===no&&x.i===si)[0]; if(!it) return;
     it.due = Date.now() + (act==='cardok'?3*864e5:12*36e5);
     store.setHard(hard);
     const cd=el.closest('.card'); cd.classList.remove('flip'); cd.style.opacity=.4; cd.style.pointerEvents='none';
@@ -1255,10 +1288,10 @@ document.addEventListener('click',e=>{
     CUR.afterRender=()=>{ prog(+el.dataset.no,c).stage=0; renderLesson(); };
   }
   else if(act==='unstar'){
-    const hard=hardAll(); const it=hard.splice(+el.dataset.ix,1)[0];
-    store.setHard(hard);
-    if(it){ const o=progOf(it.cid||DEF_COURSE)[it.no];
-      if(o&&o.hard){ const k=o.hard.indexOf(it.i); if(k>=0){ o.hard.splice(k,1); saveProgress(); } } }
+    const cid=el.dataset.c||DEF_COURSE, no=+el.dataset.no, si=+el.dataset.i;
+    store.setHard(hardAll().filter(x=>!((x.cid||DEF_COURSE)===cid&&x.no===no&&x.i===si)));
+    const o=progOf(cid)[no];
+    if(o&&o.hard){ const k=o.hard.indexOf(si); if(k>=0){ o.hard.splice(k,1); saveProgress(); } }
     renderHard();
   }
   else if(act==='cardplay'){ (async()=>{ const d=await loadLesson(+el.dataset.no, el.dataset.c);
