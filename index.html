@@ -1,20 +1,20 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<link rel="icon" href="data:,">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="NCE2 Loop">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="apple-touch-startup-image" media="(device-width:1024px) and (device-height:1366px) and (-webkit-device-pixel-ratio:2) and (orientation:portrait)" href="splash-2048x2732.png">
-<link rel="apple-touch-startup-image" media="(device-width:1024px) and (device-height:1366px) and (-webkit-device-pixel-ratio:2) and (orientation:landscape)" href="splash-2732x2048.png">
-<link rel="apple-touch-startup-image" media="(device-width:430px) and (device-height:932px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)" href="splash-1290x2796.png">
-<link rel="apple-touch-startup-image" media="(device-width:430px) and (device-height:932px) and (-webkit-device-pixel-ratio:3) and (orientation:landscape)" href="splash-2796x1290.png">
-<link rel="apple-touch-startup-image" href="splash-1290x2796.png">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#3B5BDB">
+<html lang="zh-CN" data-page-node-id="NN1MEqJjX7AnX1QWnOB9fz">
+<head data-page-node-id="hpFC2mYjItPHyQ1LMtzS5X">
+<meta charset="utf-8" data-page-node-id="qQhZAkRop4bIHsrFjgoiia">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" data-page-node-id="RwTB9C7Di0bRJd2zBVwFaX">
+<link rel="icon" href="data:," data-page-node-id="SDwc2lnAZb60jkKScZy6FQ">
+<meta name="apple-mobile-web-app-capable" content="yes" data-page-node-id="KSPpqgUyHnFYjJokylOCgJ">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" data-page-node-id="FwoFYq5pknDgw5Mx2AFRdH">
+<meta name="apple-mobile-web-app-title" content="NCE2 Loop" data-page-node-id="PuNEL1jRZd1oMxPE5uq3ab">
+<link rel="apple-touch-icon" href="apple-touch-icon.png" data-page-node-id="kYBv1nc5xsptTDZj0m4XZH">
+<link rel="apple-touch-startup-image" media="(device-width:1024px) and (device-height:1366px) and (-webkit-device-pixel-ratio:2) and (orientation:portrait)" href="splash-2048x2732.png" data-page-node-id="vGjqvELJny8lenClm3IGwd">
+<link rel="apple-touch-startup-image" media="(device-width:1024px) and (device-height:1366px) and (-webkit-device-pixel-ratio:2) and (orientation:landscape)" href="splash-2732x2048.png" data-page-node-id="AE1vf5sUuVCtXk6NkLafE9">
+<link rel="apple-touch-startup-image" media="(device-width:430px) and (device-height:932px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)" href="splash-1290x2796.png" data-page-node-id="xTFKRCdXbCAB6uuDnEgiaO">
+<link rel="apple-touch-startup-image" media="(device-width:430px) and (device-height:932px) and (-webkit-device-pixel-ratio:3) and (orientation:landscape)" href="splash-2796x1290.png" data-page-node-id="KHBJNiptWdvaKNYxc60TAN">
+<link rel="apple-touch-startup-image" href="splash-1290x2796.png" data-page-node-id="xOhwNkt797JyyB4YvqFOIX">
+<link rel="manifest" href="manifest.json" data-page-node-id="VETCe5cWyEKmuas79dWXEE">
+<meta name="theme-color" content="#3B5BDB" data-page-node-id="QABikQRNN5QRvFne7W3FdA">
     <title>NCE2 Loop · 精听跟读复述复习</title>
 <style>
 :root{--acc:#4C6EF5;--accBtn:#3B5BDB;--ok:#12B886;--bad:#E03131;--warn:#F59F00;--ink:#212529;--sub:#6C757D;
@@ -160,10 +160,10 @@ audio{width:100%}
 @media print{nav.tabs{display:none}}
 </style>
 </head>
-<body>
-<div class="wrap" id="app"></div>
-<nav class="tabs" id="tabs"></nav>
-<audio id="au" preload="none"></audio>
+<body data-page-node-id="fkACEsMfaEvRSAXz4FoagJ">
+<div class="wrap" id="app" data-page-node-id="oND3mH3lBDkPCMSWcxaOBg"></div>
+<nav class="tabs" id="tabs" data-page-node-id="qssm8we7nXdqwvPn6FNoA8"></nav>
+<audio id="au" preload="none" data-page-node-id="cnVWohopJ1fh7zxa2sl41R"></audio>
 
 <script>
 /* ===== 会话与页内登录（学生）：不登录可学习（仅本地），登录后数据上云 ===== */
@@ -686,8 +686,7 @@ function renderCourses(){
     }).join('');
   }
   h+=`</div>
-  <div class="cap" id="stgLine">储存信息读取中…</div>
-  <div class="foot">配套训练工具 · 更多课程在课程库里</div>`;
+  <div class="cap" id="stgLine">储存信息读取中…</div>`;
   $('#app').innerHTML=h;
   fillStorage();
 }
@@ -1209,8 +1208,7 @@ function renderMe(){
       <button class="btn sm g" data-act="exp">导出 JSON 备份</button>
       <button class="btn sm g" data-act="imp">导入恢复</button>
       <input type="file" id="impFile" accept=".json" style="display:none">
-      <button class="btn sm g" data-act="clr">清空全部记录</button></div></div>
-  <div class="foot">配套训练工具 · 更多课程在课程库里</div>`;
+      <button class="btn sm g" data-act="clr">清空全部记录</button></div></div>`;
   $('#app').innerHTML=h;
   const b=document.getElementById('meOut2');
   if(b) b.addEventListener('click',()=>{ if(window.el2Logout) window.el2Logout(); });
