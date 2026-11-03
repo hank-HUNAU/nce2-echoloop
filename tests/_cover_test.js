@@ -6,7 +6,7 @@ const { chromium } = require('playwright');
   const errs = [];
   page.on('pageerror', e => errs.push(String(e).slice(0,150)));
   await page.goto('http://127.0.0.1:8137/index.html#/home', { waitUntil: 'load' });
-  await page.waitForFunction(() => document.body.innerText.includes('课程中心'), null, { timeout: 15000 });
+  await page.waitForFunction(() => document.body.innerText.includes('我的课程'), null, { timeout: 15000 });
   const r1 = await page.evaluate(async () => {
     const imgs = [...document.querySelectorAll('.bk2')];
     const loaded = await Promise.all(imgs.map(i => new Promise(res => { if(i.complete) res(i.naturalWidth>0); else i.onload=()=>res(i.naturalWidth>0), i.onerror=()=>res(false); })));

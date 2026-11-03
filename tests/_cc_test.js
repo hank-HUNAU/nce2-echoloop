@@ -7,7 +7,7 @@ const { chromium } = require('playwright');
   page.on('pageerror', e => errs.push(String(e).slice(0,150)));
   // ① 课程中心
   await page.goto('http://127.0.0.1:8136/index.html#/home', { waitUntil: 'load' });
-  await page.waitForFunction(() => document.body.innerText.includes('课程中心'), null, { timeout: 15000 });
+  await page.waitForFunction(() => document.body.innerText.includes('我的课程'), null, { timeout: 15000 });
   const r1 = await page.evaluate(() => ({
     today: document.body.innerText.includes('今日任务'),
     nce2: document.body.innerText.includes('新概念英语 2'),
