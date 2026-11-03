@@ -35,6 +35,66 @@
       "dataPat": "nce1/data/L{NN}.json",
       "audioPat": "nce1/audio/L{NN}.mp3",
       "pad": 2
+    },
+    {
+      "id": "tks",
+      "name": "Think Starter",
+      "short": "TKS",
+      "tag": "Cambridge TH!NK",
+      "cover": "covers/tks_s.jpg",
+      "lessons": 12,
+      "ready": false,
+      "default": false,
+      "sizeMB": 0,
+      "desc": "12 单元 · 音频对齐与课件制作中",
+      "dataPat": "tks/data/L{NN}.json",
+      "audioPat": "tks/audio/L{NN}.mp3",
+      "pad": 2
+    },
+    {
+      "id": "tk1",
+      "name": "Think 1",
+      "short": "TK1",
+      "tag": "Cambridge TH!NK",
+      "cover": "covers/tk1_s.jpg",
+      "lessons": 12,
+      "ready": false,
+      "default": false,
+      "sizeMB": 0,
+      "desc": "12 单元 · 音频对齐与课件制作中",
+      "dataPat": "tk1/data/L{NN}.json",
+      "audioPat": "tk1/audio/L{NN}.mp3",
+      "pad": 2
+    },
+    {
+      "id": "ref",
+      "name": "Reading Explorer Foundations",
+      "short": "REF",
+      "tag": "National Geographic",
+      "cover": "covers/ref_s.jpg",
+      "lessons": 12,
+      "ready": false,
+      "default": false,
+      "sizeMB": 0,
+      "desc": "12 单元（A/B 两篇） · 音频对齐与课件制作中",
+      "dataPat": "ref/data/L{NN}.json",
+      "audioPat": "ref/audio/L{NN}.mp3",
+      "pad": 2
+    },
+    {
+      "id": "re1",
+      "name": "Reading Explorer 1",
+      "short": "RE1",
+      "tag": "National Geographic",
+      "cover": "covers/re1_s.jpg",
+      "lessons": 12,
+      "ready": false,
+      "default": false,
+      "sizeMB": 0,
+      "desc": "12 单元（A/B 两篇） · 音频对齐与课件制作中",
+      "dataPat": "re1/data/L{NN}.json",
+      "audioPat": "re1/audio/L{NN}.mp3",
+      "pad": 2
     }
   ]
 }
