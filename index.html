@@ -103,7 +103,9 @@ nav.tabs a.on{color:var(--acc)}
 .coDot.prog b{position:relative;font-size:9px;font-weight:700;color:#087F5B}
 .coCard.off{opacity:.72}
 .bkc{width:66px;height:88px;border-radius:11px;object-fit:cover;display:block;margin:0 auto 8px;border:0.5px solid var(--line);background:#F1F3F5}
-.coName{font-size:15px;font-weight:600;line-height:1.3}
+.coName{font-size:15px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 书名类文本一律单行：窄屏收缩省略，绝不跨行 */
+.oneline{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* 难句/卡片 的课程筛选 */
 .hchips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
 .hchips::-webkit-scrollbar{display:none}
@@ -546,7 +548,7 @@ const COURSES=[
   desc:'12 单元 · 音频对齐与课件制作中',dataPat:'tks/data/L{NN}.json',audioPat:'tks/audio/L{NN}.mp3',pad:2},
  {id:'tk1',name:'Think 1',short:'TK1',tag:'Cambridge TH!NK',cover:'covers/tk1_s.jpg',lessons:12,ready:false,default:false,sizeMB:0,
   desc:'12 单元 · 音频对齐与课件制作中',dataPat:'tk1/data/L{NN}.json',audioPat:'tk1/audio/L{NN}.mp3',pad:2},
- {id:'ref',name:'Reading Explorer Foundations',short:'REF',tag:'National Geographic',cover:'covers/ref_s.jpg',lessons:12,ready:false,default:false,sizeMB:0,
+ {id:'ref',name:'Reading Explorer F',short:'REF',tag:'National Geographic',cover:'covers/ref_s.jpg',lessons:12,ready:false,default:false,sizeMB:0,
   desc:'12 单元（A/B 两篇） · 音频对齐与课件制作中',dataPat:'ref/data/L{NN}.json',audioPat:'ref/audio/L{NN}.mp3',pad:2},
  {id:'re1',name:'Reading Explorer 1',short:'RE1',tag:'National Geographic',cover:'covers/re1_s.jpg',lessons:12,ready:false,default:false,sizeMB:0,
   desc:'12 单元（A/B 两篇） · 音频对齐与课件制作中',dataPat:'re1/data/L{NN}.json',audioPat:'re1/audio/L{NN}.mp3',pad:2}
@@ -679,7 +681,7 @@ function renderCourses(){
       const meta=c.ready?`已学 ${s.learned}/${c.lessons}`:'教材数据准备中 · 敬请期待';
       return `<div class="item" data-act="openc" data-c="${c.id}" style="cursor:pointer">
         <img class="bk2" src="${c.cover}" alt="${esc(c.name)}"${c.ready?'':' style="opacity:.7"'}>
-        <div class="tt"><div class="en">${esc(c.name)}</div><div class="meta">${meta}</div></div>
+        <div class="tt"><div class="en oneline">${esc(c.name)}</div><div class="meta">${meta}</div></div>
         <button class="btn sm${c.ready?'':' g'}">${c.ready?'进入':'筹备中'}</button></div>`;
     }).join('');
   }
@@ -1150,7 +1152,7 @@ function meOfflineRow(c){
   const btn=ready?`<button class="btn sm g" data-act="dlc" data-c="${c.id}">更新</button>`
     :(run?`<button class="btn sm g" data-act="pausec" data-c="${c.id}">暂停</button>`
     :`<button class="btn sm" data-act="dlc" data-c="${c.id}">下载</button>`);
-  return `<div class="item" id="ol-${c.id}"><div class="tt"><div class="en">${esc(c.name)}</div>
+  return `<div class="item" id="ol-${c.id}"><div class="tt"><div class="en oneline">${esc(c.name)}</div>
     <div class="meta">${state}</div></div>${btn}</div>`;
 }
 function renderMe(){
