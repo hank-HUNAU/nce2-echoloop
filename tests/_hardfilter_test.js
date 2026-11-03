@@ -46,12 +46,14 @@ function say(k, v) { R[k] = v; console.log(k + ': ' + JSON.stringify(v)); }
   say('筛选 N1 内容', await page.$eval('#app .item .en', e => e.textContent.trim()));
   say('筛选后范围提示', await page.$$eval('.tip', a => a.some(x => x.textContent.includes('当前只看'))));
 
-  /* ④ 卡片：跨 tab 沿用筛选，且正面显示课程 */
+  /* ④ 卡片：跨 tab 沿用筛选；正面只留中文（辅助文字隐藏），背面三图标 */
   await page.goto(B + '#/cards', { waitUntil: 'load' });
   await page.waitForTimeout(600);
   say('卡片筛选条', await page.$$eval('.hchip', a => a.length));
   say('卡片数（沿用 N1）', await page.$$eval('.card', a => a.length));
   say('卡片正面', await page.$eval('.card .f', e => e.textContent.replace(/\s+/g, ' ').trim()));
+  say('正面无辅助文字', await page.$eval('.card .f', e => !e.textContent.includes('N1') && !e.querySelector('.pill')));
+  say('背面图标数', await page.$$eval('.card .cico', a => a.length));
 
   await page.click('.card');                 /* 先翻面，背面的按钮才可点 */
   await page.waitForTimeout(600);
@@ -123,7 +125,9 @@ function say(k, v) { R[k] = v; console.log(k + ': ' + JSON.stringify(v)); }
     && R['筛选后范围提示'] === true
     && R['卡片筛选条'] === 3
     && R['卡片数（沿用 N1）'] === 1
-    && /N1/.test(R['卡片正面'])
+    && /伞/.test(R['卡片正面'])
+    && R['正面无辅助文字'] === true
+    && R['背面图标数'] === 3
     && R['自评后 nce1 有 due'] === true && R['自评后 nce2 无 due（未被误改）'] === true
     && R['取消收藏后剩余'].join() === 'nce2'
     && R['单课程时筛选条数'] === 0

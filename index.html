@@ -137,6 +137,12 @@ nav.tabs a.on{color:var(--acc)}
  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;text-align:center}
 .card .f{position:relative;background:#fff;min-height:190px}
 .card .b{position:absolute;inset:0;background:#F0F4FF;transform:rotateY(180deg);overflow-y:auto}
+/* 闪卡背面三图标：语境重听 / 没记住 / 记住了 */
+.cico{width:52px;height:52px;border-radius:50%;border:1.5px solid var(--line);background:#fff;
+ display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;color:var(--accBtn);flex:0 0 52px}
+.cico svg{width:24px;height:24px}
+.cico.no{color:var(--bad);border-color:#F1BFC0;background:#FFF5F5}
+.cico.ok{color:var(--ok);border-color:#B7E4CE;background:#F0FFF9}
 .ring{width:110px}
 .ring text{font-weight:700}
 .foot{color:var(--sub);font-size:12px;text-align:center;margin-top:14px}
@@ -1108,16 +1114,17 @@ function renderCards(){
   let h=`<div class="topbar"><h1>语境闪卡 ${tipQ('cards','看中文回忆英文 → 点卡翻转核对 → 自评。没记住的 12 小时后再出现，记住了 3 天后再见。')}</h1></div>
   ${hardChips()}${hardScopeTip()}<div class="tip">今日待复习 ${dueN} / ${hard.length} 张。</div>`;
   if(!hard.length){ h+=`<div class="sec"><div class="empty">${HARDF==='all'?'收藏难句后，这里会自动生成卡片':'这门课还没有收藏的难句'}</div></div>`; $('#app').innerHTML=h; return; }
+  const IC_SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>';
+  const IC_NO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>';
+  const IC_OK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg>';
   h+='<div id="deck">'+hard.map((x,ix)=>`
     <div class="card" data-act="flip" data-ix="${ix}" style="${(x.due&&x.due>now)?'opacity:.55':''}"><div class="in">
-      <div class="f"><div class="pill">中文回忆${(x.due&&x.due>now)?' · 已排程':''}</div><div style="font-size:20px;font-weight:700;margin-top:8px">${esc(x.zh)||'（无译文）'}</div>
-        <div class="tip" style="margin-top:8px"><span style="color:var(--accBtn);font-weight:600">${esc((catCourse(x.cid||DEF_COURSE)||{}).short||x.cid||DEF_COURSE)}</span> · L${x.no} ${x.pat?'· '+esc(x.pat):''}</div></div>
-      <div class="b"><div class="pill" style="background:#DBE4FF">原句</div>
-        <div class="en" style="font-family:Georgia,'Times New Roman',serif;font-size:18px;margin-top:8px">${esc(x.en)}</div>
-        <div class="tip" style="margin-top:8px"><button class="btn sm g" data-act="cardplay" data-no="${x.no}" data-c="${x.cid||DEF_COURSE}" data-i="${x.i}">🔊 语境重听</button></div>
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="btn sm" style="flex:1" data-act="cardno" data-c="${x.cid||DEF_COURSE}" data-no="${x.no}" data-i="${x.i}">没记住</button>
-          <button class="btn sm ok" style="flex:1;background:var(--ok)" data-act="cardok" data-c="${x.cid||DEF_COURSE}" data-no="${x.no}" data-i="${x.i}">记住了</button></div></div>
+      <div class="f"><div style="font-size:20px;font-weight:700">${esc(x.zh)||'（无译文）'}</div></div>
+      <div class="b"><div class="en" style="font-family:Georgia,'Times New Roman',serif;font-size:18px">${esc(x.en)}</div>
+        <div style="display:flex;gap:16px;justify-content:center;margin-top:14px">
+          <button class="cico" data-act="cardplay" data-no="${x.no}" data-c="${x.cid||DEF_COURSE}" data-i="${x.i}" title="语境重听" aria-label="语境重听">${IC_SPK}</button>
+          <button class="cico no" data-act="cardno" data-c="${x.cid||DEF_COURSE}" data-no="${x.no}" data-i="${x.i}" title="没记住" aria-label="没记住">${IC_NO}</button>
+          <button class="cico ok" data-act="cardok" data-c="${x.cid||DEF_COURSE}" data-no="${x.no}" data-i="${x.i}" title="记住了" aria-label="记住了">${IC_OK}</button></div></div>
     </div></div>`).join('')+'</div>';
   $('#app').innerHTML=h;
 }
