@@ -1,0 +1,40 @@
+{
+  "v": 1,
+  "updatedAt": "2026-11-03",
+  "note": "课程清单（唯一可运营入口）。新增课程 = 改这里 + 丢文件，App 无需发版。files 用 {NN} 占位课号，pad 是补零位宽。",
+  "codes": [
+    { "code": "NCE2-LOOP", "add": ["nce2"], "note": "老师发给学生的课程码：一次加入我的课程并开始下载" }
+  ],
+  "courses": [
+    {
+      "id": "nce2",
+      "name": "新概念英语 2",
+      "short": "N2",
+      "tag": "NCE2 Loop",
+      "cover": "covers/nce2_s.jpg",
+      "lessons": 96,
+      "ready": true,
+      "default": true,
+      "sizeMB": 78,
+      "desc": "96 课 · 盲听 / 跟读 / 精听 / 复述 + 7 轮复习",
+      "dataPat": "data/L{NN}.json",
+      "audioPat": "audio/L{NN}.mp3",
+      "pad": 2
+    },
+    {
+      "id": "nce1",
+      "name": "新概念英语 1",
+      "short": "N1",
+      "tag": "NCE1 Loop",
+      "cover": "covers/nce1_s.jpg",
+      "lessons": 144,
+      "ready": false,
+      "default": false,
+      "sizeMB": 0,
+      "desc": "144 课 · 音频对齐与课件制作中",
+      "dataPat": "nce1/data/L{NN}.json",
+      "audioPat": "nce1/audio/L{NN}.mp3",
+      "pad": 2
+    }
+  ]
+}
