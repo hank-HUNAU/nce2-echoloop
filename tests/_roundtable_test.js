@@ -33,7 +33,9 @@ const LONG='The moment I shouted, a young man and a young woman sitting behind m
   });
   console.log('[卡片]', JSON.stringify(card));
   // 登录弹窗尺寸 + 键盘态
-  await page.click('#tabLogin');
+  await page.evaluate(() => { location.hash='#/me'; });
+  await page.waitForTimeout(500);
+  await page.click('[data-act="melogin"]');
   const modal = await page.evaluate(() => {
     const card = document.querySelector('.lmCard');
     const cs = getComputedStyle(card);

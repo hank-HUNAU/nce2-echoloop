@@ -16,7 +16,9 @@ const { chromium } = require('playwright');
   }));
   console.log('[ipad横屏]', JSON.stringify(r1));
   // 登录框键盘避让类
-  await page.click('#tabLogin');
+  await page.evaluate(() => { location.hash='#/me'; });
+  await page.waitForTimeout(500);
+  await page.click('[data-act="melogin"]');
   await page.focus('#lmEm');
   const kb = await page.evaluate(() => document.getElementById('loginMask').classList.contains('kb'));
   await page.evaluate(() => document.getElementById('lmEm').blur());

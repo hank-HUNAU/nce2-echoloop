@@ -223,7 +223,8 @@ audio{width:100%}
     if(!window.confirm('退出登录？退出后学习记录将停止同步（本机进度保留）')) return;
     try{ localStorage.removeItem('el2_session'); }catch(e){}
     window.EL2SESS=null;
-    if(typeof nav==='function') nav();
+    if(typeof window.el2AuthChanged==='function') window.el2AuthChanged();
+    else if(typeof nav==='function') nav();
   };
   mask.querySelector('#lmGo').addEventListener('click',function(){
     var err=mask.querySelector('#lmErr'), go=mask.querySelector('#lmGo');
@@ -244,7 +245,7 @@ audio{width:100%}
             s={access_token:res.d.access_token,refresh_token:res.d.refresh_token,
                expires_at:Date.now()+(res.d.expires_in||3600)*1000,role:'kid',
                family_code:row.family_code||'',uid:res.d.user?res.d.user.id:'',email:em};
-            save(); closeMask(); if(typeof nav==='function') nav();
+            save(); closeMask(); if(typeof window.el2AuthChanged==='function') window.el2AuthChanged(); else if(typeof nav==='function') nav();
             var _g=document.getElementById('lmGo'); if(_g){ _g.disabled=false; _g.textContent='登 录'; }
           }else if(row.role==='teacher'){
             location.replace(TEACHER+'#t='+encodeURIComponent(res.d.access_token));
@@ -338,8 +339,20 @@ function progStatAll(){
   ids.forEach(c=>{ const s=progStat(c); a.learned+=s.learned; a.done+=s.done; a.rounds+=s.rounds; });
   return a;
 }
-/* 难句/卡片 的课程筛选（内存态，不持久化；只有存在多门课的难句时才出现） */
-let HARDF='all';
+/* 难句/卡片 的课程范围（内存态，不持久化）——方案 C：跟随 + 状态外显
+   规则：
+   · 从课程页（#/c/:id）或课文页（#/lesson/N?c=）进来 → 默认选中那门课
+   · 从课程中心/课程库/冷启动进来 → 默认「全部」
+   · 在「难句 ↔ 卡片」之间来回切 → 沿用当前选择，不打断刚做的筛选
+   筛选条出现条件：有 ≥2 门课有难句，或已选中某门课（保证单课程时也能切回「全部」） */
+let HARDF='all', LAST_HASH='';
+function scopeOnEnter(){
+  const prev=LAST_HASH||'';
+  if(prev.startsWith('#/hard')||prev.startsWith('#/cards')) return;
+  if(prev.startsWith('#/c/')){ HARDF=decodeURIComponent(prev.slice(4).split('?')[0])||DEF_COURSE; return; }
+  if(prev.startsWith('#/lesson/')){ const Q=hashQs(); HARDF=Q.c||CUR.course||curCourse()||DEF_COURSE; return; }
+  HARDF='all';
+}
 function hardList(){
   const a=hardAll();
   return HARDF==='all'?a:a.filter(x=>(x.cid||DEF_COURSE)===HARDF);
@@ -347,7 +360,8 @@ function hardList(){
 function hardChips(){
   const a=hardAll();
   const cids=[...new Set(a.map(x=>x.cid||DEF_COURSE))];
-  if(cids.length<2) return '';
+  if(cids.length<2 && HARDF==='all') return '';          /* 单课程且未筛选 → 不制造无意义控件 */
+  if(HARDF!=='all' && cids.indexOf(HARDF)<0) cids.push(HARDF);  /* 选中的课暂时没难句也要能切回来 */
   const cnt=id=>a.filter(x=>(x.cid||DEF_COURSE)===id).length;
   const chip=(v,label,n)=>`<button class="hchip${HARDF===v?' on':''}" data-act="hardf" data-v="${v}">${label}<i>${n}</i></button>`;
   return `<div class="hchips">${chip('all','全部',a.length)}`+
@@ -541,32 +555,24 @@ const TABS=[
   ['#/home','课程','<path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"/>'],
   ['#/hard','难句','<path d="M12 21s-7-4.6-9.5-8.5C.6 9.5 2.4 6 5.7 6c2 0 3.4 1.1 4.3 2.6h4c.9-1.5 2.3-2.6 4.3-2.6 3.3 0 5.1 3.5 3.2 6.5C19 16.4 12 21 12 21z"/>'],
   ['#/cards','卡片','<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/>'],
-  ['#/stats','统计','<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'],
+  /* 第 4 tab「我的」＝账号 + 学习统计 + 离线包 + 数据管理（登录不再单独占一格） */
+  ['#/me','我的','<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/>'],
 ];
 function nav(){ const h=location.hash||'#/home';
-  const ME_ICON='<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/>';
-  let meTab;
-  if(window.EL2SESS){
-    const who=(window.EL2SESS.email||'').split('@')[0];
-    const on=h==='#/me'?' class="on"':'';
-    meTab=`<a href="#/me"${on} title="${who}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ME_ICON}</svg>我的</a>`;
-  }else{
-    meTab=`<a href="javascript:void(0)" id="tabLogin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ME_ICON}</svg>登录</a>`;
-  }
-  $('#tabs').innerHTML=TABS.map(t=>{const on=(h.startsWith(t[0])||(t[0]==='#/home'&&(h.startsWith('#/c/')||h.startsWith('#/lesson/')||h.startsWith('#/store'))))?' class="on"':'';
-    return `<a href="${t[0]}"${on}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${t[2]}</svg>${t[1]}</a>`;}).join('')+meTab;
+  $('#tabs').innerHTML=TABS.map(t=>{
+    let on='';
+    if(t[0]==='#/me'){ on=(h.startsWith('#/me')||h.startsWith('#/stats'))?' class="on"':''; }
+    else on=(h.startsWith(t[0])||(t[0]==='#/home'&&(h.startsWith('#/c/')||h.startsWith('#/lesson/')||h.startsWith('#/store'))))?' class="on"':'';
+    return `<a href="${t[0]}"${on}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${t[2]}</svg>${t[1]}</a>`;}).join('');
   if(dueList().length>0 && h!=='#/home' && !h.startsWith('#/c/')){
     const hm=document.querySelector('nav.tabs a[href="#/home"]');
     if(hm && !hm.querySelector('.bdg')){ const b=document.createElement('i'); b.className='bdg'; hm.appendChild(b); }
   }
-  const tl=document.getElementById('tabLogin');
-  if(tl) tl.addEventListener('click',function(ev){ ev.preventDefault(); if(window.el2OpenLogin) window.el2OpenLogin(); });
-  const tm=document.getElementById('tabMe');
-  if(tm) tm.addEventListener('click',function(ev){ ev.preventDefault(); if(window.el2Logout) window.el2Logout(); });
 }
 async function router(){
   nav();
   const h=location.hash||'#/home';
+  if(h.startsWith('#/hard')||h.startsWith('#/cards')) scopeOnEnter();
   if(h.startsWith('#/lesson/')){
     const Q=hashQs();
     const cid=Q.c||curCourse();
@@ -591,7 +597,7 @@ async function router(){
     renderLesson();
   }else if(h.startsWith('#/hard')) renderHard();
   else if(h.startsWith('#/cards')) renderCards();
-  else if(h.startsWith('#/stats')) renderStats();
+  else if(h.startsWith('#/stats')) renderMe();      /* 旧地址兼容：#/stats 并入「我的」 */
   else if(h.startsWith('#/me')) renderMe();
   else if(h.startsWith('#/store')) renderStore();
   else if(h.startsWith('#/c/')){
@@ -602,6 +608,7 @@ async function router(){
     if(c&&c.ready) renderHome(); else renderCourseSoon(cid);
   }
   else renderCourses();
+  LAST_HASH=h;                                     /* 记住来源页：难句/卡片据此决定默认课程范围 */
 }
 window.addEventListener('hashchange',router);
 /* 返回键保护：back 永远回到首页（防学习误退）；退出用系统手势/后台划掉 */
@@ -1053,9 +1060,15 @@ document.addEventListener('click',async e=>{
 });
 
 /* ================= 难句本 ================= */
+/* 范围提示：只在「跟随某门课」时出现，提醒孩子这是局部视图，可一键回全课程 */
+function hardScopeTip(){
+  if(HARDF==='all') return '';
+  const c=catCourse(HARDF)||{};
+  return `<div class="tip" style="margin:0 0 8px">当前只看 <b style="color:var(--accBtn)">${esc(c.name||HARDF)}</b> 的难句 · 点「全部」可跨课程复习</div>`;
+}
 function renderHard(){
   const hard=hardList();
-  let h=`<h1>难句本</h1><div class="sec"><h2>难句本 ${tipQ('hard','精听时点 ★ 收藏的句子都汇总在这里，点「重练」回到原课再练一遍。')}</h2>${hardChips()}`;
+  let h=`<h1>难句本</h1><div class="sec"><h2>难句本 ${tipQ('hard','精听时点 ★ 收藏的句子都汇总在这里，点「重练」回到原课再练一遍。')}</h2>${hardChips()}${hardScopeTip()}`;
   if(!hard.length) h+= HARDF==='all'
     ? '<div class="empty">还没有收藏，去精听里点亮星星吧</div>'
     : '<div class="empty">这门课还没有收藏的难句</div>';
@@ -1075,7 +1088,7 @@ function renderCards(){
   const hard=hardList().slice().sort((a,b)=>(a.due||0)-(b.due||0));
   const dueN=hard.filter(x=>!x.due||x.due<=now).length;
   let h=`<h1>语境闪卡 ${tipQ('cards','看中文回忆英文 → 点卡翻转核对 → 自评。没记住的 12 小时后再出现，记住了 3 天后再见。')}</h1>
-  ${hardChips()}<div class="tip">今日待复习 ${dueN} / ${hard.length} 张。</div>`;
+  ${hardChips()}${hardScopeTip()}<div class="tip">今日待复习 ${dueN} / ${hard.length} 张。</div>`;
   if(!hard.length){ h+=`<div class="sec"><div class="empty">${HARDF==='all'?'收藏难句后，这里会自动生成卡片':'这门课还没有收藏的难句'}</div></div>`; $('#app').innerHTML=h; return; }
   h+='<div id="deck">'+hard.map((x,ix)=>`
     <div class="card" data-act="flip" data-ix="${ix}" style="${(x.due&&x.due>now)?'opacity:.55':''}"><div class="in">
@@ -1100,33 +1113,83 @@ function ringSvg(id,pct,color,label){
     <text x="55" y="53" text-anchor="middle" font-size="19" fill="#212529">${pct}%</text>
     <text x="55" y="73" text-anchor="middle" font-size="11" fill="#868E96">${label}</text></svg></div>`;
 }
+/* ================= 我的（账号 + 统计 + 离线包 + 数据管理，四合一） ================= */
+/* 离线包一行：状态 + 对应动作（下载 / 暂停 / 更新）；paintDl 会就地重绘这一行 */
+function meOfflineRow(c){
+  const st=dlGet(c.id), pct=dlPct(c.id);
+  const ready=!!(st&&st.state==='done'), run=!!(st&&st.state==='run');
+  const state=ready?'<span style="color:var(--ok)">✓ 已就绪 · 断网也能学</span>'
+    :(run?`<span style="color:var(--accBtn)">下载中 ${pct}%（可退出去听课，回来接着下）</span>`
+    :`未下载 · 约 ${c.sizeMB||0}MB`);
+  const btn=ready?`<button class="btn sm g" data-act="dlc" data-c="${c.id}">更新</button>`
+    :(run?`<button class="btn sm g" data-act="pausec" data-c="${c.id}">暂停</button>`
+    :`<button class="btn sm" data-act="dlc" data-c="${c.id}">下载</button>`);
+  return `<div class="item" id="ol-${c.id}"><div class="tt"><div class="en">${esc(c.name)}</div>
+    <div class="meta">${state}</div></div>${btn}</div>`;
+}
 function renderMe(){
-  if(!window.EL2SESS){ location.hash='#/home'; return; }
+  const sess=window.EL2SESS;
   const ag=progStatAll();
   const learned=ag.learned, done=ag.done, rounds=ag.rounds;
-  const totLearn=myCourses().reduce((a,id)=>a+((catCourse(id)||{}).lessons||0),0)||96;
+  const my=myCourses();
+  const totLearn=my.reduce((a,id)=>a+((catCourse(id)||{}).lessons||0),0)||96;
+  const due=dueList().length;
   const mins=Math.round((STATS.playSec||0)/60);
-  let h=`<h1>我的</h1>
-  <div class="sec"><h2>账号</h2><div class="item"><div class="tt">
-    <div class="en">${esc(window.EL2SESS.email||'')}</div>
-    <div class="meta">学习记录会同步给爸爸妈妈和老师</div></div></div></div>
-  <div class="sec"><h2>离线包</h2>
-    <div class="item"><div class="tt"><div class="en" id="olState">…</div>
-      <div class="meta">新概念 2 全部课文与音频 · 约 80MB · 下载后可完全离线学习</div></div></div>
-    <div class="pbar" id="olBar" style="display:none;margin:8px 0 4px"><i style="width:0%"></i></div>
-    <button class="btn" id="olBtn" style="margin-top:4px">下载离线包</button>
-    <div class="tip" style="margin-top:8px">下载后出门、断网都能正常学习；点「更新」可拉取最新课文数据。</div></div>
-  <div class="sec"><h2>学习概览</h2>
-    <div class="item"><div class="tt"><div class="en">已学 ${learned}/${totLearn} · 通关 ${done}/${totLearn}</div>
-      <div class="meta">累计复习 ${rounds} 轮 · 累计听读 ${mins} 分钟</div></div></div>
-    <div class="tip">现在已登录，学的内容会自动同步 ✓</div></div>
-  <div class="sec"><button class="btn" id="meOut2">退出登录</button>
-    <div class="tip" style="margin-top:8px">退出后，已学的内容还留在平板里。</div></div>`;
+  const days=[...Array(7)].map((_,k)=>{ const d=new Date(Date.now()-(6-k)*864e5);
+    const key=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+    return {label:'周'+'日一二三四五六'[d.getDay()],v:Math.round((STATS.days[key]||0)/60)}; });
+  const max=Math.max(5,...days.map(x=>x.v));
+  const readyCs=my.map(id=>catCourse(id)).filter(c=>c&&c.ready&&(dlGet(c.id)||{}).state==='done');
+  const readyMB=readyCs.reduce((a,c)=>a+(c.sizeMB||0),0);
+
+  let h=`<h1>我的</h1>`;
+  /* ① 账号（未登录=页内登录卡，不再单独占一个 tab） */
+  if(sess){
+    h+=`<div class="sec"><h2>账号</h2>
+      <div class="item"><div class="tt"><div class="en">${esc(sess.email||'')}</div>
+        <div class="meta">学习记录会同步给爸爸妈妈和老师</div></div>
+        <button class="btn sm g" id="meOut2">退出</button></div></div>`;
+  }else{
+    h+=`<div class="sec"><h2>登录</h2>
+      <div class="item"><div class="tt"><div class="en">还没有登录</div>
+        <div class="meta">登录后学习记录同步给家长和老师；不登录也能学，记录只存在这台设备上</div></div>
+        <button class="btn sm" data-act="melogin">登录</button></div></div>`;
+  }
+  /* ② 学习概览 */
+  h+=`<div class="sec"><h2>学习概览</h2>
+    <div style="display:flex;justify-content:space-around">
+      ${ringSvg('a',Math.round(learned*100/totLearn),'#4C6EF5','已学')}${ringSvg('b',Math.round(done*100/totLearn),'#12B886','通关')}${ringSvg('c',learned?Math.min(100,Math.round(rounds*100/(learned*7))):0,'#F59F00','复习')}</div>
+    <div class="tip" style="text-align:center;margin-top:6px">已学 ${learned}/${totLearn} · 通关 ${done}/${totLearn} · 复习 ${rounds} 轮 · 待复习 ${due} 课</div></div>`;
+  /* ③ 近 7 天 */
+  h+=`<div class="sec"><h2>近 7 天练习（分钟）</h2>
+    <div style="display:flex;align-items:flex-end;gap:8px;height:120px;padding:0 4px">
+      ${days.map(x=>`<div style="flex:1;text-align:center"><div style="font-size:12px;color:var(--sub)">${x.v||''}</div>
+        <div style="background:var(--acc);border-radius:6px 6px 0 0;height:${Math.round(x.v/max*88)}px;min-height:3px"></div>
+        <div style="font-size:12px;color:var(--sub)">${x.label}</div></div>`).join('')}
+    </div>
+    <div class="item" style="margin-top:10px"><div class="tt">累计收听</div><b>${mins} 分钟</b></div>
+    <div class="item"><div class="tt">跟读句子次数</div><b>${STATS.shadowN||0}</b></div>
+    <div class="item"><div class="tt">录音次数</div><b>${STATS.recN||0}</b></div></div>`;
+  /* ④ 离线包：按「我的课程」逐门列，操作就地完成 */
+  h+=`<div class="sec"><h2>离线包 ${tipQ('ofl','下载后断网也能学。在课程库里点「移除」只释放文件，学习进度与难句本都会保留。')}</h2>
+    ${my.map(id=>catCourse(id)).filter(c=>c&&c.ready).map(meOfflineRow).join('')||'<div class="empty">还没有可下载的课程</div>'}
+    <div class="tip" style="margin-top:8px">已下载 ${readyCs.length} 门 · 约 ${readyMB}MB</div>
+    <div style="margin-top:8px"><button class="btn sm g" data-go="#/store">管理课程与离线包</button></div></div>`;
+  /* ⑤ 数据管理（打印时排除） */
+  h+=`<div class="sec no-print"><h2>数据管理</h2><div class="tip">换新平板前，先点「导出备份」保存记录。</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn sm g" data-act="exp">导出 JSON 备份</button>
+      <button class="btn sm g" data-act="imp">导入恢复</button>
+      <input type="file" id="impFile" accept=".json" style="display:none">
+      <button class="btn sm g" data-act="clr">清空全部记录</button></div></div>
+  <div class="foot">配套训练工具 · 更多课程在课程库里</div>`;
   $('#app').innerHTML=h;
   const b=document.getElementById('meOut2');
   if(b) b.addEventListener('click',()=>{ if(window.el2Logout) window.el2Logout(); });
-  refreshOlUI();
 }
+/* 登录态变化（登录/退出）→ 顶部 tab 与「我的」页同步刷新 */
+window.el2AuthChanged=function(){ nav(); const hh=location.hash||'#/home';
+  if(hh.startsWith('#/me')||hh.startsWith('#/stats')) renderMe(); };
 /* ===== 课程离线包：按课程下载进 el2-content 缓存层（设备级，不依赖登录） ===== */
 const CACHE_CONTENT='el2-content';
 const DL={};                       /* 运行期进度缓存，避免每次渲染都读 localStorage */
@@ -1194,54 +1257,25 @@ function paintDl(id){
   const c=catCourse(id); if(!c) return;
   const cell=document.getElementById('sc-'+id);
   if(cell&&document.body.contains(cell)&&cell.parentNode){ cell.outerHTML=renderStoreCard(c); }
-  const bar=document.getElementById('olBar'), fill=bar?bar.querySelector('i'):null;
-  if(fill) fill.style.width=dlPct(id)+'%';
+  const row=document.getElementById('ol-'+id);          /* 「我的」页离线包那一行 */
+  if(row&&document.body.contains(row)&&row.parentNode){ row.outerHTML=meOfflineRow(c); }
   refreshOlUI();
 }
+
 function refreshOlUI(){
-  const s=dlGet('nce2'), btn=$('#olBtn'), stt=$('#olState'), hb=$('#homeOlBtn');
+  /* 只服务于课程首页那颗离线按钮（「我的」页的离线行由 paintDl 就地重绘） */
+  const cid=(typeof curCourse==='function')?curCourse():DEF_COURSE;
+  const s=dlGet(cid), hb=$('#homeOlBtn');
+  if(!hb) return;
   const done=!!(s&&s.state==='done'), run=!!(s&&s.state==='run');
-  if(stt) stt.textContent=done?'✓ 离线包已就绪':(run?'下载中 '+dlPct('nce2')+'%（可退出去听课，回来接着下）':'未下载 · 首次约 78MB');
-  if(btn) btn.textContent=done?'更新离线包':(run?'暂停下载':'下载离线包');
-  if(hb) hb.textContent=done?'📥 更新离线包':(run?'📥 下载中 '+dlPct('nce2')+'%':'📥 下载离线包');
+  hb.textContent=done?'📥 更新离线包':(run?'📥 下载中 '+dlPct(cid)+'%':'📥 下载离线包');
 }
 window.dlOffline=function(){
-  const s=dlGet('nce2');
-  if(s&&s.state==='run'){ dlPause('nce2'); return; }
-  return dlCourse('nce2');
+  const cid=(typeof curCourse==='function')?curCourse():DEF_COURSE;
+  const s=dlGet(cid);
+  if(s&&s.state==='run'){ dlPause(cid); return; }
+  return dlCourse(cid);
 };
-function renderStats(){
-  const ag=progStatAll();
-  const learned=ag.learned, done=ag.done, rounds=ag.rounds;
-  const totLearn=myCourses().reduce((a,id)=>a+((catCourse(id)||{}).lessons||0),0)||96;
-  const due=dueList().length;
-  const mins=Math.round((STATS.playSec||0)/60);
-  const days=[...Array(7)].map((_,k)=>{ const d=new Date(Date.now()-(6-k)*864e5);
-    const key=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
-    return {label:'周'+'日一二三四五六'[d.getDay()],v:Math.round((STATS.days[key]||0)/60)}; });
-  const max=Math.max(5,...days.map(x=>x.v));
-  let h=`<h1>学习统计</h1>
-  <div class="sec"><div style="display:flex;justify-content:space-around">
-    ${ringSvg('a',Math.round(learned*100/totLearn),'#4C6EF5','已学')}${ringSvg('b',Math.round(done*100/totLearn),'#12B886','通关')}${ringSvg('c',learned?Math.min(100,Math.round(rounds*100/(learned*7))):0,'#F59F00','复习')}</div>
-    <div class="tip" style="text-align:center;margin-top:6px">已学 ${learned}/${totLearn} · 通关 ${done}/${totLearn} · 复习 ${rounds} 轮 · 待复习 ${due} 课</div></div>
-  <div class="sec"><h2>近 7 天练习（分钟）</h2>
-    <div style="display:flex;align-items:flex-end;gap:8px;height:120px;padding:0 4px">
-      ${days.map(x=>`<div style="flex:1;text-align:center"><div style="font-size:12px;color:var(--sub)">${x.v||''}</div>
-        <div style="background:var(--acc);border-radius:6px 6px 0 0;height:${Math.round(x.v/max*88)}px;min-height:3px"></div>
-        <div style="font-size:12px;color:var(--sub)">${x.label}</div></div>`).join('')}
-    </div></div>
-  <div class="sec"><div class="item"><div class="tt">累计收听</div><b>${mins} 分钟</b></div>
-    <div class="item"><div class="tt">跟读句子次数</div><b>${STATS.shadowN||0}</b></div>
-    <div class="item"><div class="tt">录音次数</div><b>${STATS.recN||0}</b></div></div>
-  <div class="sec no-print"><h2>数据管理</h2><div class="tip">换新平板前，先点「导出备份」保存记录。</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn sm g" data-act="exp">导出 JSON 备份</button>
-      <button class="btn sm g" data-act="imp">导入恢复</button>
-      <input type="file" id="impFile" accept=".json" style="display:none">
-      <button class="btn sm g" data-act="clr">清空全部记录</button></div>
-    <div style="margin-top:10px"><a href="#" data-act="logout" style="font-size:12px;color:var(--sub)">退出登录（换账号）</a></div></div>`;
-  $('#app').innerHTML=h;
-}
 /* ================= 数据管理动作 ================= */
 document.addEventListener('click',e=>{
   const el=e.target.closest('[data-act]'); if(!el) return;
@@ -1263,6 +1297,7 @@ document.addEventListener('click',e=>{
     renderStore();
     return;
   }
+  if(act==='melogin'){ if(window.el2OpenLogin) window.el2OpenLogin(); return; }
   if(act==='logout'){ localStorage.removeItem('el2_session'); location.replace('login.html'); return; }
   if(act==='revsh'){ CUR.shReveal=!CUR.shReveal; renderLesson(); return; }
   if(act==='retellhint'){ CUR.retellHint=!CUR.retellHint; renderLesson(); return; }
@@ -1306,7 +1341,7 @@ document.addEventListener('click',e=>{
     if(!confirm('确定清空全部学习记录？（课程文件不受影响）')) return;
     if(!confirm('再次确认：此操作不可恢复！')) return;
     PROG={_v:3,courses:{}}; STATS={playSec:0,shadowN:0,recN:0,days:{}}; store.setHard([]);
-    saveProgress(); saveStats(); renderStats();
+    saveProgress(); saveStats(); renderMe();
   }
 });
 document.addEventListener('change',e=>{
