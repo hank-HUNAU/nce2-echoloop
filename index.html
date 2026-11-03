@@ -278,28 +278,83 @@ const store={
   getStats(){ try{return JSON.parse(localStorage.getItem(LS+'stats')||'{}');}catch(e){return{};} },
   setStats(s){ localStorage.setItem(LS+'stats',JSON.stringify(s)); },
 };
-let PROG=store.get();
-/* v2 顺序迁移：旧顺序[精听0,跟读1,盲听2,复述3] → 新顺序[盲听0,跟读1,精听2,复述3]（一次性，0↔2 互换） */
-if(!PROG.__v2){ for(const k in PROG){ const q=PROG[k];
-    if(q&&typeof q.stage==='number'){ if(q.stage===0)q.stage=2; else if(q.stage===2)q.stage=0; } }
-  PROG.__v2=1; try{store.set(PROG);}catch(e){} }
+/* ===== 进度存储 v3：按课程分组 {_v:3, courses:{nce2:{"1":{…}}}} =====
+   v3 前是扁平 {课号:记录}——第二门课一接入就会与 NCE2 同课号写成同一条记录（静默互串）。
+   迁移在读取时做一次，对同一份旧数据幂等；旧数据全部归属默认课程。 */
+const DEF_COURSE='nce2';
+function blankProg(){ return {stage:0,si:0,listened:{},shadow:{},hard:[],firstLearnAt:0,reviews:0,lastReviewAt:0,blindDone:false,retellDone:false}; }
+function migrateProg(raw){
+  if(!raw||typeof raw!=='object') return {_v:3,courses:{}};
+  if(raw._v===3&&raw.courses){
+    /* 兜底：旧版 JS（缓存未更新）仍按扁平结构写入时，把它并回默认课程，别丢数据 */
+    const stray=Object.keys(raw).filter(k=>/^\d+$/.test(k));
+    if(stray.length){
+      const o=raw.courses[DEF_COURSE]||(raw.courses[DEF_COURSE]={});
+      stray.forEach(k=>{ o[k]=raw[k]; delete raw[k]; });
+    }
+    return raw;
+  }
+  const inner={};
+  for(const k in raw){ if(/^\d+$/.test(k)&&raw[k]&&typeof raw[k]==='object') inner[k]=raw[k]; }
+  /* 先补跑 v2 顺序迁移：旧顺序[精听0,跟读1,盲听2,复述3] → 新顺序[盲听0,跟读1,精听2,复述3] */
+  if(!raw.__v2){ for(const k in inner){ const q=inner[k];
+    if(typeof q.stage==='number'){ if(q.stage===0)q.stage=2; else if(q.stage===2)q.stage=0; } } }
+  return {_v:3,courses:{[DEF_COURSE]:inner}};
+}
+let PROG=migrateProg(store.get());
+try{ store.set(PROG); }catch(e){}
 let STATS=Object.assign({playSec:0,shadowN:0,recN:0,days:{}},store.getStats());
 function saveProgress(){ store.set(PROG); }
 function saveStats(){ store.setStats(STATS); }
-function prog(no){ if(!PROG[no]) PROG[no]={stage:0,si:0,listened:{},shadow:{},hard:[],firstLearnAt:0,reviews:0,lastReviewAt:0,blindDone:false,retellDone:false}; return PROG[no]; }
+/* 当前课程：接入第二门课时由路由写入 CUR.course；现在恒为 nce2 */
+function curCourse(){ return (CUR&&CUR.course)||DEF_COURSE; }
+function progOf(cid){
+  cid=cid||curCourse();
+  if(!PROG.courses) PROG.courses={};
+  if(!PROG.courses[cid]) PROG.courses[cid]={};
+  return PROG.courses[cid];
+}
+function prog(no,cid){ const o=progOf(cid), k=String(no);
+  if(!o[k]) o[k]=blankProg(); return o[k]; }
+/* 单课程汇总：已学 / 通关 / 复习轮数 / 最近课号 / 继续目标 */
+function progStat(cid){
+  const o=progOf(cid), ks=Object.keys(o);
+  let learned=0,done=0,rounds=0,best=-1,cont=0,last=0;
+  ks.forEach(k=>{ const p=o[k]||{}; const sc=(p.stage||0)*100+(p.si||0);
+    if(sc>best){best=sc;cont=+k;}
+    if(p.firstLearnAt){ learned++; if(p.reviews>=OFFSETS.length) done++; rounds+=(p.reviews||0);
+      if(+k>last) last=+k; } });
+  return {learned,done,rounds,cont,last};
+}
+function progStatAll(){
+  const a={learned:0,done:0,rounds:0};
+  const ids=(typeof myCourses==='function')?myCourses():Object.keys(PROG.courses||{});
+  ids.forEach(c=>{ const s=progStat(c); a.learned+=s.learned; a.done+=s.done; a.rounds+=s.rounds; });
+  return a;
+}
+/* 难句本：v3 前没有 cid 字段（只可能是 NCE2），读取时补默认课程 */
+function hardAll(){
+  const a=store.getHard(); let ch=false;
+  a.forEach(x=>{ if(!x.cid){ x.cid=DEF_COURSE; ch=true; } });
+  if(ch){ try{ store.setHard(a); }catch(e){} }
+  return a;
+}
 
 /* 复习调度：nextDue(no) → 毫秒时间戳；dueRound(no) → 第几轮(1-7) 或 0 */
 function nextDue(p){
   if(!p.firstLearnAt||p.reviews>=OFFSETS.length) return 0;
   return p.firstLearnAt+OFFSETS[p.reviews]*864e5;
 }
-function dueList(){
+/* cid 省略 = 全部课程（首页聚合）；给了就只看这一门 */
+function dueList(cid){
   const now=Date.now(),out=[];
-  for(const k in PROG){ const p=PROG[k];
-    if(!p.firstLearnAt) continue;
-    const nd=nextDue(p);
-    if(nd&&now>=nd) out.push({no:+k,round:p.reviews+1,due:nd,overdueDays:Math.floor((now-nd)/864e5)});
-  }
+  const cs=cid?[cid]:((typeof myCourses==='function')?myCourses():Object.keys(PROG.courses||{}));
+  cs.forEach(c=>{ const o=(PROG.courses||{})[c]||{};
+    for(const k in o){ const p=o[k];
+      if(!p.firstLearnAt) continue;
+      const nd=nextDue(p);
+      if(nd&&now>=nd) out.push({cid:c,no:+k,round:p.reviews+1,due:nd,overdueDays:Math.floor((now-nd)/864e5)});
+    } });
   out.sort((a,b)=>a.due-b.due); return out;
 }
 
@@ -307,7 +362,7 @@ function dueList(){
 function statDay(sec){ const d=todayStr(); STATS.playSec=(STATS.playSec||0)+sec;
   STATS.days[d]=(STATS.days[d]||0)+sec; saveStats();
   try{ const st=['intensive','shadow','blind','retell'];
-    const idx=(CUR.mode==='rev')?(CUR.rstep||0):((PROG[CUR.no]||{}).stage||0);
+    const idx=(CUR.mode==='rev')?(CUR.rstep||0):((prog(CUR.no).stage)||0);
     syncEnqueue(st[idx]||'intensive',sec,null); }catch(e){} }
 
 /* ================= 云同步（Supabase el2_events，匿名静默上报） ================= */
@@ -397,16 +452,35 @@ function playAll(onend){ AU.src=curAudio(); AU.currentTime=0; AU.play(); playT0=
   AU.addEventListener('timeupdate',segStop);
 }
 
-/* ================= 数据加载 ================= */
+/* ================= 数据加载（按课程取 dataPat，第二门课接入即生效） ================= */
 const DATACACHE={};
-async function loadLesson(no){
-  if(DATACACHE[no]) return DATACACHE[no];
-  const r=await fetch('data/L'+String(no).padStart(2,'0')+'.json');
-  DATACACHE[no]=await r.json(); return DATACACHE[no];
+async function loadLesson(no,cid){
+  cid=cid||curCourse();
+  const key=cid+':'+no;
+  if(DATACACHE[key]) return DATACACHE[key];
+  const c=catCourse(cid)||{dataPat:'data/L{NN}.json',pad:2};
+  const path=(c.dataPat||'data/L{NN}.json').replace('{NN}',String(no).padStart(c.pad||2,'0'));
+  const r=await fetch(path);
+  DATACACHE[key]=await r.json(); return DATACACHE[key];
 }
 
 /* ================= 路由 ================= */
-let CUR={no:0,data:null,stage:0,mode:'learn'};
+let CUR={no:0,data:null,stage:0,mode:'learn',course:'nce2'};
+/* hash 查询参数：#/lesson/12?m=rev&c=nce1 → {m:'rev',c:'nce1'} */
+function hashQs(){
+  const o={}, q=(location.hash.split('?')[1]||'');
+  q.split('&').forEach(kv=>{ if(!kv) return; const i=kv.indexOf('=');
+    o[i<0?kv:kv.slice(0,i)] = i<0?'':decodeURIComponent(kv.slice(i+1)); });
+  return o;
+}
+/* 生成课程内页链接：默认课程保持干净 URL，非默认课程带 c 参数 */
+function lessonHref(no,cid,mode){
+  cid=cid||curCourse();
+  let q=[];
+  if(mode) q.push('m='+mode);
+  if(cid!==DEF_COURSE) q.push('c='+encodeURIComponent(cid));
+  return '#/lesson/'+no+(q.length?'?'+q.join('&'):'');
+}
 function tipQ(key,text){
   return `<span class="tipq" data-act="tipq" data-tk="${key}" title="说明">?</span><div class="tipd" id="tipd-${key}" style="display:none"><div class="tip">${text}</div></div>`;
 }
@@ -473,22 +547,25 @@ async function router(){
   nav();
   const h=location.hash||'#/home';
   if(h.startsWith('#/lesson/')){
+    const Q=hashQs();
+    const cid=Q.c||curCourse();
     setTimeout(()=>{ const no=+h.match(/#\/lesson\/(\d+)/)[1];
       if(!window.caches || !navigator.onLine) return;
-      const src='audio/L'+String(no).padStart(2,'0')+'.mp3';
-      caches.open(CACHE_CONTENT).then(c=>c.match(src).then(m=>{
+      const c=catCourse(cid)||{audioPat:'audio/L{NN}.mp3',pad:2};
+      const src=(c.audioPat||'audio/L{NN}.mp3').replace('{NN}',String(no).padStart(c.pad||2,'0'));
+      caches.open(CACHE_CONTENT).then(cc=>cc.match(src).then(m=>{
         if(m) return;                       // 已缓存，跳过
-        return c.add(src);                  // 预取整课：fetch+落缓存
+        return cc.add(src);                 // 预取整课：fetch+落缓存
       })).catch(()=>{});
     }, 2500); // 开课 2.5s 后空闲预取整课音频，逐句播放本地命中
 
-    const m=h.match(/#\/lesson\/(\d+)(\?m=rev)?/);
-    CUR.mode=m[2]?'rev':'learn';
-    const no=+m[1];
+    CUR.mode=Q.m==='rev'?'rev':'learn';
+    if(Q.c) CUR.course=Q.c;
+    const no=+h.match(/#\/lesson\/(\d+)/)[1];
     if(CUR.no!==no||!CUR.data){
       CUR.no=no;
       $('#app').innerHTML='<h1>L'+no+'</h1><div class="sec"><div class="skel" style="width:70%"></div><div class="skel"></div><div class="skel"></div><div class="skel" style="width:85%"></div><div class="skel"></div><div class="skel" style="width:60%"></div></div>';
-      CUR.data=await loadLesson(no);
+      CUR.data=await loadLesson(no,cid);
     }
     renderLesson();
   }else if(h.startsWith('#/hard')) renderHard();
@@ -496,8 +573,13 @@ async function router(){
   else if(h.startsWith('#/stats')) renderStats();
   else if(h.startsWith('#/me')) renderMe();
   else if(h.startsWith('#/store')) renderStore();
-  else if(h.startsWith('#/c/nce2')) renderHome();
-  else if(h.startsWith('#/c/nce1')) renderCourseSoon();
+  else if(h.startsWith('#/c/')){
+    /* 通用课程内页：第二门课 ready 后这里直接生效，无需再改路由 */
+    const cid=decodeURIComponent(h.slice(4).split('?')[0])||DEF_COURSE;
+    const c=catCourse(cid);
+    CUR.course=(c&&c.ready)?cid:DEF_COURSE;
+    if(c&&c.ready) renderHome(); else renderCourseSoon(cid);
+  }
   else renderCourses();
 }
 window.addEventListener('hashchange',router);
@@ -517,21 +599,21 @@ window.addEventListener('hashchange',router);
 /* ================= 首页 ================= */
 function renderCourses(){
   const due=dueList();
-  const learned=Object.keys(PROG).filter(k=>PROG[k].firstLearnAt).length;
-  let cont=0,best=-1;
-  for(const k in PROG){ const p2=PROG[k]; const sc=p2.stage*100+(p2.si||0); if(sc>best){best=sc;cont=+k;} }
-  const contNo=cont||Object.keys(PROG).map(Number).sort((a,b)=>b-a)[0]||1;
   const my=myCourses();
+  /* 首页「今日任务」优先显示最早到期那门课的继续目标 */
+  const firstCid=(due[0]&&due[0].cid)||(my[0]||DEF_COURSE);
+  const firstStat=progStat(firstCid);
+  const contNo=firstStat.cont||firstStat.last||1;
   let h=`<div class="topbar"><h1>课程中心</h1><button class="hbtn" data-go="#/store">＋ 选择课程</button></div>
   <div class="sec"><h2>今日任务</h2>`;
   if(due.length){
-    h+=due.map(dd=>`<div class="item"><div class="tt"><div class="en">新概念 2 · L${dd.no} · 第 ${dd.round} 轮复习</div>
+    h+=due.map(dd=>`<div class="item"><div class="tt"><div class="en">${esc((catCourse(dd.cid)||{}).name||dd.cid)} · L${dd.no} · 第 ${dd.round} 轮复习</div>
       <div class="meta">${dd.overdueDays>0?`<span class="late">已逾期 ${dd.overdueDays} 天</span>`:'今日到期'} · 盲听+难句补练+复述</div></div>
-      <button class="btn sm" data-go="#/lesson/${dd.no}?m=rev">开始复习</button></div>`).join('');
+      <button class="btn sm" data-go="${lessonHref(dd.no,dd.cid,'rev')}">开始复习</button></div>`).join('');
   }else{
-    h+=`<div class="item"><div class="tt"><div class="en">新概念 2 · 继续精听 L${contNo}</div>
+    h+=`<div class="item"><div class="tt"><div class="en">${esc((catCourse(firstCid)||{}).name||firstCid)} · 继续精听 L${contNo}</div>
       <div class="meta">今天没有到期复习，往下推进吧</div></div>
-      <button class="btn sm" data-go="#/lesson/${contNo}">继续 →</button></div>`;
+      <button class="btn sm" data-go="${lessonHref(contNo,firstCid)}">继续 →</button></div>`;
   }
   h+=`</div>
   <div class="sec"><h2>我的课程</h2>`;
@@ -541,8 +623,9 @@ function renderCourses(){
     h+=my.map(id=>{
       const c=catCourse(id); if(!c) return '';
       const st=dlGet(c.id), ok=!!(st&&st.state==='done'), run=!!(st&&st.state==='run');
+      const s=progStat(c.id), dn=dueList(c.id).length;
       const meta=c.ready
-        ? (c.id==='nce2'?`已学 ${learned}/${c.lessons} · 到期复习 ${due.length} 课`:`共 ${c.lessons} 课`)
+        ? `已学 ${s.learned}/${c.lessons} · 到期复习 ${dn} 课`
         : '教材数据准备中 · 敬请期待';
       let ofl='';
       if(c.ready){
@@ -624,35 +707,37 @@ function renderStore(){
   h+=`<div class="foot">课程内容与音频会存到本机，断网也能学。</div>`;
   $('#app').innerHTML=h;
 }
-function renderCourseSoon(){
+function renderCourseSoon(cid){
+  const c=catCourse(cid||'nce1')||{id:'nce1',name:'新概念英语 1',cover:'covers/nce1_s.jpg',lessons:144};
   $('#app').innerHTML=`<a href="#/home" style="color:var(--sub);text-decoration:none;font-size:14px">← 课程中心</a>
-  <h1 style="margin:4px 0 0">新概念英语 1</h1>
-  <div class="sec"><div class="item"><img class="bk2" src="covers/nce1_s.jpg" alt="新概念英语 1" style="width:66px;height:88px;border-radius:12px">
-    <div class="tt"><div class="en">教材数据准备中</div><div class="meta">144 课 · 音频对齐与课件制作进行中，敬请期待</div></div></div></div>`;
+  <h1 style="margin:4px 0 0">${esc(c.name)}</h1>
+  <div class="sec"><div class="item"><img class="bk2" src="${c.cover}" alt="${esc(c.name)}" style="width:66px;height:88px;border-radius:12px">
+    <div class="tt"><div class="en">教材数据准备中</div><div class="meta">${c.lessons||''} 课 · 音频对齐与课件制作进行中，敬请期待</div></div></div></div>`;
 }
 function renderHome(){
-  const due=dueList();
-  const total=96, learned=Object.keys(PROG).filter(k=>PROG[k].firstLearnAt).length;
-  const done=Object.keys(PROG).filter(k=>PROG[k].reviews>=OFFSETS.length).length;
-  let cont=0,best=-1;
-  for(const k in PROG){ const p=PROG[k]; const sc=p.stage*100+(p.si||0); if(sc>best){best=sc;cont=+k;} }
-  const lastTouched=Object.keys(PROG).map(Number).sort((a,b)=>b-a)[0]||1;
+  const cid=curCourse();
+  const c=catCourse(cid)||{lessons:96,name:'新概念英语 2',tag:'NCE2 Loop',cover:'covers/nce2_s.jpg'};
+  const total=c.lessons||96;
+  const due=dueList(cid);
+  const s=progStat(cid);
+  const learned=s.learned, done=s.done, cont=s.cont;
+  const nxt=cont?(cont+1<=total?cont+1:1):1;
   let h=`<a href="#/home" style="color:var(--sub);text-decoration:none;font-size:14px">← 课程中心</a>
-  <h1 style="margin:4px 0 0;display:flex;align-items:center;gap:8px"><img src="covers/nce2_s.jpg" alt="" style="width:28px;height:37px;border-radius:8px;object-fit:cover;border:0.5px solid var(--line);background:#F1F3F5">新概念英语 2 <span style="font-size:12px;color:var(--sub);font-weight:400">NCE2 Loop</span></h1>
+  <h1 style="margin:4px 0 0;display:flex;align-items:center;gap:8px"><img src="${c.cover}" alt="" style="width:28px;height:37px;border-radius:8px;object-fit:cover;border:0.5px solid var(--line);background:#F1F3F5">${esc(c.name)} <span style="font-size:12px;color:var(--sub);font-weight:400">${esc(c.tag||'')}</span></h1>
   <div class="sec"><h2>今天要处理 ${tipQ('sched','到期复习由系统自动排程：学完一课后，按 6小时 → 1天 → 2天 → 4天 → 7天 → 14天 → 28天 排 7 轮复习。')}</h2>`;
   if(due.length){
     h+=due.map(d=>`<div class="item"><div class="tt"><div class="en">L${d.no} · 第 ${d.round} 轮复习</div>
       <div class="meta">${d.overdueDays>0?`<span class="late">已逾期 ${d.overdueDays} 天</span>`:'今日到期'} · 盲听+难句补练+复述</div></div>
-      <button class="btn sm" data-go="#/lesson/${d.no}?m=rev">开始复习</button></div>`).join('');
+      <button class="btn sm" data-go="${lessonHref(d.no,cid,'rev')}">开始复习</button></div>`).join('');
   }else{
     h+=`<div class="empty">今天没有到期的复习，${learned?'学一课新的吧':'从 L01 开始吧'}</div>`;
   }
   h+=`</div>
   <div class="sec"><h2>继续学习</h2>
     <div class="item"><div class="tt"><div class="en">L${cont||1}${cont?'':'（未开始）'}</div>
-      <div class="meta">已学 ${learned}/96 · 通关 ${done}/96</div></div>
-      <button class="btn sm" data-go="#/lesson/${cont||1}">${learned?'继续':'开始'}</button>
-      <button class="btn sm g" data-go="#/lesson/${cont?cont+1<=96?cont+1:1:1}">下一课</button></div>
+      <div class="meta">已学 ${learned}/${total} · 通关 ${done}/${total}</div></div>
+      <button class="btn sm" data-go="${lessonHref(cont||1,cid)}">${learned?'继续':'开始'}</button>
+      <button class="btn sm g" data-go="${lessonHref(nxt,cid)}">下一课</button></div>
     <div class="bar" style="margin-top:10px"><i style="width:${Math.round(learned*100/total)}%"></i></div>
     <div class="tip" style="margin-top:4px">总进度 ${Math.round(learned*100/total)}%</div>
     <div style="margin-top:10px"><button class="btn sm g" id="homeOlBtn">📥 下载离线包</button>
@@ -673,13 +758,17 @@ function renderHome(){
   refreshOlUI();
 }
 function cells(){
-  const dueSet=new Set(dueList().map(d=>d.no));
+  const cid=curCourse();
+  const c=catCourse(cid)||{lessons:96};
+  const total=c.lessons||96;
+  const dueSet=new Set(dueList(cid).map(d=>d.no));
+  const o=progOf(cid);
   let h='';
-  for(let n=1;n<=96;n++){
-    const p=PROG[n], cls=p?(p.reviews>=OFFSETS.length?'done':p.firstLearnAt?'doing':''):'';
+  for(let n=1;n<=total;n++){
+    const p=o[n], cls=p?(p.reviews>=OFFSETS.length?'done':p.firstLearnAt?'doing':''):'';
     const due=dueSet.has(n);
     const label=(p&&p.firstLearnAt)?(p.reviews>=OFFSETS.length?'通关':'第'+(p.reviews+1)+'轮'):'未学';
-    h+=`<div class="cell ${cls} ${due?'due':''}" data-go="#/lesson/${n}" data-t="${(TITLES[n-1]||'').toLowerCase()}"><b>L${n}</b><span>${label}</span></div>`;
+    h+=`<div class="cell ${cls} ${due?'due':''}" data-go="${lessonHref(n,cid)}" data-t="${(TITLES[n-1]||'').toLowerCase()}"><b>L${n}</b><span>${label}</span></div>`;
   }
   return h;
 }
@@ -856,6 +945,7 @@ document.addEventListener('click',async e=>{
   const el=e.target.closest('[data-act]');
   if(!el||!CUR.data) return;
   const act=el.dataset.act, i=+el.dataset.i, p=prog(CUR.no), d=CUR.data;
+  const cid=curCourse();
   const rev=CUR.mode==='rev';   /* P0 修复：rev 从未定义，plays 点击必抛 ReferenceError（自 f52a179 潜伏） */
   if(act==='plays'){
     const s=d.sentences[i];
@@ -874,8 +964,8 @@ document.addEventListener('click',async e=>{
   else if(act==='det'){ const z=$('#zh'+i),dt=$('#det'+i); if(z)z.style.display=z.style.display==='none'?'block':'none'; if(dt)dt.style.display=dt.style.display==='none'?'block':'none'; }
   else if(act==='star'){
     const arr=p.hard, ix=arr.indexOf(i);
-    if(ix>=0){arr.splice(ix,1); store.setHard(store.getHard().filter(x=>!(x.no===CUR.no&&x.i===i)));}
-    else{arr.push(i); const s=d.sentences[i]; const hard=store.getHard(); hard.unshift({no:CUR.no,i,en:s.en,zh:s.zh,pat:s.pat||'',ts:Date.now()}); store.setHard(hard);}
+    if(ix>=0){arr.splice(ix,1); store.setHard(hardAll().filter(x=>!(x.cid===cid&&x.no===CUR.no&&x.i===i)));}
+    else{arr.push(i); const s=d.sentences[i]; const hard=hardAll(); hard.unshift({cid,no:CUR.no,i,en:s.en,zh:s.zh,pat:s.pat||'',ts:Date.now()}); store.setHard(hard);}
     saveProgress(); el.classList.toggle('on');
   }
   else if(act==='loop'){ CUR.loops=+el.dataset.v; CUR.loopsLeft=CUR.loops; refreshStage(); }
@@ -893,7 +983,7 @@ document.addEventListener('click',async e=>{
       REC.onstop=()=>{
         stream.getTracks().forEach(t=>t.stop());
         CUR.blob=new Blob(RECCHUNKS,{type:REC.mimeType||'audio/webm'});
-        const key=el.dataset.retell?`${CUR.no}_retell`:`${CUR.no}_s${CUR.si}`;
+        const key=el.dataset.retell?`${cid}_${CUR.no}_retell`:`${cid}_${CUR.no}_s${CUR.si}`;
         recSave(key,CUR.blob);
         STATS.recN=(STATS.recN||0)+1; saveStats();
         el.textContent='● 录跟读'; el.classList.remove('recording');
@@ -943,13 +1033,13 @@ document.addEventListener('click',async e=>{
 
 /* ================= 难句本 ================= */
 function renderHard(){
-  const hard=store.getHard();
+  const hard=hardAll();
   let h=`<h1>难句本</h1><div class="sec"><h2>难句本 ${tipQ('hard','精听时点 ★ 收藏的句子都汇总在这里，点「重练」回到原课再练一遍。')}</h2>`;
   if(!hard.length) h+='<div class="empty">还没有收藏，去精听里点亮星星吧</div>';
   h+=hard.map((x,ix)=>`<div class="item">
     <div class="tt"><div class="en">${esc(x.en)}</div>
       <div class="zh">${esc(x.zh)}${x.pat?` · <span class="tag">${esc(x.pat)}</span>`:''} · L${x.no}</div></div>
-    <button class="btn sm g" data-act="goSent" data-no="${x.no}" data-i="${x.i}">重练</button>
+    <button class="btn sm g" data-act="goSent" data-no="${x.no}" data-c="${x.cid||DEF_COURSE}" data-i="${x.i}">重练</button>
     <button class="star on" data-act="unstar" data-ix="${ix}">★</button></div>`).join('');
   h+='</div>';
   $('#app').innerHTML=h;
@@ -957,7 +1047,7 @@ function renderHard(){
 /* ================= 闪卡 ================= */
 function renderCards(){
   const now=Date.now();
-  const hard=store.getHard().slice().sort((a,b)=>(a.due||0)-(b.due||0));
+  const hard=hardAll().slice().sort((a,b)=>(a.due||0)-(b.due||0));
   const dueN=hard.filter(x=>!x.due||x.due<=now).length;
   let h=`<h1>语境闪卡 ${tipQ('cards','看中文回忆英文 → 点卡翻转核对 → 自评。没记住的 12 小时后再出现，记住了 3 天后再见。')}</h1><div class="tip">今日待复习 ${dueN} 张。</div>`;
   if(!hard.length){ h+='<div class="sec"><div class="empty">收藏难句后，这里会自动生成卡片</div></div>'; $('#app').innerHTML=h; return; }
@@ -967,7 +1057,7 @@ function renderCards(){
         <div class="tip" style="margin-top:8px">L${x.no} ${x.pat?'· '+esc(x.pat):''}</div></div>
       <div class="b"><div class="pill" style="background:#DBE4FF">原句</div>
         <div class="en" style="font-family:Georgia,'Times New Roman',serif;font-size:18px;margin-top:8px">${esc(x.en)}</div>
-        <div class="tip" style="margin-top:8px"><button class="btn sm g" data-act="cardplay" data-no="${x.no}" data-i="${x.i}">🔊 语境重听</button></div>
+        <div class="tip" style="margin-top:8px"><button class="btn sm g" data-act="cardplay" data-no="${x.no}" data-c="${x.cid||DEF_COURSE}" data-i="${x.i}">🔊 语境重听</button></div>
         <div style="display:flex;gap:8px;margin-top:10px">
           <button class="btn sm" style="flex:1" data-act="cardno" data-ix="${ix}">没记住</button>
           <button class="btn sm ok" style="flex:1;background:var(--ok)" data-act="cardok" data-ix="${ix}">记住了</button></div></div>
@@ -986,9 +1076,9 @@ function ringSvg(id,pct,color,label){
 }
 function renderMe(){
   if(!window.EL2SESS){ location.hash='#/home'; return; }
-  const learned=Object.keys(PROG).filter(k=>PROG[k].firstLearnAt).length;
-  const done=Object.keys(PROG).filter(k=>PROG[k].reviews>=OFFSETS.length).length;
-  const rounds=Object.values(PROG).reduce((a,p)=>a+(p.reviews||0),0);
+  const ag=progStatAll();
+  const learned=ag.learned, done=ag.done, rounds=ag.rounds;
+  const totLearn=myCourses().reduce((a,id)=>a+((catCourse(id)||{}).lessons||0),0)||96;
   const mins=Math.round((STATS.playSec||0)/60);
   let h=`<h1>我的</h1>
   <div class="sec"><h2>账号</h2><div class="item"><div class="tt">
@@ -1001,7 +1091,7 @@ function renderMe(){
     <button class="btn" id="olBtn" style="margin-top:4px">下载离线包</button>
     <div class="tip" style="margin-top:8px">下载后出门、断网都能正常学习；点「更新」可拉取最新课文数据。</div></div>
   <div class="sec"><h2>学习概览</h2>
-    <div class="item"><div class="tt"><div class="en">已学 ${learned}/96 · 通关 ${done}/96</div>
+    <div class="item"><div class="tt"><div class="en">已学 ${learned}/${totLearn} · 通关 ${done}/${totLearn}</div>
       <div class="meta">累计复习 ${rounds} 轮 · 累计听读 ${mins} 分钟</div></div></div>
     <div class="tip">现在已登录，学的内容会自动同步 ✓</div></div>
   <div class="sec"><button class="btn" id="meOut2">退出登录</button>
@@ -1095,9 +1185,9 @@ window.dlOffline=function(){
   return dlCourse('nce2');
 };
 function renderStats(){
-  const learned=Object.keys(PROG).filter(k=>PROG[k].firstLearnAt).length;
-  const done=Object.keys(PROG).filter(k=>PROG[k].reviews>=OFFSETS.length).length;
-  const rounds=Object.values(PROG).reduce((a,p)=>a+(p.reviews||0),0);
+  const ag=progStatAll();
+  const learned=ag.learned, done=ag.done, rounds=ag.rounds;
+  const totLearn=myCourses().reduce((a,id)=>a+((catCourse(id)||{}).lessons||0),0)||96;
   const due=dueList().length;
   const mins=Math.round((STATS.playSec||0)/60);
   const days=[...Array(7)].map((_,k)=>{ const d=new Date(Date.now()-(6-k)*864e5);
@@ -1106,8 +1196,8 @@ function renderStats(){
   const max=Math.max(5,...days.map(x=>x.v));
   let h=`<h1>学习统计</h1>
   <div class="sec"><div style="display:flex;justify-content:space-around">
-    ${ringSvg('a',Math.round(learned*100/96),'#4C6EF5','已学')}${ringSvg('b',Math.round(done*100/96),'#12B886','通关')}${ringSvg('c',learned?Math.min(100,Math.round(rounds*100/(learned*7))):0,'#F59F00','复习')}</div>
-    <div class="tip" style="text-align:center;margin-top:6px">已学 ${learned}/96 · 通关 ${done}/96 · 复习 ${rounds} 轮 · 待复习 ${due} 课</div></div>
+    ${ringSvg('a',Math.round(learned*100/totLearn),'#4C6EF5','已学')}${ringSvg('b',Math.round(done*100/totLearn),'#12B886','通关')}${ringSvg('c',learned?Math.min(100,Math.round(rounds*100/(learned*7))):0,'#F59F00','复习')}</div>
+    <div class="tip" style="text-align:center;margin-top:6px">已学 ${learned}/${totLearn} · 通关 ${done}/${totLearn} · 复习 ${rounds} 轮 · 待复习 ${due} 课</div></div>
   <div class="sec"><h2>近 7 天练习（分钟）</h2>
     <div style="display:flex;align-items:flex-end;gap:8px;height:120px;padding:0 4px">
       ${days.map(x=>`<div style="flex:1;text-align:center"><div style="font-size:12px;color:var(--sub)">${x.v||''}</div>
@@ -1152,24 +1242,29 @@ document.addEventListener('click',e=>{
   if(act==='retellhint'){ CUR.retellHint=!CUR.retellHint; renderLesson(); return; }
   if(act==='tipq'){ const dEl=document.getElementById('tipd-'+el.dataset.tk); if(dEl) dEl.style.display=dEl.style.display==='none'?'block':'none'; return; }
   if(act==='cardok'||act==='cardno'){
-    const hard=store.getHard(); const it=hard[+el.dataset.ix]; if(!it) return;
+    const hard=hardAll(); const it=hard[+el.dataset.ix]; if(!it) return;
     it.due = Date.now() + (act==='cardok'?3*864e5:12*36e5);
     store.setHard(hard);
     const cd=el.closest('.card'); cd.classList.remove('flip'); cd.style.opacity=.4; cd.style.pointerEvents='none';
     return;
   }
   if(act==='flip'){ el.classList.toggle('flip'); }
-  else if(act==='goSent'){ location.hash='#/lesson/'+el.dataset.no; CUR.afterRender=()=>{ prog(+el.dataset.no).stage=0; renderLesson(); }; }
+  else if(act==='goSent'){
+    const c = el.dataset.c||DEF_COURSE;
+    location.hash=lessonHref(+el.dataset.no,c);
+    CUR.afterRender=()=>{ prog(+el.dataset.no,c).stage=0; renderLesson(); };
+  }
   else if(act==='unstar'){
-    const hard=store.getHard(); const it=hard.splice(+el.dataset.ix,1)[0];
+    const hard=hardAll(); const it=hard.splice(+el.dataset.ix,1)[0];
     store.setHard(hard);
-    if(it&&PROG[it.no]){ const arr=PROG[it.no].hard; const k=arr.indexOf(it.i); if(k>=0){arr.splice(k,1); saveProgress();} }
+    if(it){ const o=progOf(it.cid||DEF_COURSE)[it.no];
+      if(o&&o.hard){ const k=o.hard.indexOf(it.i); if(k>=0){ o.hard.splice(k,1); saveProgress(); } } }
     renderHard();
   }
-  else if(act==='cardplay'){ (async()=>{ const d=await loadLesson(+el.dataset.no);
+  else if(act==='cardplay'){ (async()=>{ const d=await loadLesson(+el.dataset.no, el.dataset.c);
       const s=d.sentences[+el.dataset.i]; if(s) playSeg(s.t,s.t2,null,audioSrcOf(d.audio)); })(); }
   else if(act==='exp'){
-    const blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),progress:PROG,hard:store.getHard(),stats:STATS},null,2)],{type:'application/json'});
+    const blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),v:3,progress:PROG,hard:hardAll(),stats:STATS},null,2)],{type:'application/json'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='nce2_loop备份_'+todayStr()+'.json'; a.click();
     setTimeout(()=>URL.revokeObjectURL(a.href),2000);
   }
@@ -1177,7 +1272,7 @@ document.addEventListener('click',e=>{
   else if(act==='clr'){
     if(!confirm('确定清空全部学习记录？（课程文件不受影响）')) return;
     if(!confirm('再次确认：此操作不可恢复！')) return;
-    PROG={}; STATS={playSec:0,shadowN:0,recN:0,days:{}}; store.setHard([]);
+    PROG={_v:3,courses:{}}; STATS={playSec:0,shadowN:0,recN:0,days:{}}; store.setHard([]);
     saveProgress(); saveStats(); renderStats();
   }
 });
@@ -1185,8 +1280,8 @@ document.addEventListener('change',e=>{
   if(e.target&&e.target.id==='impFile'&&e.target.files[0]){
     const fr=new FileReader();
     fr.onload=()=>{ try{ const d=JSON.parse(fr.result);
-        if(d.progress){ PROG=d.progress; saveProgress(); }
-        if(d.hard){ store.setHard(d.hard); }
+        if(d.progress){ PROG=migrateProg(d.progress); saveProgress(); }   /* 旧格式备份也能导入 */
+        if(d.hard){ const a=d.hard.map(x=>Object.assign({cid:DEF_COURSE},x)); store.setHard(a); }
         if(d.stats){ STATS=Object.assign({playSec:0,shadowN:0,recN:0,days:{}},d.stats); saveStats(); }
         alert('已导入'); location.hash='#/home'; router();
       }catch(err){ alert('导入失败：'+err.message); } };
@@ -1215,6 +1310,7 @@ function resumeDl(){
     const s=dlGet(id); if(s&&s.state==='run') dlCourse(id);
   }); }, 1200);
 }
+hardAll();                                 /* 难句本补 cid（v3 迁移），顺手落盘 */
 router();                                  /* 先用内嵌清单渲染，秒开 */
 loadCatalog().then(verifyAll).then(()=>{ router(); resumeDl(); }).catch(()=>{});
 }
