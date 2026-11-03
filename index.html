@@ -87,9 +87,8 @@ nav.tabs a.on{color:var(--acc)}
  margin:calc(-14px - env(safe-area-inset-top,0px)) calc(-14px - env(safe-area-inset-right,0px)) 6px calc(-14px - env(safe-area-inset-left,0px));
  padding:calc(14px + env(safe-area-inset-top,0px)) calc(14px + env(safe-area-inset-right,0px)) 10px calc(14px + env(safe-area-inset-left,0px));
  background:var(--bg);border-bottom:1px solid var(--line)}
-.tbBack{flex:0 0 auto;min-width:52px;color:var(--sub);text-decoration:none;font-size:15px;white-space:nowrap}
+.tbBack{flex:0 0 auto;min-width:52px;text-align:right;color:var(--accBtn);font-weight:600;text-decoration:none;font-size:15px;white-space:nowrap;padding:6px 0 6px 10px}
 .ttitle{flex:1;min-width:0;font-size:18px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tspace{flex:0 0 52px}
 .topbar h1{font-size:22px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hbtn{border:1.5px solid var(--acc);color:var(--accBtn);background:#fff;border-radius:999px;padding:0 16px;height:46px;font-size:15px;font-family:inherit;cursor:pointer;white-space:nowrap}
 .coGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
@@ -748,9 +747,8 @@ function renderStore(){
   const cs=catList();
   const codes=(CATALOG&&CATALOG.codes)||[];
   let h=`<div class="topbar">
-    <a class="tbBack" href="#/home">‹ 返回</a>
     <div class="ttitle">课程库</div>
-    <span class="tspace"></span></div>
+    <a class="tbBack" href="#/home">‹ 返回</a></div>
   <div class="tip" style="margin-bottom:12px">点封面：添加并自动下载 · 下载中再点暂停 · 长按封面移除。</div>
   <div class="coGrid">${cs.map(renderStoreCard).join('')}</div>`;
   if(codes.length){
@@ -764,8 +762,8 @@ function renderStore(){
 }
 function renderCourseSoon(cid){
   const c=catCourse(cid||'nce1')||{id:'nce1',name:'新概念英语 1',cover:'covers/nce1_s.jpg',lessons:144};
-  $('#app').innerHTML=`<div class="topbar"><a class="tbBack" href="#/home">‹ 返回</a>
-  <div class="ttitle">${esc(c.name)}</div><span class="tspace"></span></div>
+  $('#app').innerHTML=`<div class="topbar">
+  <div class="ttitle">${esc(c.name)}</div><a class="tbBack" href="#/home">‹ 返回</a></div>
   <div class="sec"><div class="item"><img class="bk2" src="${c.cover}" alt="${esc(c.name)}" style="width:66px;height:88px;border-radius:12px">
     <div class="tt"><div class="en">教材数据准备中</div><div class="meta">${c.lessons||''} 课 · 音频对齐与课件制作进行中，敬请期待</div></div></div></div>`;
 }
@@ -777,9 +775,9 @@ function renderHome(){
   const s=progStat(cid);
   const learned=s.learned, done=s.done, cont=s.cont;
   const nxt=cont?(cont+1<=total?cont+1:1):1;
-  let h=`<div class="topbar"><a class="tbBack" href="#/home">‹ 返回</a>
+  let h=`<div class="topbar">
     <h1 style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;font-size:19px;overflow:hidden"><img src="${c.cover}" alt="" style="width:24px;height:32px;border-radius:6px;object-fit:cover;border:0.5px solid var(--line);background:#F1F3F5;flex:0 0 24px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</span> <span style="font-size:12px;color:var(--sub);font-weight:400;flex:0 0 auto">${esc(c.tag||'')}</span></h1>
-    <span class="tspace"></span></div>
+    <a class="tbBack" href="#/home">‹ 返回</a></div>
   <div class="sec"><h2>今天要处理 ${tipQ('sched','到期复习由系统自动排程：学完一课后，按 6小时 → 1天 → 2天 → 4天 → 7天 → 14天 → 28天 排 7 轮复习。')}</h2>`;
   if(due.length){
     h+=due.map(d=>`<div class="item"><div class="tt"><div class="en">L${d.no} · 第 ${d.round} 轮</div>
@@ -854,9 +852,9 @@ function renderLesson(){
   const steps=rev?['盲听','难句补练','复述']:STAGES;
   if(rev&&CUR.rstep==null) CUR.rstep=0;
   const cur=rev?CUR.rstep:(p.stage??0);
-  let h=`<div class="topbar"><a class="tbBack" href="#/c/${curCourse()}">‹ 返回</a>
+  let h=`<div class="topbar">
     <h1 style="flex:1;min-width:0;font-size:19px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">L${d.no} · ${esc(d.title)}</h1>
-    <span class="tspace"></span></div>
+    <a class="tbBack" href="#/c/${curCourse()}">‹ 返回</a></div>
   <div class="tip">${esc(d.titleZh)} · ${d.sentences.length} 句 ${rev?`· 第 ${p.reviews+1} 轮`:''}</div>
   <div class="stepper">${steps.map((s,i)=>`<div class="st s${rev?[0,2,3][i]:i} ${i===cur?'on':''}" data-act="jump" data-v="${i}">${s}</div>`).join('')}</div>
   <div id="stage"></div>`;
