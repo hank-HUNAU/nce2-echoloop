@@ -81,7 +81,15 @@ nav.tabs a.on{color:var(--acc)}
 .bk2{width:56px;height:74px;border-radius:10px;object-fit:cover;display:block;flex:0 0 56px;border:0.5px solid var(--color-border-tertiary, #E9ECEF);background:#F1F3F5}
 .blurred{filter:blur(9px);user-select:none;pointer-events:none;transition:filter .25s}
 /* 课程中心 / 课程库 */
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+/* 顶栏：所有页面统一——吸顶、压住刘海安全区、内容从其下方滚过 */
+.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:10px;
+ margin:calc(-14px - env(safe-area-inset-top,0px)) calc(-14px - env(safe-area-inset-right,0px)) 6px calc(-14px - env(safe-area-inset-left,0px));
+ padding:calc(14px + env(safe-area-inset-top,0px)) calc(14px + env(safe-area-inset-right,0px)) 10px calc(14px + env(safe-area-inset-left,0px));
+ background:var(--bg);border-bottom:1px solid var(--line)}
+.tbBack{flex:0 0 auto;min-width:52px;color:var(--sub);text-decoration:none;font-size:15px;white-space:nowrap}
+.ttitle{flex:1;min-width:0;font-size:18px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tspace{flex:0 0 52px}
+.topbar h1{font-size:22px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hbtn{border:1.5px solid var(--acc);color:var(--accBtn);background:#fff;border-radius:999px;padding:0 16px;height:46px;font-size:15px;font-family:inherit;cursor:pointer;white-space:nowrap}
 .coGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .coCard{border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px 10px 11px;text-align:center}
@@ -635,12 +643,12 @@ function renderCourses(){
   let h=`<div class="topbar"><h1>课程中心</h1><button class="hbtn" data-go="#/store">＋ 选择课程</button></div>
   <div class="sec"><h2>今日任务</h2>`;
   if(due.length){
-    h+=due.map(dd=>`<div class="item"><div class="tt"><div class="en">${esc((catCourse(dd.cid)||{}).name||dd.cid)} · L${dd.no} · 第 ${dd.round} 轮复习</div>
-      <div class="meta">${dd.overdueDays>0?`<span class="late">已逾期 ${dd.overdueDays} 天</span>`:'今日到期'} · 盲听+难句补练+复述</div></div>
-      <button class="btn sm" data-go="${lessonHref(dd.no,dd.cid,'rev')}">开始复习</button></div>`).join('');
+    h+=due.map(dd=>`<div class="item"><div class="tt"><div class="en">${esc((catCourse(dd.cid)||{}).name||dd.cid)} · L${dd.no} · 第 ${dd.round} 轮</div>
+      <div class="meta">${dd.overdueDays>0?`<span class="late">已逾期 ${dd.overdueDays} 天</span>`:'今日到期'}</div></div>
+      <button class="btn sm" data-go="${lessonHref(dd.no,dd.cid,'rev')}">开始</button></div>`).join('');
   }else{
     h+=`<div class="item"><div class="tt"><div class="en">${esc((catCourse(firstCid)||{}).name||firstCid)} · 继续精听 L${contNo}</div>
-      <div class="meta">今天没有到期复习，往下推进吧</div></div>
+      <div class="meta">今天没有到期复习</div></div>
       <button class="btn sm" data-go="${lessonHref(contNo,firstCid)}">继续 →</button></div>`;
   }
   h+=`</div>
@@ -653,7 +661,7 @@ function renderCourses(){
       const st=dlGet(c.id), ok=!!(st&&st.state==='done'), run=!!(st&&st.state==='run');
       const s=progStat(c.id), dn=dueList(c.id).length;
       const meta=c.ready
-        ? `已学 ${s.learned}/${c.lessons} · 到期复习 ${dn} 课`
+        ? `已学 ${s.learned}/${c.lessons} · 到期 ${dn} 课`
         : '教材数据准备中 · 敬请期待';
       let ofl='';
       if(c.ready){
@@ -721,24 +729,24 @@ function renderStore(){
   const cs=catList();
   const codes=(CATALOG&&CATALOG.codes)||[];
   let h=`<div class="topbar">
-    <a href="#/home" style="color:var(--sub);text-decoration:none;font-size:15px;min-width:56px">‹ 返回</a>
-    <b style="font-size:18px">课程库</b>
-    <a href="#/home" style="color:var(--sub);text-decoration:none;font-size:15px;min-width:56px;text-align:right">关闭</a></div>
-  <div class="tip" style="margin-bottom:12px">点「添加」即加入我的课程，并在后台自动下载音频与课件，可随时暂停。</div>
+    <a class="tbBack" href="#/home">‹ 返回</a>
+    <div class="ttitle">课程库</div>
+    <span class="tspace"></span></div>
+  <div class="tip" style="margin-bottom:12px">点「添加」即加入我的课程并自动下载，可随时暂停。</div>
   <div class="coGrid">${cs.map(renderStoreCard).join('')}</div>`;
   if(codes.length){
     h+=`<div class="sec"><h2>课程码</h2>
       <div class="codeRow"><input id="codeIn" placeholder="输入老师给的课程码" autocomplete="off" autocapitalize="characters">
         <button class="btn sm" data-act="codego" style="min-width:96px">添加</button></div>
-      <div class="tip" style="margin:8px 0 0">输入课程码可跳过挑选，直接加入我的课程并开始下载。</div></div>`;
+      <div class="tip" style="margin:8px 0 0">输入课程码直接加入对应课程并下载。</div></div>`;
   }
   h+=`<div class="foot">课程内容与音频会存到本机，断网也能学。</div>`;
   $('#app').innerHTML=h;
 }
 function renderCourseSoon(cid){
   const c=catCourse(cid||'nce1')||{id:'nce1',name:'新概念英语 1',cover:'covers/nce1_s.jpg',lessons:144};
-  $('#app').innerHTML=`<a href="#/home" style="color:var(--sub);text-decoration:none;font-size:14px">← 课程中心</a>
-  <h1 style="margin:4px 0 0">${esc(c.name)}</h1>
+  $('#app').innerHTML=`<div class="topbar"><a class="tbBack" href="#/home">‹ 返回</a>
+  <div class="ttitle">${esc(c.name)}</div><span class="tspace"></span></div>
   <div class="sec"><div class="item"><img class="bk2" src="${c.cover}" alt="${esc(c.name)}" style="width:66px;height:88px;border-radius:12px">
     <div class="tt"><div class="en">教材数据准备中</div><div class="meta">${c.lessons||''} 课 · 音频对齐与课件制作进行中，敬请期待</div></div></div></div>`;
 }
@@ -750,15 +758,16 @@ function renderHome(){
   const s=progStat(cid);
   const learned=s.learned, done=s.done, cont=s.cont;
   const nxt=cont?(cont+1<=total?cont+1:1):1;
-  let h=`<a href="#/home" style="color:var(--sub);text-decoration:none;font-size:14px">← 课程中心</a>
-  <h1 style="margin:4px 0 0;display:flex;align-items:center;gap:8px"><img src="${c.cover}" alt="" style="width:28px;height:37px;border-radius:8px;object-fit:cover;border:0.5px solid var(--line);background:#F1F3F5">${esc(c.name)} <span style="font-size:12px;color:var(--sub);font-weight:400">${esc(c.tag||'')}</span></h1>
+  let h=`<div class="topbar"><a class="tbBack" href="#/home">‹ 返回</a>
+    <h1 style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;font-size:19px;overflow:hidden"><img src="${c.cover}" alt="" style="width:24px;height:32px;border-radius:6px;object-fit:cover;border:0.5px solid var(--line);background:#F1F3F5;flex:0 0 24px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</span> <span style="font-size:12px;color:var(--sub);font-weight:400;flex:0 0 auto">${esc(c.tag||'')}</span></h1>
+    <span class="tspace"></span></div>
   <div class="sec"><h2>今天要处理 ${tipQ('sched','到期复习由系统自动排程：学完一课后，按 6小时 → 1天 → 2天 → 4天 → 7天 → 14天 → 28天 排 7 轮复习。')}</h2>`;
   if(due.length){
-    h+=due.map(d=>`<div class="item"><div class="tt"><div class="en">L${d.no} · 第 ${d.round} 轮复习</div>
-      <div class="meta">${d.overdueDays>0?`<span class="late">已逾期 ${d.overdueDays} 天</span>`:'今日到期'} · 盲听+难句补练+复述</div></div>
-      <button class="btn sm" data-go="${lessonHref(d.no,cid,'rev')}">开始复习</button></div>`).join('');
+    h+=due.map(d=>`<div class="item"><div class="tt"><div class="en">L${d.no} · 第 ${d.round} 轮</div>
+      <div class="meta">${d.overdueDays>0?`<span class="late">已逾期 ${d.overdueDays} 天</span>`:'今日到期'}</div></div>
+      <button class="btn sm" data-go="${lessonHref(d.no,cid,'rev')}">开始</button></div>`).join('');
   }else{
-    h+=`<div class="empty">今天没有到期的复习，${learned?'学一课新的吧':'从 L01 开始吧'}</div>`;
+    h+=`<div class="empty">今天没有到期复习，${learned?'学一课新的吧':'从 L01 开始吧'}</div>`;
   }
   h+=`</div>
   <div class="sec"><h2>继续学习</h2>
@@ -826,10 +835,10 @@ function renderLesson(){
   const steps=rev?['盲听','难句补练','复述']:STAGES;
   if(rev&&CUR.rstep==null) CUR.rstep=0;
   const cur=rev?CUR.rstep:(p.stage??0);
-  let h=`<div style="display:flex;align-items:center;gap:8px">
-    <a href="#/home" style="color:var(--sub);text-decoration:none;font-size:14px">← 首页</a>
-    <h1 style="flex:1">L${d.no} · ${esc(d.title)}</h1></div>
-  <div class="tip">${esc(d.titleZh)} · ${d.sentences.length} 句 ${rev?`· 第 ${p.reviews+1} 轮复习`:''}</div>
+  let h=`<div class="topbar"><a class="tbBack" href="#/c/${curCourse()}">‹ 返回</a>
+    <h1 style="flex:1;min-width:0;font-size:19px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">L${d.no} · ${esc(d.title)}</h1>
+    <span class="tspace"></span></div>
+  <div class="tip">${esc(d.titleZh)} · ${d.sentences.length} 句 ${rev?`· 第 ${p.reviews+1} 轮`:''}</div>
   <div class="stepper">${steps.map((s,i)=>`<div class="st s${rev?[0,2,3][i]:i} ${i===cur?'on':''}" data-act="jump" data-v="${i}">${s}</div>`).join('')}</div>
   <div id="stage"></div>`;
   $('#app').innerHTML=h;
@@ -939,16 +948,16 @@ function stageRetell(){
 function finBlock(){
   const p=prog(CUR.no), rev=CUR.mode==='rev';
   if(rev){
-    return `<div style="margin-top:10px"><button class="btn ok" data-act="revfin">✓ 完成第 ${p.reviews+1} 轮复习</button>
+    return `<div style="margin-top:10px"><button class="btn ok" data-act="revfin">✓ 完成第 ${p.reviews+1} 轮</button>
       <div class="tip" style="margin-top:6px">完成后自动排入下一轮：${p.reviews+1<OFFSETS.length?OFFSETS[p.reviews+1]+' 天后':'全部 7 轮已通关'}</div></div>`;
   }
   if(p.firstLearnAt){
     const nd=nextDue(p);
     return `<div class="detail" style="margin-top:10px">✓ 首次学习已完成（${fmtDate(new Date(p.firstLearnAt).toLocaleString())}）。
-      ${nd?`下一轮复习：<b>${fmtDate(new Date(nd).toLocaleString())}</b>`:'7 轮复习全部完成，本课通关 🎉'}
+      ${nd?`下一轮：<b>${fmtDate(new Date(nd).toLocaleString())}</b>`:'7 轮复习全部完成，本课通关 🎉'}
       <div style="margin-top:8px"><a href="#/home" class="btn sm g" style="text-decoration:none">回首页</a></div></div>`;
   }
-  return `<div style="margin-top:10px"><button class="btn ok" data-act="fin">✓ 完成本课首次学习（排入 7 轮复习）</button></div>`;
+  return `<div style="margin-top:10px"><button class="btn ok" data-act="fin">✓ 完成本课</button></div>`;
 }
 /* —— 难句补练（复习模式第 2 步） —— */
 function stageHardDrill(){
@@ -1068,7 +1077,8 @@ function hardScopeTip(){
 }
 function renderHard(){
   const hard=hardList();
-  let h=`<h1>难句本</h1><div class="sec"><h2>难句本 ${tipQ('hard','精听时点 ★ 收藏的句子都汇总在这里，点「重练」回到原课再练一遍。')}</h2>${hardChips()}${hardScopeTip()}`;
+  let h=`<div class="topbar"><h1>难句本 ${tipQ('hard','精听时点 ★ 收藏的句子都汇总在这里，点「重练」回到原课再练一遍。')}</h1></div>
+  <div class="sec">${hardChips()}${hardScopeTip()}`;
   if(!hard.length) h+= HARDF==='all'
     ? '<div class="empty">还没有收藏，去精听里点亮星星吧</div>'
     : '<div class="empty">这门课还没有收藏的难句</div>';
@@ -1087,7 +1097,7 @@ function renderCards(){
   const now=Date.now();
   const hard=hardList().slice().sort((a,b)=>(a.due||0)-(b.due||0));
   const dueN=hard.filter(x=>!x.due||x.due<=now).length;
-  let h=`<h1>语境闪卡 ${tipQ('cards','看中文回忆英文 → 点卡翻转核对 → 自评。没记住的 12 小时后再出现，记住了 3 天后再见。')}</h1>
+  let h=`<div class="topbar"><h1>语境闪卡 ${tipQ('cards','看中文回忆英文 → 点卡翻转核对 → 自评。没记住的 12 小时后再出现，记住了 3 天后再见。')}</h1></div>
   ${hardChips()}${hardScopeTip()}<div class="tip">今日待复习 ${dueN} / ${hard.length} 张。</div>`;
   if(!hard.length){ h+=`<div class="sec"><div class="empty">${HARDF==='all'?'收藏难句后，这里会自动生成卡片':'这门课还没有收藏的难句'}</div></div>`; $('#app').innerHTML=h; return; }
   h+='<div id="deck">'+hard.map((x,ix)=>`
@@ -1142,7 +1152,7 @@ function renderMe(){
   const readyCs=my.map(id=>catCourse(id)).filter(c=>c&&c.ready&&(dlGet(c.id)||{}).state==='done');
   const readyMB=readyCs.reduce((a,c)=>a+(c.sizeMB||0),0);
 
-  let h=`<h1>我的</h1>`;
+  let h=`<div class="topbar"><h1>我的</h1></div>`;
   /* ① 账号（未登录=页内登录卡，不再单独占一个 tab） */
   if(sess){
     h+=`<div class="sec"><h2>账号</h2>
@@ -1152,7 +1162,7 @@ function renderMe(){
   }else{
     h+=`<div class="sec"><h2>登录</h2>
       <div class="item"><div class="tt"><div class="en">还没有登录</div>
-        <div class="meta">登录后学习记录同步给家长和老师；不登录也能学，记录只存在这台设备上</div></div>
+        <div class="meta">登录后学习记录同步给家长和老师；不登录也能学。</div></div>
         <button class="btn sm" data-act="melogin">登录</button></div></div>`;
   }
   /* ② 学习概览 */
@@ -1174,7 +1184,7 @@ function renderMe(){
   h+=`<div class="sec"><h2>离线包 ${tipQ('ofl','下载后断网也能学。在课程库里点「移除」只释放文件，学习进度与难句本都会保留。')}</h2>
     ${my.map(id=>catCourse(id)).filter(c=>c&&c.ready).map(meOfflineRow).join('')||'<div class="empty">还没有可下载的课程</div>'}
     <div class="tip" style="margin-top:8px">已下载 ${readyCs.length} 门 · 约 ${readyMB}MB</div>
-    <div style="margin-top:8px"><button class="btn sm g" data-go="#/store">管理课程与离线包</button></div></div>`;
+    <div style="margin-top:8px"><button class="btn sm g" data-go="#/store">去课程库管理</button></div></div>`;
   /* ⑤ 数据管理（打印时排除） */
   h+=`<div class="sec no-print"><h2>数据管理</h2><div class="tip">换新平板前，先点「导出备份」保存记录。</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">

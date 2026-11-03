@@ -26,7 +26,7 @@ const { chromium } = require('playwright');
   await page.waitForTimeout(600);
   const r2 = await page.evaluate(() => {
     const hm = document.querySelector('nav.tabs a[href="#/home"]');
-    return { badgeGone: !(hm && hm.querySelector('.bdg')), dueCard: document.body.innerText.includes('第 2 轮复习') };
+    return { badgeGone: !(hm && hm.querySelector('.bdg')), dueCard: document.body.innerText.includes('第 2 轮') };
   });
   console.log(JSON.stringify({ ...r, ...r2, errs: errs.length }, null, 1));
   await browser.close();
