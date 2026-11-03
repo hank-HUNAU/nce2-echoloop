@@ -1115,8 +1115,8 @@ function renderCards(){
   ${hardChips()}${hardScopeTip()}<div class="tip">今日待复习 ${dueN} / ${hard.length} 张。</div>`;
   if(!hard.length){ h+=`<div class="sec"><div class="empty">${HARDF==='all'?'收藏难句后，这里会自动生成卡片':'这门课还没有收藏的难句'}</div></div>`; $('#app').innerHTML=h; return; }
   const IC_SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>';
-  const IC_NO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>';
-  const IC_OK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg>';
+  const IC_NO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 9l-6 6M9 9l6 6"/></svg>';
+  const IC_OK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12.5l2.7 2.7L16 9.5"/></svg>';
   h+='<div id="deck">'+hard.map((x,ix)=>`
     <div class="card" data-act="flip" data-ix="${ix}" style="${(x.due&&x.due>now)?'opacity:.55':''}"><div class="in">
       <div class="f"><div style="font-size:20px;font-weight:700">${esc(x.zh)||'（无译文）'}</div></div>
